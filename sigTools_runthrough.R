@@ -90,7 +90,7 @@ write.table(
     "HRD_point"=HRDetect_res$hrdetect_output[8],
     quantiles
   ),
-  file = paste(wkdir,sample_name,".hrd.txt")
+  file = paste(wkdir,sample_name,".sigtools.hrd.txt")
 )
 
 #sigsToUse <- getOrganSignatures(tissue,typemut = "subs") 
