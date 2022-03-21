@@ -1,7 +1,6 @@
 
 
-ssh ugehn01.hpc.oicr.on.ca
-qrsh -P gsi -l h_vmem=10G -q u18build
+
 
 
 wrkdir=/.mounts/labs/CGI/scratch/fbeaudry/sigTools_test/
@@ -14,9 +13,8 @@ VAF=15
 
 HRDtissue=Ovary
 
-#for sampleRoot in OCT_010359
-#do
-sampleRoot=OCT_010958
+for sampleRoot in OCT_011223
+do
 
 module load grch38-alldifficultregions hg38/p12
 
@@ -67,5 +65,5 @@ tail -n +2 ${studyLocation}/${study}/${sampleRoot}/gammas/${gamma}/${sampleRoot}
 module unload gatk rstats
 module load sigtools
 
-Rscript --vanilla ~/sigtools_workflow/sigTools_runthrough.R ${sampleRoot}  ${HRDtissue} ${wrkdir} ${VAF}
-#done
+Rscript --vanilla ~/sigtools_workflow/sigTools_runthrough.R ${sampleRoot}  ${HRDtissue} ${wrkdir} ${VAF} 2>${wrkdir}/sigTools_runthrough.err
+done
