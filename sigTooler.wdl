@@ -8,6 +8,9 @@ workflow sigTooler {
     	File smallsVcfIndex
 
     	File segFile
+
+    	String VAF
+    	String tissue
 	}
 
 	call filterStructural {
