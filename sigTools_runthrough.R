@@ -19,11 +19,12 @@ args = commandArgs(trailingOnly=TRUE)
 sample_name <- args[1]
 tissue <- args[2]
 wkdir <- args[3]
+VAF <- args[4]
 
 ####SNV####
 print("reading SNV file... this is the longest step")
 snvFile_loc <- paste(wkdir,sample_name,
-                     ".filter.deduped.realigned.recalibrated.mutect2.SNP.vcf.gz",sep="")
+                     ".filter.deduped.realigned.recalibrated.mutect2.MAF",VAF,".SNP.vcf.gz",sep="")
 
 snv_catalogue <- vcfToSNVcatalogue(vcfFilename = snvFile_loc,genome.v = "hg38")
 print("SNV cataloguing done")
@@ -32,12 +33,12 @@ snv_catalogue_reformat <- sigTools_formatter(input=snv_catalogue,sampleName=samp
 
 ####indel####
 indel_vcf_file <- paste(wkdir,sample_name,
-                        ".filter.deduped.realigned.recalibrated.mutect2.INDEL.vcf.gz",sep="")
+                        ".filter.deduped.realigned.recalibrated.mutect2.MAF",VAF,".INDEL.vcf.gz",sep="")
 names(indel_vcf_file)[1] <- sample_name
 
 ####structural variants####
 SV_bedpe <- read.table(paste(wkdir,sample_name,
-                               ".somatic.delly.merged.reformat.bedpe",sep=""),
+                               ".somatic.delly.merged.MAF",VAF,".bedpe",sep=""),
                        sep = "\t",header = TRUE,
                        stringsAsFactors = FALSE,check.names = FALSE)
 
