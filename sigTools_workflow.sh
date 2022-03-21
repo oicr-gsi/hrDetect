@@ -1,8 +1,4 @@
 
-
-
-
-
 wrkdir=/.mounts/labs/CGI/scratch/fbeaudry/sigTools_test/
 cd $wrkdir
 
@@ -13,7 +9,7 @@ VAF=15
 
 HRDtissue=Ovary
 
-for sampleRoot in OCT_011223
+for sampleRoot in OCT_010867 OCT_010638 OCT_010497 OCT_010707
 do
 
 module load grch38-alldifficultregions hg38/p12
@@ -23,6 +19,8 @@ module load grch38-alldifficultregions hg38/p12
 
 SNV_file=$(zgrep ${study} $PROVREP | awk -v study="$study" -F "\t" '$2 == study' | grep ${sampleRoot} | grep filter.deduped.realigned.recalibrated.mutect2.vcf.gz | cut -f1,2,14,31,47 | sort -r  | uniq | awk '$6 !~ ".tbi" {print $6}' |  head -n 1)
 SV_file=$(zgrep ${study} $PROVREP | awk -v study="$study" -F "\t" '$2 == study' |  grep ${sampleRoot} | grep filtered.delly.merged.vcf.gz  | cut -f1,2,14,31,47 | sort -r  | uniq | awk '$6 !~ ".tbi" {print $6}' |  head -n 1 )
+
+module unload sigtools rstats
 
 module load gatk tabix bcftools  
 
