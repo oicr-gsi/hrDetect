@@ -2,7 +2,6 @@
 wrkdir=/.mounts/labs/CGI/scratch/fbeaudry/sigTools_test/
 cd $wrkdir
 
-
 VAF=01
 
 #HRDtissue=Pancreas
@@ -32,16 +31,24 @@ bcftools query -f "%CHROM\t%POS\t%INFO/END\t%FILTER\t%ALT\t%INFO/CIPOS\t%INFO/CI
 
 ##task No2 make seperate .vcf files for SNVs and indels 
 
-bcftools filter -i "(FORMAT/AD[0:1])/(FORMAT/AD[0:0]+FORMAT/AD[0:1]) >= 0.${VAF}" ${SNV_file} >${sampleRoot}.filter.deduped.realigned.recalibrated.mutect2.MAF${VAF}.vcf
-gatk IndexFeatureFile -I ${sampleRoot}.filter.deduped.realigned.recalibrated.mutect2.MAF${VAF}.vcf
+#gatk IndexFeatureFile -I ${sampleRoot}.filter.deduped.realigned.recalibrated.mutect2.MAF${VAF}.vcf
+
+indel_VAF=15
+SNP_VAF=10
 
 for varType in SNP INDEL
 do
+	gatk SelectVariants -R ${HG38_ROOT}/hg38_random.fa  --exclude-intervals ${GRCH38_ALLDIFFICULTREGIONS_ROOT}/GRCh38_alldifficultregions.bed -V ${SNV_file}  --select-type-to-include ${varType} -O ${sampleRoot}.filter.deduped.realigned.recalibrated.mutect2.${varType}.vcf
+done
 
-	gatk SelectVariants -R ${HG38_ROOT}/hg38_random.fa  --exclude-intervals ${GRCH38_ALLDIFFICULTREGIONS_ROOT}/GRCh38_alldifficultregions.bed -V ${sampleRoot}.filter.deduped.realigned.recalibrated.mutect2.MAF${VAF}.vcf  --select-type-to-include ${varType} -O ${sampleRoot}.filter.deduped.realigned.recalibrated.mutect2.MAF${VAF}.${varType}.vcf
+bcftools filter -i "(FORMAT/AD[0:1])/(FORMAT/AD[0:0]+FORMAT/AD[0:1]) >= 0.${indel_VAF}" ${sampleRoot}.filter.deduped.realigned.recalibrated.mutect2.INDEL.vcf >${sampleRoot}.filter.deduped.realigned.recalibrated.mutect2.INDEL.MAF${indel_VAF}.vcf
 
-	bgzip ${sampleRoot}.filter.deduped.realigned.recalibrated.mutect2.MAF${VAF}.${varType}.vcf
-	tabix -p vcf ${sampleRoot}.filter.deduped.realigned.recalibrated.mutect2.MAF${VAF}.${varType}.vcf.gz
+bcftools filter -i "(FORMAT/AD[0:1])/(FORMAT/AD[0:0]+FORMAT/AD[0:1]) >= 0.${SNP_VAF}" ${sampleRoot}.filter.deduped.realigned.recalibrated.mutect2.SNP.vcf >${sampleRoot}.filter.deduped.realigned.recalibrated.mutect2.SNP.MAF${SNP_VAF}.vcf
+
+for varType in SNP INDEL
+do
+	bgzip ${sampleRoot}.filter.deduped.realigned.recalibrated.mutect2.${varType}.MAF*.vcf
+	tabix -p vcf ${sampleRoot}.filter.deduped.realigned.recalibrated.mutect2.${varType}.MAF*.vcf.gz
 done
 
 ##task No3 Copy number for loss-of-heterozygosity
