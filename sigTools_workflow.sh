@@ -27,7 +27,7 @@ module load gatk tabix bcftools
 ##task No1 make .bedpe
 
 echo  -e "chrom1\tstart1\tend1\tchrom2\tstart2\tend2\tsample\tsvclass"  >${sampleRoot}.somatic.delly.merged.MAF${VAF}.bedpe
-bcftools query -f "%CHROM\t%POS\t%INFO/END\t%FILTER\t%ALT\t%INFO/CIPOS\t%INFO/CIEND\t[%DR\t]\t[%DV\t]\t[%RR\t]\t[%RV\t]\n" ${SV_file} | awk '$5 !~ ":" {print}' | awk '$4 ~ "PASS" {print}' | awk -v VAF=0.$VAF '($10+$14)/($8+$10+$12+$14) > VAF {print}' | awk -v sample_t=${sampleRoot}  'split($6,a,",") split($7,b,",") {print $1"\t"$2+a[1]-1"\t"$2+a[2]"\t"$1"\t"$3+b[1]-1"\t"$2+b[2]"\t"sample_t"\t"$5} ' | sed 's/<//g; s/>//g'  >>${sampleRoot}.somatic.delly.merged.MAF${VAF}.bedpe
+bcftools query -f "%CHROM\t%POS\t%INFO/END\t%FILTER\t%ALT\t%INFO/CIPOS\t%INFO/CIEND\t[%DR\t]\t[%DV\t]\t[%RR\t]\t[%RV\t]\n" ${SV_file} | awk '$5 !~ ":" {print}' | awk '$4 ~ "PASS" {print}' | awk -v VAF=0.0 '($10+$14)/($8+$10+$12+$14) > VAF {print}' | awk -v sample_t=${sampleRoot}  'split($6,a,",") split($7,b,",") {print $1"\t"$2+a[1]-1"\t"$2+a[2]"\t"$1"\t"$3+b[1]-1"\t"$2+b[2]"\t"sample_t"\t"$5} ' | sed 's/<//g; s/>//g'  >>${sampleRoot}.somatic.delly.merged.bedpe
 
 ##task No2 make seperate .vcf files for SNVs and indels 
 
@@ -67,6 +67,6 @@ tail -n +2 ${studyLocation}/${study}/${sampleRoot}/gammas/${gamma}/${sampleRoot}
 module unload gatk rstats
 module load sigtools
 
-Rscript --vanilla ~/sigtools_workflow/sigTools_runthrough.R ${sampleRoot} ${HRDtissue} ${wrkdir} ${VAF} 2>${wrkdir}/sigTools_runthrough.err
+		Rscript --vanilla ~/sigtools_workflow/sigTools_runthrough.R ${sampleRoot} ${HRDtissue} ${wrkdir}/${sampleRoot}.filter.deduped.realigned.recalibrated.mutect2.SNP.MAF${SNP_VAF}.vcf ${wrkdir}/${sampleRoot}.filter.deduped.realigned.recalibrated.mutect2.INDEL.MAF${INDEL_VAF}.vcf ${wrkdir}/${sampleRoot}.somatic.delly.merged.bedpe ${wrkdir}/${sampleRoot}_segments.cna.txt
 
 done < ${wrkdir}/samples.${study}.txt
