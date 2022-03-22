@@ -21,8 +21,8 @@ awk '$1 ~ "BRCA2" {print "BRCA2_mutation\t"$9}' ${studyLocation}/${study}/${samp
 awk '$1 ~ "BRCA1" {print "BRCA1_mutation_VAF\t"$43}' ${studyLocation}/${study}/${sampleRoot}/report/data_mutations_extended_oncogenic.txt >>${wrkdir}/${sampleRoot}.HRDsummary.txt
 awk '$1 ~ "BRCA2" {print "BRCA2_mutation_VAF\t"$43}' ${studyLocation}/${study}/${sampleRoot}/report/data_mutations_extended_oncogenic.txt >>${wrkdir}/${sampleRoot}.HRDsummary.txt
 
-awk '$1 ~ "BRCA1" {print "BRCA1_CNA\t"$2}' ${studyLocation}/${study}/${sampleRoot}/report/data_log2CNA.txt  >>${wrkdir}/${sampleRoot}.HRDsummary.txt
-awk '$1 ~ "BRCA2" {print "BRCA2_CNA\t"$2}' ${studyLocation}/${study}/${sampleRoot}/report/data_log2CNA.txt  >>${wrkdir}/${sampleRoot}.HRDsummary.txt
+#awk '$1 ~ "BRCA1" {print "BRCA1_CNA\t"$2}' ${studyLocation}/${study}/${sampleRoot}/report/data_log2CNA.txt  >>${wrkdir}/${sampleRoot}.HRDsummary.txt
+#awk '$1 ~ "BRCA2" {print "BRCA2_CNA\t"$2}' ${studyLocation}/${study}/${sampleRoot}/report/data_log2CNA.txt  >>${wrkdir}/${sampleRoot}.HRDsummary.txt
 
 awk '$1 ~ "BRCA1" {print "BRCA1_expression\t"$2}' ${studyLocation}/${study}/${sampleRoot}/report/data_expression_percentile_tcga.txt  >>${wrkdir}/${sampleRoot}.HRDsummary.txt
 awk '$1 ~ "BRCA2" {print "BRCA2_expression\t"$2}' ${studyLocation}/${study}/${sampleRoot}/report/data_expression_percentile_tcga.txt  >>${wrkdir}/${sampleRoot}.HRDsummary.txt
@@ -50,7 +50,7 @@ while read sampleRoot
 do
 awk  -v study="$study" -v sampleRoot="$sampleRoot" '{print study"\t"sampleRoot"\t"$1"\t"$2}' ${sampleRoot}.HRDsummary.txt >>sigTools.summaries.txt
 
-for VAF in 05 15
+for VAF in 01 05 15
 do
 awk -v VAF="$VAF" -v study="$study" -v sampleRoot="$sampleRoot" '{print study"\t"sampleRoot"\t"VAF"\t"$1"\t"$2}' ${sampleRoot}.sigtools.hrd.MAF${VAF}.txt >>sigTools.MAFtest1.txt
 

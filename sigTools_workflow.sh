@@ -2,12 +2,16 @@
 wrkdir=/.mounts/labs/CGI/scratch/fbeaudry/sigTools_test/
 cd $wrkdir
 
-study=PASS01
-studyLocation=/.mounts/labs/CGI/cap-djerba
 
-VAF=05
+VAF=01
 
-HRDtissue=Pancreas
+#HRDtissue=Pancreas
+#study=PASS01
+#studyLocation=/.mounts/labs/CGI/cap-djerba
+
+HRDtissue=Ovary
+study=TGL62
+studyLocation=/.mounts/labs/CGI/scratch/fbeaudry
 
 while read sampleRoot
 do
