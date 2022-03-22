@@ -54,7 +54,7 @@ SV_catalogue_reformat <- sigTools_formatter(input=SV_catalogue,sampleName=sample
 
 ##LOH##
 
-ascat.data <- read.table(LOD_seg_file,sep="\t",header=TRUE)
+ascat.data <- read.table(LOH_seg_file,sep="\t",header=TRUE)
 hrd_index <- ascatToHRDLOH(ascat.data=ascat.data,SAMPLE.ID=sample_name)
 
 ####HRD test####
