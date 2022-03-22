@@ -38,16 +38,23 @@ grep 'Genome Altered (%)' ${studyLocation}/${study}/${sampleRoot}/report/*_djerb
 
 awk '{print "Sig3\t"$5}' ${studyLocation}/${study}/${sampleRoot}/report/sigs/weights.txt | tail -n +2  >>${wrkdir}/${sampleRoot}.HRDsummary.txt
 
-done < ${studyLocation}/${study}/samples.txt
+done < ${wrkdir}/samples.${study}.txt
 
 
-rm sigTools.test1.text
+rm sigTools.MAFtest1.txt
+rm sigTools.summaries.txt
+
+for study in PASS01 TGL62
+do
 while read sampleRoot
 do
+awk  -v study="$study" -v sampleRoot="$sampleRoot" '{print study"\t"sampleRoot"\t"$1"\t"$2}' ${sampleRoot}.HRDsummary.txt >>sigTools.summaries.txt
 
-awk -v VAF="$VAF" -v study="$study" -v sampleRoot="$sampleRoot" '{print study"\t"sampleRoot"\t"VAF"\t"$1"\t"$2}' ${sampleRoot}.HRDsummary.txt >>sigTools.test1.text
-awk -v VAF="$VAF" -v study="$study" -v sampleRoot="$sampleRoot" '{print study"\t"sampleRoot"\t"VAF"\t"$1"\t"$2}' ${sampleRoot}.sigtools.hrd.txt >>sigTools.test1.text
+for VAF in 05 15
+do
+awk -v VAF="$VAF" -v study="$study" -v sampleRoot="$sampleRoot" '{print study"\t"sampleRoot"\t"VAF"\t"$1"\t"$2}' ${sampleRoot}.sigtools.hrd.MAF${VAF}.txt >>sigTools.MAFtest1.txt
 
-done < ${studyLocation}/${study}/samples.txt
-
+done
+done < ${wrkdir}/samples.${study}.txt
+done
 

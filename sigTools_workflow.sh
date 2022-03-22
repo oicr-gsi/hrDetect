@@ -5,10 +5,9 @@ cd $wrkdir
 study=PASS01
 studyLocation=/.mounts/labs/CGI/cap-djerba
 
-VAF=15
+VAF=05
 
 HRDtissue=Pancreas
-
 
 while read sampleRoot
 do
@@ -59,4 +58,4 @@ module load sigtools
 
 Rscript --vanilla ~/sigtools_workflow/sigTools_runthrough.R ${sampleRoot} ${HRDtissue} ${wrkdir} ${VAF} 2>${wrkdir}/sigTools_runthrough.err
 
-done < samples.${study}.txt
+done < ${wrkdir}/samples.${study}.txt
