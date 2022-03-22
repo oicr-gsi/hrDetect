@@ -91,7 +91,7 @@ write.table(
     "HRD_point"=HRDetect_res$hrdetect_output[8],
     quantiles
   ),
-  file = paste(wkdir,sample_name,".sigtools.hrd.txt",sep=""),
+  file = paste(wkdir,sample_name,".sigtools.hrd.MAF",VAF,".txt",sep=""),
   append = F, quote = FALSE, sep = "\t", 
   eol = "\n", na = "NA",dec = ".", row.names = TRUE, 
   col.names = FALSE

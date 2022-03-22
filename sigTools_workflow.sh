@@ -2,12 +2,13 @@
 wrkdir=/.mounts/labs/CGI/scratch/fbeaudry/sigTools_test/
 cd $wrkdir
 
-study=TGL62
-studyLocation=/.mounts/labs/CGI/scratch/fbeaudry/
+study=PASS01
+studyLocation=/.mounts/labs/CGI/cap-djerba
 
 VAF=15
 
-HRDtissue=Ovary
+HRDtissue=Pancreas
+
 
 while read sampleRoot
 do
@@ -58,4 +59,4 @@ module load sigtools
 
 Rscript --vanilla ~/sigtools_workflow/sigTools_runthrough.R ${sampleRoot} ${HRDtissue} ${wrkdir} ${VAF} 2>${wrkdir}/sigTools_runthrough.err
 
-done < ${studyLocation}/${study}/samples.txt
+done < samples.${study}.txt

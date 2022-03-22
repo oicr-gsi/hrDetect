@@ -3,7 +3,7 @@
 
 ssh ugehn01.hpc.oicr.on.ca
 
-qrsh -P gsi -l h_vmem=10G #-q u18build
+qrsh -P gsi -l h_vmem=20G #-q u18build
 
 study=TGL62
 studyLocation=/.mounts/labs/CGI/scratch/fbeaudry
@@ -11,6 +11,7 @@ studyLocation=/.mounts/labs/CGI/scratch/fbeaudry
 wrkdir=/.mounts/labs/CGI/scratch/fbeaudry/sigTools_test/
 cd $wrkdir
 
+VAF=15
 
 while read sampleRoot
 do
@@ -35,6 +36,18 @@ grep 'Tumour Mutation Burden' ${studyLocation}/${study}/${sampleRoot}/report/*_d
 grep 'Genome Altered (%)' ${studyLocation}/${study}/${sampleRoot}/report/*_djerba_report.html | awk '{print "Genome_altered\t"$4}'  >>${wrkdir}/${sampleRoot}.HRDsummary.txt
 
 
-awk '{print "Sig3\t"$4}' ${studyLocation}/${study}/${sampleRoot}/report/sigs/weights.txt | tail -n +2  >>${wrkdir}/${sampleRoot}.HRDsummary.txt
+awk '{print "Sig3\t"$5}' ${studyLocation}/${study}/${sampleRoot}/report/sigs/weights.txt | tail -n +2  >>${wrkdir}/${sampleRoot}.HRDsummary.txt
 
 done < ${studyLocation}/${study}/samples.txt
+
+
+rm sigTools.test1.text
+while read sampleRoot
+do
+
+awk -v VAF="$VAF" -v study="$study" -v sampleRoot="$sampleRoot" '{print study"\t"sampleRoot"\t"VAF"\t"$1"\t"$2}' ${sampleRoot}.HRDsummary.txt >>sigTools.test1.text
+awk -v VAF="$VAF" -v study="$study" -v sampleRoot="$sampleRoot" '{print study"\t"sampleRoot"\t"VAF"\t"$1"\t"$2}' ${sampleRoot}.sigtools.hrd.txt >>sigTools.test1.text
+
+done < ${studyLocation}/${study}/samples.txt
+
+
