@@ -31,7 +31,7 @@ workflow sigTooler {
 	call filterStructural {
 		input: 
 			structuralVcfFile = structuralVcfFile,
-			structuralVAF = structuralVAF
+			structuralVAF = structuralVAF,
 			sampleName = sampleName
 	}
 
@@ -74,23 +74,23 @@ workflow sigTooler {
         		url: "https://github.com/broadinstitute/gatk/releases"
       		},
       		{
-      			name: "tabix/1.9"
+      			name: "tabix/1.9",
       			url: "http://www.htslib.org/doc/tabix.html"
       		},
       		{
-      			name: "bcftools/1.9"
+      			name: "bcftools/1.9",
       			url: "https://samtools.github.io/bcftools/bcftools.html"
       		},
       		{
-      			name: "sigtools/0.0.0.9000"
+      			name: "sigtools/0.0.0.9000",
       			url: "https://github.com/Nik-Zainal-Group/signature.tools.lib"
       		},
       		{
-      			name: "grch38-alldifficultregions/3.0"
+      			name: "grch38-alldifficultregions/3.0",
       			url: "https://ftp-trace.ncbi.nlm.nih.gov/giab/ftp/release/genome-stratifications/v3.0/GRCh38/union/"
       		},
       		{
-      			name: "hg38/p12"
+      			name: "hg38/p12",
       			url: "https://www.ncbi.nlm.nih.gov/assembly/GCF_000001405.38/"
       		}
     	]
@@ -100,95 +100,98 @@ workflow sigTooler {
 	}
 
 	output {
-		File sigToolsOutput = "~{basename}.sigtools.hrd.txt"
+		File sigToolsOutput = "~{sampleName}.sigtools.hrd.txt"
   	}
-
 }
 
 task filterStructural {
- 	input {
-	    File structuralVcfFile 
-	    String basename = basename("~{structuralVcfFile}", ".vcf.gz")
-	    String modules = "bcftools/1.9"
-	    String sampleName
-	    Int structuralVAF
-	    Int jobMemory = 5
-	    Int threads = 1
-	    Int timeout = 1
-	 }
+	input {
+		File structuralVcfFile 
+		String basename = basename("~{structuralVcfFile}", ".vcf.gz")
+		String modules = "bcftools/1.9"
+		String sampleName
+		Int structuralVAF = 0
+		Int jobMemory = 5
+		Int threads = 1
+		Int timeout = 1
+	}
 
 	parameter_meta {
-	    vcfFile: "Vcf input file"
-	    basename: "Base name"
-	    modules: "Required environment modules"
-	    sampleName: "Name of sample matching the tumor sample in .vcf"
-	   	structuralVAF: "VAF for structural variants"
-	    jobMemory: "Memory allocated for this job (GB)"
-	    threads: "Requested CPU threads"
-	    timeout: "Hours before task timeout"
+		structuralVcfFile: "Vcf input file"
+		basename: "Base name"
+		modules: "Required environment modules"
+		sampleName: "Name of sample matching the tumor sample in .vcf"
+		structuralVAF: "VAF for structural variants"
+		jobMemory: "Memory allocated for this job (GB)"
+		threads: "Requested CPU threads"
+		timeout: "Hours before task timeout"
 	}
 
 	command <<<
-	    set -euo pipefail
+		set -euo pipefail
 
 		echo  -e "chrom1\tstart1\tend1\tchrom2\tstart2\tend2\tsample\tsvclass"  >~{basename}.bedpe
 
 		bcftools query -f "%CHROM\t%POS\t%INFO/END\t%FILTER\t%ALT\t%INFO/CIPOS\t%INFO/CIEND\t[%DR\t]\t[%DV\t]\t[%RR\t]\t[%RV\t]\n" ~{structuralVcfFile} | \
-		  awk '$5 !~ ":" {print}' | \
-		  awk '$4 ~ "PASS" {print}' | \
-		  awk -v VAF=0.~{structuralVAF} '($10+$14)/($8+$10+$12+$14) > VAF {print}' | \
-		  awk -v sampleName=~{sampleName} 'split($6,a,",") split($7,b,",") {print $1"\t"$2+a[1]-1"\t"$2+a[2]"\t"$1"\t"$3+b[1]-1"\t"$2+b[2]"\t"sampleName"\t"$5} ' | \
-		  sed 's/<//g; s/>//g' >>~{basename}.bedpe
-	>>> 
+		awk '$5 !~ ":" {print}' | \
+		awk '$4 ~ "PASS" {print}' | \
+		awk -v VAF=0.~{structuralVAF} '($10+$14)/($8+$10+$12+$14) > VAF {print}' | \
+		awk -v sampleName=~{sampleName} 'split($6,a,",") split($7,b,",") {print $1"\t"$2+a[1]-1"\t"$2+a[2]"\t"$1"\t"$3+b[1]-1"\t"$2+b[2]"\t"sampleName"\t"$5} ' | \
+		sed 's/<//g; s/>//g' >>~{basename}.bedpe
+	>>>
 
 	runtime {
-	    modules: "~{modules}"
-	    memory:  "~{jobMemory} GB"
-	    cpu:     "~{threads}"
-	    timeout: "~{timeout}"
+		modules: "~{modules}"
+		memory:  "~{jobMemory} GB"
+		cpu:     "~{threads}"
+		timeout: "~{timeout}"
 	}
 
 	output {
-    	File structuralbedpe = "~{basename}.filtered.delly.merged.bedpe"
+		File structuralbedpe = "~{basename}.filtered.delly.merged.bedpe"
 	}
-	
+
 	meta {
-	    output_meta: {
-      		structuralbedpe: "filtered structural .bedpe"
-    	}
-  	}
+		output_meta: {
+			structuralbedpe: "filtered structural .bedpe"
+		}
+	}
 }
 
 task filterINDELs {
- 	input {
-	    File smallsVcfFile,
-	    String basename = basename("~{smallsVcfFile}", ".vcf.gz")
-	    String modules = "gatk/4.2.0.0", "tabix/1.9", "bcftools/1.9", "grch38-alldifficultregions/3.0", "hg38/p12"
-	    Int indelVAF
-	    Int jobMemory = 10
-	    Int threads = 1
-	    Int timeout = 2
-	 }
+	input {
+		File smallsVcfFile
+		String basename = basename("~{smallsVcfFile}", ".vcf.gz")
+		String modules = "gatk/4.2.0.0 tabix/1.9 bcftools/1.9 grch38-alldifficultregions/3.0 hg38/p12"
+		String genome = "$HG38_ROOT/hg38_random.fa"
+		String difficultRegions = "$GRCH38_ALLDIFFICULTREGIONS_ROOT}/GRCh38_alldifficultregions.bed"
+		Int indelVAF
+		Int jobMemory = 10
+		Int threads = 1
+		Int timeout = 2
+	}
 
 	parameter_meta {
-	    smallsVcfFile: "Vcf input file"
-	    basename: "Base name"
-	    modules: "Required environment modules"
-	    indelVAF: "VAF for indels"
-	    jobMemory: "Memory allocated for this job (GB)"
-	    threads: "Requested CPU threads"
-	    timeout: "Hours before task timeout"
+		smallsVcfFile: "Vcf input file"
+		basename: "Base name"
+		modules: "Required environment modules"
+		genome: "Path to loaded genome"
+		difficultRegions: "Path to loaded difficult regions to align to"
+		indelVAF: "VAF for indels"
+		jobMemory: "Memory allocated for this job (GB)"
+		threads: "Requested CPU threads"
+		timeout: "Hours before task timeout"
 	}
 
 	command <<<
-	    set -euo pipefail
+		set -euo pipefail
 
 		gatk SelectVariants \
-		  -V ~{smallsVcfFile} \
-		  -R ~{HG38_ROOT}/hg38_random.fa  \
-		  --exclude-intervals ~{GRCH38_ALLDIFFICULTREGIONS_ROOT}/GRCh38_alldifficultregions.bed \
-		  --select-type-to-include INDEL \
-		  -O ~{basename}.INDEL.vcf
+		-V ~{smallsVcfFile} \
+		-R ~{genome}  \
+		--exclude-intervals ~{difficultRegions} \
+		--select-type-to-include INDEL \
+		-O ~{basename}.INDEL.vcf
 
 		bcftools filter -i "(FORMAT/AD[0:1])/(FORMAT/AD[0:0]+FORMAT/AD[0:1]) >= 0.~{indelVAF}" ~{basename}.INDEL.vcf >~{basename}.INDEL.VAF.vcf
 
@@ -198,10 +201,10 @@ task filterINDELs {
 	>>> 
 
 	runtime {
-	    modules: "~{modules}"
-	    memory:  "~{jobMemory} GB"
-	    cpu:     "~{threads}"
-	    timeout: "~{timeout}"
+		modules: "~{modules}"
+		memory: "~{jobMemory} GB"
+		cpu: "~{threads}"
+		timeout: "~{timeout}"
 	}
 
 	output {
@@ -209,43 +212,46 @@ task filterINDELs {
 	}
 	
 	meta {
-	    output_meta: {
-      		indelVcfOutput: "filtered indel .vcf"
-    	}
-  	}
+		output_meta: {
+			indelVcfOutput: "filtered indel .vcf"
+		}
+	}
 }
 
-
-task filterSNPs {
- 	input {
-	    File smallsVcfFile,
-	    String basename = basename("~{smallsVcfFile}", ".vcf.gz")
-	    String modules = "gatk/4.2.0.0", "tabix/1.9", "bcftools/1.9", "grch38-alldifficultregions/3.0", "hg38/p12"
-	    Int snvVAF
-	    Int jobMemory = 10
-	    Int threads = 1
-	    Int timeout = 2
-	 }
+task filterSNVs {
+	input {
+		File smallsVcfFile
+		String basename = basename("~{smallsVcfFile}", ".vcf.gz")
+		String modules = "gatk/4.2.0.0 tabix/1.9 bcftools/1.9 grch38-alldifficultregions/3.0 hg38/p12"
+		String genome = "$HG38_ROOT/hg38_random.fa"
+		String difficultRegions = "$GRCH38_ALLDIFFICULTREGIONS_ROOT}/GRCh38_alldifficultregions.bed"
+		Int snvVAF
+		Int jobMemory = 10
+		Int threads = 1
+		Int timeout = 2
+	}
 
 	parameter_meta {
-	    vcfFile: "Vcf input file"
-	    snvVAF: "VAF for SNV filtering"
-	    basename: "Base name"
-	    modules: "Required environment modules"
-	    jobMemory: "Memory allocated for this job (GB)"
-	    threads: "Requested CPU threads"
-	    timeout: "Hours before task timeout"
+		smallsVcfFile: "Vcf input file"
+		snvVAF: "VAF for SNV filtering"
+		basename: "Base name"
+		modules: "Required environment modules"
+		genome: "Path to loaded genome"
+		difficultRegions: "Path to loaded difficult regions to align to"
+		jobMemory: "Memory allocated for this job (GB)"
+		threads: "Requested CPU threads"
+		timeout: "Hours before task timeout"
 	}
 
 	command <<<
-	    set -euo pipefail
+		set -euo pipefail
 
 		gatk SelectVariants \
-		  -V ~{smallsVcfFile} \
-		  -R ~{HG38_ROOT}/hg38_random.fa  \
-		  --exclude-intervals ~{GRCH38_ALLDIFFICULTREGIONS_ROOT}/GRCh38_alldifficultregions.bed \
-		  --select-type-to-include SNP \
-		  -O ~{basename}.SNP.vcf
+		-V ~{smallsVcfFile} \
+		-R ~{genome}  \
+		--exclude-intervals ~{difficultRegions} \
+		--select-type-to-include SNP \
+		-O ~{basename}.SNP.vcf
 
 		bcftools filter -i "(FORMAT/AD[0:1])/(FORMAT/AD[0:0]+FORMAT/AD[0:1]) >= 0.~{snvVAF}" ~{basename}.SNP.vcf >~{basename}.SNP.VAF.vcf
 
@@ -256,65 +262,65 @@ task filterSNPs {
 	>>> 
 
 	runtime {
-	    modules: "~{modules}"
-	    memory:  "~{jobMemory} GB"
-	    cpu:     "~{threads}"
-	    timeout: "~{timeout}"
+		modules: "~{modules}"
+		memory:  "~{jobMemory} GB"
+		cpu:     "~{threads}"
+		timeout: "~{timeout}"
 	}
 
 	output {
-    	File snvVcfOutput = "~{basename}.SNP.VAF.vcf.gz"
+		File snvVcfOutput = "~{basename}.SNP.VAF.vcf.gz"
 	}
-	
+
 	meta {
-	    output_meta: {
-      		snvVcfOutput: "filtered SNV .vcf"
-    	}
-  	}
+		output_meta: {
+			snvVcfOutput: "filtered SNV .vcf"
+		}
+	}
 }
 
 task convertSegFile {
- 	input {
-	    File segFile 
-	    String basename = basename("~{segFile}", "_segments.txt")
-	    Int jobMemory = 5
-	    Int threads = 1
-	    Int timeout = 1
-	 }
+	input {
+		File segFile 
+		String basename = basename("~{segFile}", "_segments.txt")
+		Int jobMemory = 5
+		Int threads = 1
+		Int timeout = 1
+	}
 
 	parameter_meta {
-	    segFile: "segment input file from sequenza"
-	    basename: "Base name"
-	    jobMemory: "Memory allocated for this job (GB)"
-	    threads: "Requested CPU threads"
-	    timeout: "Hours before task timeout"
+		segFile: "segment input file from sequenza"
+		basename: "Base name"
+		jobMemory: "Memory allocated for this job (GB)"
+		threads: "Requested CPU threads"
+		timeout: "Hours before task timeout"
 	}
 
 	command <<<
 
-	    set -euo pipefail
+		set -euo pipefail
 
 		echo  -e "seg_no\tChromosome\tchromStart\tchromEnd\ttotal.copy.number.inNormal\tminor.copy.number.inNormal\ttotal.copy.number.inTumour\tminor.copy.number.inTumour" >~{basename}_segments.cna.txt
-		
+
 		tail -n +2 ~{segFile} | \
-		  awk 'split($1,a,"\"") split(a[2],b,"chr") {print NR"\t"b[2]"\t"$2"\t"$3"\t"2"\t"1"\t"$10"\t"$12}' >>~{basename}_segments.cna.txt
+		awk 'split($1,a,"\"") split(a[2],b,"chr") {print NR"\t"b[2]"\t"$2"\t"$3"\t"2"\t"1"\t"$10"\t"$12}' >>~{basename}_segments.cna.txt
 	>>> 
 
 	runtime {
-	    memory:  "~{jobMemory} GB"
-	    cpu:     "~{threads}"
-	    timeout: "~{timeout}"
+		memory:  "~{jobMemory} GB"
+		cpu:     "~{threads}"
+		timeout: "~{timeout}"
 	}
 
 	output {
 		File segmentsOutput = "~{basename}_segments.cna.txt"
 	}
-	
+
 	meta {
-	    output_meta: {
-      		segmentsOutput: "reformatted segmentation file"
-    	}
-  	}
+		output_meta: {
+			segmentsOutput: "reformatted segmentation file"
+		}
+	}
 }
 
 task hrdResults {
@@ -325,12 +331,11 @@ task hrdResults {
 		File lohSegFile
 		String tissue
 		String rScript
-    	String sampleName
+		String sampleName
 		String modules = "sigtools/0.0.0.9000"
 		Int jobMemory = 20
 		Int threads = 1
 		Int timeout = 2
-
 	}
 
 	parameter_meta {
@@ -338,9 +343,9 @@ task hrdResults {
 		indelVcfFiltered: "filtered INDEL .vcf"
 		snvVcfFiltered: "filtered SNV .vcf"
 		lohSegFile: "reformatted segmentation file"
-    	tissue: "Cancerous-tissue of origin"
-    	rScript: "Temporary variable to call the .R script containing sigtools, will be modulated. default: ~/sigtools_workflow/sigTools_runthrough.R"
-    	sampleName: "Name of sample matching the tumor sample in .vcf"		
+		tissue: "Cancerous-tissue of origin"
+		rScript: "Temporary variable to call the .R script containing sigtools, will be modulated. default: ~/sigtools_workflow/sigTools_runthrough.R"
+		sampleName: "Name of sample matching the tumor sample in .vcf"		
 		modules: "Required environment modules"
 		jobMemory: "Memory allocated for this job (GB)"
 		threads: "Requested CPU threads"
@@ -351,28 +356,22 @@ task hrdResults {
 		set -euo pipefail
 
 		Rscript --vanilla ~{rScript} ~{sampleName} ~{tissue} ~{snvVcfFiltered} ~{indelVcfFiltered} ~{structuralBedpeFiltered} ~{lohSegFile}
-
 	>>> 
 
 	runtime {
-	    modules: "~{modules}"
-	    memory:  "~{jobMemory} GB"
-	    cpu:     "~{threads}"
-	    timeout: "~{timeout}"
+		modules: "~{modules}"
+		memory:  "~{jobMemory} GB"
+		cpu:     "~{threads}"
+		timeout: "~{timeout}"
 	}
 
 	output {
-		File sigToolsOutput = "~{basename}.sigtools.hrd.txt"
+		File sigToolsOutput = "~{sampleName}.sigtools.hrd.txt"
 	}
 
 	meta {
-    	output_meta: {
-      		sigToolsOutput : "point estimate and bootstraped confidence intervals for HRD from sigtools"
-	    }
+		output_meta: {
+			sigToolsOutput : "point estimate and bootstraped confidence intervals for HRD from sigtools"
+		}
 	}
 }
-
-
-
-
-

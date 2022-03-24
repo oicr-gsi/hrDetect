@@ -1,3 +1,12 @@
 {
-	"sigTooler.filterStructural.structuralVcfFile" : ""
+  "sigTooler.rScript": "/.mounts/labs/CGI/scratch/fbeaudry/sigtools_workflow/sigTools_runthrough.R",
+  "sigTooler.tissue": "Pancreas",
+  "sigTooler.sampleName": "String",
+  "sigTooler.segFile": "File",
+  "sigTooler.smallsVcfFile": "File",
+  "sigTooler.smallsVcfIndex": "File",
+  "sigTooler.structuralVcfFile": "File",
+  "sigTooler.snvVAF": "05",
+  "sigTooler.indelVAF": "05"
 }
+
