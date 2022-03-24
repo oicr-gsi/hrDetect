@@ -4,65 +4,69 @@ workflow sigTooler {
 
 	input {
 		File structuralVcfFile
-
     	File smallsVcfFile
     	File smallsVcfIndex
-
     	File segFile
-
-    	Int variantAlleleFrequency
+    	Int structuralVAF
+    	Int indelVAF
+    	Int snvVAF
     	String tissue
+    	String rScript
+    	String sampleName
 	}
 
 	parameter_meta {
     	structuralVcfFile: "Input VCF file of structural variants (eg. from delly)"
-
     	smallsVcfFile: "Input VCF file of SNV and indels (small mutations) (eg. from mutect2)"
     	smallsVcfIndex: "Index of input VCF file of SNV and indels"
-
     	segFile: "File for segmentations, used to estimate number of segments in Loss of heterozygosity (LOH) (eg. from sequenza)"
-
-    	variantAlleleFrequency: "Variant Allele Frequency for filtering of small mutations"
-
+    	structuralVAF: "Variant Allele Frequency for filtering of structural variants. default: 0"
+    	indelVAF: "Variant Allele Frequency for filtering of indel mutations"
+    	snvVAF: "Variant Allele Frequency for filtering of SNVs"
     	tissue: "Cancerous-tissue of origin"
-    	
+    	rScript: "Temporary variable to call the .R script containing sigtools, will be modulated. default: ~/sigtools_workflow/sigTools_runthrough.R"
+    	sampleName: "Name of sample matching the tumor sample in .vcf"
   	}
 
 	call filterStructural {
 		input: 
-			vcfFile = structuralVcfFile,
-			outputFileNamePrefix = outputFileNamePrefix
+			structuralVcfFile = structuralVcfFile,
+			structuralVAF = structuralVAF
+			sampleName = sampleName
 	}
 
 	call filterINDELs {
 		input: 
-			vcfFile = smallsVcfFile,
-			outputFileNamePrefix = outputFileNamePrefix
+			smallsVcfFile = smallsVcfFile,
+			indelVAF = indelVAF
 	}
 
-	call filterSNPs {
+	call filterSNVs {
 		input: 
-			vcfFile = smallsVcfFile,
-			outputFileNamePrefix = outputFileNamePrefix
+			smallsVcfFile = smallsVcfFile,
+			snvVAF = snvVAF
 	}
 
 	call convertSegFile {
 		input: 
-			segFile = segFile,
-			outputFileNamePrefix = outputFileNamePrefix
+			segFile = segFile
 	}
 
 	call hrdResults {
-		input:	snvVcfFiltered = filterSNVs.snvVcfOutput,
-				structuralVcfFiltered = filterStructural.structuralVcfOutput,
-				outputFileNamePrefix = outputFileNamePrefix
-
+		input:
+			structuralBedpeFiltered = filterStructural.structuralbedpe,
+			indelVcfFiltered = filterINDELs.indelVcfOutput,
+			snvVcfFiltered = filterSNVs.snvVcfOutput,
+			lohSegFile = convertSegFile.segmentsOutput,
+			tissue = tissue,
+    		rScript = rScript,
+    		sampleName = sampleName
 	}
 
   	meta {
     	author: "Felix Beaudry"
     	email: "fbeaudry@oicr.on.ca"
-    	description: "Homolog Recombination Deficiency Prediction Workflow using sig.tools"
+    	description: "Homologous Recombination Deficiency (HRD) Prediction Workflow using sig.tools"
     	dependencies: 
     	[
       		{
@@ -71,13 +75,24 @@ workflow sigTooler {
       		},
       		{
       			name: "tabix/1.9"
-      			url: ""
+      			url: "http://www.htslib.org/doc/tabix.html"
       		},
       		{
-      			name: "bcftools"
-      			url: ""
+      			name: "bcftools/1.9"
+      			url: "https://samtools.github.io/bcftools/bcftools.html"
+      		},
+      		{
+      			name: "sigtools/0.0.0.9000"
+      			url: "https://github.com/Nik-Zainal-Group/signature.tools.lib"
+      		},
+      		{
+      			name: "grch38-alldifficultregions/3.0"
+      			url: "https://ftp-trace.ncbi.nlm.nih.gov/giab/ftp/release/genome-stratifications/v3.0/GRCh38/union/"
+      		},
+      		{
+      			name: "hg38/p12"
+      			url: "https://www.ncbi.nlm.nih.gov/assembly/GCF_000001405.38/"
       		}
-
     	]
     	output_meta: {
    			sigToolsOutput : "point estimate and bootstraped confidence intervals for HRD from sigtools"
@@ -87,23 +102,27 @@ workflow sigTooler {
 	output {
 		File sigToolsOutput = "~{basename}.sigtools.hrd.txt"
   	}
-  	
+
 }
 
 task filterStructural {
  	input {
-	    File vcfFile 
-	    String basename = basename("~{vcfFile}", ".vcf.gz")
-	    String modules = "bcftools"
-	    Int jobMemory = 32
-	    Int threads = 4
-	    Int timeout = 16
+	    File structuralVcfFile 
+	    String basename = basename("~{structuralVcfFile}", ".vcf.gz")
+	    String modules = "bcftools/1.9"
+	    String sampleName
+	    Int structuralVAF
+	    Int jobMemory = 5
+	    Int threads = 1
+	    Int timeout = 1
 	 }
 
 	parameter_meta {
 	    vcfFile: "Vcf input file"
 	    basename: "Base name"
 	    modules: "Required environment modules"
+	    sampleName: "Name of sample matching the tumor sample in .vcf"
+	   	structuralVAF: "VAF for structural variants"
 	    jobMemory: "Memory allocated for this job (GB)"
 	    threads: "Requested CPU threads"
 	    timeout: "Hours before task timeout"
@@ -112,12 +131,14 @@ task filterStructural {
 	command <<<
 	    set -euo pipefail
 
-		echo  -e "chrom1\tstart1\tend1\tchrom2\tstart2\tend2\tsample\tsvclass"  >~{basename}.filtered.delly.merged.bedpe
+		echo  -e "chrom1\tstart1\tend1\tchrom2\tstart2\tend2\tsample\tsvclass"  >~{basename}.bedpe
 
-		structural_VAF=0
-
-		bcftools query -f "%CHROM\t%POS\t%INFO/END\t%FILTER\t%ALT\t%INFO/CIPOS\t%INFO/CIEND\t[%DR\t]\t[%DV\t]\t[%RR\t]\t[%RV\t]\n" ~{vcfFile} | awk '$5 !~ ":" {print}' | awk '$4 ~ "PASS" {print}' | awk -v VAF=0.~{structural_VAF} '($10+$14)/($8+$10+$12+$14) > VAF {print}' | awk -v sample_t=~{basename} 'split($6,a,",") split($7,b,",") {print $1"\t"$2+a[1]-1"\t"$2+a[2]"\t"$1"\t"$3+b[1]-1"\t"$2+b[2]"\t"sample_t"\t"$5} ' | sed 's/<//g; s/>//g'  >>~{basename}.filtered.delly.merged.bedpe
-
+		bcftools query -f "%CHROM\t%POS\t%INFO/END\t%FILTER\t%ALT\t%INFO/CIPOS\t%INFO/CIEND\t[%DR\t]\t[%DV\t]\t[%RR\t]\t[%RV\t]\n" ~{structuralVcfFile} | \
+		  awk '$5 !~ ":" {print}' | \
+		  awk '$4 ~ "PASS" {print}' | \
+		  awk -v VAF=0.~{structuralVAF} '($10+$14)/($8+$10+$12+$14) > VAF {print}' | \
+		  awk -v sampleName=~{sampleName} 'split($6,a,",") split($7,b,",") {print $1"\t"$2+a[1]-1"\t"$2+a[2]"\t"$1"\t"$3+b[1]-1"\t"$2+b[2]"\t"sampleName"\t"$5} ' | \
+		  sed 's/<//g; s/>//g' >>~{basename}.bedpe
 	>>> 
 
 	runtime {
@@ -132,78 +153,83 @@ task filterStructural {
 	}
 	
 	meta {
-	    	output_meta: {
+	    output_meta: {
       		structuralbedpe: "filtered structural .bedpe"
-    	}
-  	}
-}
-
-task filterSNPs {
- 	input {
-	    File vcfFile 
-	    String basename = basename("~{vcfFile}", ".vcf.gz")
-	    String modules = "gatk", "tabix", "bcftools", "grch38-alldifficultregions" "hg38/p12"
-	    Int jobMemory = 32
-	    Int threads = 4
-	    Int timeout = 16
-	 }
-
-	parameter_meta {
-	    vcfFile: "Vcf input file"
-	    basename: "Base name"
-	    modules: "Required environment modules"
-	    jobMemory: "Memory allocated for this job (GB)"
-	    threads: "Requested CPU threads"
-	    timeout: "Hours before task timeout"
-	}
-
-	command <<<
-	    set -euo pipefail
-
-	gatk SelectVariants -R ~{HG38_ROOT}/hg38_random.fa  --exclude-intervals ~{GRCH38_ALLDIFFICULTREGIONS_ROOT}/GRCh38_alldifficultregions.bed -V ~{SNV_file}  --select-type-to-include SNP -O ~{sampleRoot}.filter.deduped.realigned.recalibrated.mutect2.SNP.vcf
-
-	bcftools filter -i "(FORMAT/AD[0:1])/(FORMAT/AD[0:0]+FORMAT/AD[0:1]) >= 0.~{SNP_VAF}" ~{sampleRoot}.filter.deduped.realigned.recalibrated.mutect2.SNP.vcf >~{sampleRoot}.filter.deduped.realigned.recalibrated.mutect2.SNP.MAF~{SNP_VAF}.vcf
-
-	bgzip ~{sampleRoot}.filter.deduped.realigned.recalibrated.mutect2.SNP.MAF*.vcf
-
-	tabix -p vcf ~{sampleRoot}.filter.deduped.realigned.recalibrated.mutect2.SNP.MAF*.vcf.gz
-
-	>>> 
-
-	runtime {
-	    modules: "~{modules}"
-	    memory:  "~{jobMemory} GB"
-	    cpu:     "~{threads}"
-	    timeout: "~{timeout}"
-	}
-
-	output {
-		File indelVcfOutput = "~{basename}.filter.deduped.realigned.recalibrated.mutect2.indels.vcf.gz"
-    	File snvVcfOutput = "~{basename}.filter.deduped.realigned.recalibrated.mutect2.SNV.vcf.gz"
-
-	}
-	
-	meta {
-	    	output_meta: {
-      		indelVcfOutput: "filtered indel .vcf"
-      		snvVcfOutput: "filtered SNV .vcf"
-
     	}
   	}
 }
 
 task filterINDELs {
  	input {
-	    File vcfFile 
-	    String basename = basename("~{vcfFile}", ".vcf.gz")
-	    String modules = "gatk", "tabix", "bcftools", "grch38-alldifficultregions" "hg38/p12"
-	    Int jobMemory = 32
-	    Int threads = 4
-	    Int timeout = 16
+	    File smallsVcfFile,
+	    String basename = basename("~{smallsVcfFile}", ".vcf.gz")
+	    String modules = "gatk/4.2.0.0", "tabix/1.9", "bcftools/1.9", "grch38-alldifficultregions/3.0", "hg38/p12"
+	    Int indelVAF
+	    Int jobMemory = 10
+	    Int threads = 1
+	    Int timeout = 2
+	 }
+
+	parameter_meta {
+	    smallsVcfFile: "Vcf input file"
+	    basename: "Base name"
+	    modules: "Required environment modules"
+	    indelVAF: "VAF for indels"
+	    jobMemory: "Memory allocated for this job (GB)"
+	    threads: "Requested CPU threads"
+	    timeout: "Hours before task timeout"
+	}
+
+	command <<<
+	    set -euo pipefail
+
+		gatk SelectVariants \
+		  -V ~{smallsVcfFile} \
+		  -R ~{HG38_ROOT}/hg38_random.fa  \
+		  --exclude-intervals ~{GRCH38_ALLDIFFICULTREGIONS_ROOT}/GRCh38_alldifficultregions.bed \
+		  --select-type-to-include INDEL \
+		  -O ~{basename}.INDEL.vcf
+
+		bcftools filter -i "(FORMAT/AD[0:1])/(FORMAT/AD[0:0]+FORMAT/AD[0:1]) >= 0.~{indelVAF}" ~{basename}.INDEL.vcf >~{basename}.INDEL.VAF.vcf
+
+		bgzip ~{basename}.INDEL.VAF.vcf
+
+		tabix -p vcf ~{basename}.INDEL.VAF.vcf.gz
+	>>> 
+
+	runtime {
+	    modules: "~{modules}"
+	    memory:  "~{jobMemory} GB"
+	    cpu:     "~{threads}"
+	    timeout: "~{timeout}"
+	}
+
+	output {
+		File indelVcfOutput = "~{basename}.INDEL.VAF.vcf.gz"
+	}
+	
+	meta {
+	    output_meta: {
+      		indelVcfOutput: "filtered indel .vcf"
+    	}
+  	}
+}
+
+
+task filterSNPs {
+ 	input {
+	    File smallsVcfFile,
+	    String basename = basename("~{smallsVcfFile}", ".vcf.gz")
+	    String modules = "gatk/4.2.0.0", "tabix/1.9", "bcftools/1.9", "grch38-alldifficultregions/3.0", "hg38/p12"
+	    Int snvVAF
+	    Int jobMemory = 10
+	    Int threads = 1
+	    Int timeout = 2
 	 }
 
 	parameter_meta {
 	    vcfFile: "Vcf input file"
+	    snvVAF: "VAF for SNV filtering"
 	    basename: "Base name"
 	    modules: "Required environment modules"
 	    jobMemory: "Memory allocated for this job (GB)"
@@ -214,15 +240,18 @@ task filterINDELs {
 	command <<<
 	    set -euo pipefail
 
-	varType="INDEL"
+		gatk SelectVariants \
+		  -V ~{smallsVcfFile} \
+		  -R ~{HG38_ROOT}/hg38_random.fa  \
+		  --exclude-intervals ~{GRCH38_ALLDIFFICULTREGIONS_ROOT}/GRCh38_alldifficultregions.bed \
+		  --select-type-to-include SNP \
+		  -O ~{basename}.SNP.vcf
 
-	gatk SelectVariants -R ${HG38_ROOT}/hg38_random.fa  --exclude-intervals ${GRCH38_ALLDIFFICULTREGIONS_ROOT}/GRCh38_alldifficultregions.bed -V ${SNV_file}  --select-type-to-include ${varType} -O ${sampleRoot}.filter.deduped.realigned.recalibrated.mutect2.${varType}.vcf
+		bcftools filter -i "(FORMAT/AD[0:1])/(FORMAT/AD[0:0]+FORMAT/AD[0:1]) >= 0.~{snvVAF}" ~{basename}.SNP.vcf >~{basename}.SNP.VAF.vcf
 
-	bcftools filter -i "(FORMAT/AD[0:1])/(FORMAT/AD[0:0]+FORMAT/AD[0:1]) >= 0.${indel_VAF}" ${sampleRoot}.filter.deduped.realigned.recalibrated.mutect2.INDEL.vcf >${sampleRoot}.filter.deduped.realigned.recalibrated.mutect2.INDEL.MAF${indel_VAF}.vcf
+		bgzip ~{basename}.SNP.VAF.vcf
 
-	bgzip ${sampleRoot}.filter.deduped.realigned.recalibrated.mutect2.${varType}.MAF*.vcf
-
-	tabix -p vcf ${sampleRoot}.filter.deduped.realigned.recalibrated.mutect2.${varType}.MAF*.vcf.gz
+		tabix -p vcf ~{basename}.SNP.VAF.vcf.gz
 
 	>>> 
 
@@ -234,16 +263,12 @@ task filterINDELs {
 	}
 
 	output {
-		File indelVcfOutput = "~{basename}.filter.deduped.realigned.recalibrated.mutect2.indels.vcf.gz"
-    	File snvVcfOutput = "~{basename}.filter.deduped.realigned.recalibrated.mutect2.SNV.vcf.gz"
-
+    	File snvVcfOutput = "~{basename}.SNP.VAF.vcf.gz"
 	}
 	
 	meta {
-	    	output_meta: {
-      		indelVcfOutput: "filtered indel .vcf"
+	    output_meta: {
       		snvVcfOutput: "filtered SNV .vcf"
-
     	}
   	}
 }
@@ -252,9 +277,9 @@ task convertSegFile {
  	input {
 	    File segFile 
 	    String basename = basename("~{segFile}", "_segments.txt")
-	    Int jobMemory = 32
-	    Int threads = 4
-	    Int timeout = 16
+	    Int jobMemory = 5
+	    Int threads = 1
+	    Int timeout = 1
 	 }
 
 	parameter_meta {
@@ -269,15 +294,13 @@ task convertSegFile {
 
 	    set -euo pipefail
 
-		gamma=$(awk 'split($1,a,"=") $1 ~ "sequenza_gamma" {print a[2]}'  ${studyLocation}/${study}/${sampleRoot}/config.ini )
-
-		echo  -e "seg_no\tChromosome\tchromStart\tchromEnd\ttotal.copy.number.inNormal\tminor.copy.number.inNormal\ttotal.copy.number.inTumour\tminor.copy.number.inTumour"  >${wrkdir}/${sampleRoot}_segments.cna.txt
+		echo  -e "seg_no\tChromosome\tchromStart\tchromEnd\ttotal.copy.number.inNormal\tminor.copy.number.inNormal\ttotal.copy.number.inTumour\tminor.copy.number.inTumour" >~{basename}_segments.cna.txt
 		
-		tail -n +2 ${studyLocation}/${study}/${sampleRoot}/gammas/${gamma}/${sampleRoot}*_segments.txt | awk 'split($1,a,"\"") split(a[2],b,"chr") {print NR"\t"b[2]"\t"$2"\t"$3"\t"2"\t"1"\t"$10"\t"$12}'  >>${wrkdir}/${sampleRoot}_segments.cna.txt
+		tail -n +2 ~{segFile} | \
+		  awk 'split($1,a,"\"") split(a[2],b,"chr") {print NR"\t"b[2]"\t"$2"\t"$3"\t"2"\t"1"\t"$10"\t"$12}' >>~{basename}_segments.cna.txt
 	>>> 
 
 	runtime {
-	    modules: "~{modules}"
 	    memory:  "~{jobMemory} GB"
 	    cpu:     "~{threads}"
 	    timeout: "~{timeout}"
@@ -285,30 +308,39 @@ task convertSegFile {
 
 	output {
 		File segmentsOutput = "~{basename}_segments.cna.txt"
-
 	}
 	
 	meta {
-	    	output_meta: {
+	    output_meta: {
       		segmentsOutput: "reformatted segmentation file"
-
     	}
   	}
 }
 
 task hrdResults {
 	input {
-		file basename
-		String = ~{tissue}
-		String modules = "sigtools"
-		Int jobMemory = 32
-		Int threads = 4
-		Int timeout = 16
+		File structuralBedpeFiltered
+		File indelVcfFiltered
+		File snvVcfFiltered
+		File lohSegFile
+		String tissue
+		String rScript
+    	String sampleName
+		String modules = "sigtools/0.0.0.9000"
+		Int jobMemory = 20
+		Int threads = 1
+		Int timeout = 2
+
 	}
 
 	parameter_meta {
-		snvVcfFiltered: "filtered SNV Vcf input file"
-		structuralVcfFiltered: "filtered structural variant Vcf input file"
+		structuralBedpeFiltered: "filtered structural variant .bedpe"
+		indelVcfFiltered: "filtered INDEL .vcf"
+		snvVcfFiltered: "filtered SNV .vcf"
+		lohSegFile: "reformatted segmentation file"
+    	tissue: "Cancerous-tissue of origin"
+    	rScript: "Temporary variable to call the .R script containing sigtools, will be modulated. default: ~/sigtools_workflow/sigTools_runthrough.R"
+    	sampleName: "Name of sample matching the tumor sample in .vcf"		
 		modules: "Required environment modules"
 		jobMemory: "Memory allocated for this job (GB)"
 		threads: "Requested CPU threads"
@@ -318,7 +350,7 @@ task hrdResults {
 	command <<<
 		set -euo pipefail
 
-		Rscript --vanilla ~/sigtools_workflow/sigTools_runthrough.R ~{sampleRoot} ~{HRDtissue} ~{snvFile_loc} ~{indel_vcf_file} ~{SV_bedpe_file} ~{LOH_seg_file}
+		Rscript --vanilla ~{rScript} ~{sampleName} ~{tissue} ~{snvVcfFiltered} ~{indelVcfFiltered} ~{structuralBedpeFiltered} ~{lohSegFile}
 
 	>>> 
 
@@ -330,7 +362,7 @@ task hrdResults {
 	}
 
 	output {
-			File sigToolsOutput = "~{basename}.sigtools.hrd.txt"
+		File sigToolsOutput = "~{basename}.sigtools.hrd.txt"
 	}
 
 	meta {

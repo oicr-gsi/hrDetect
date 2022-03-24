@@ -78,11 +78,11 @@ VAFvar <- rbind.data.frame(
 VAFvar_dcast <- dcast(VAFvar,formula=V3+V4+sample~V1,value.var="V2")
 
 ggplot(VAFvar_dcast,aes(x=as.factor(V3/100),color=as.factor(V4/100))) + 
-  geom_point(aes(y=HRD_median), shape=4, position=pd) + 
-  geom_point(aes(y=HRD_point), shape=1, position=pd) + 
+  geom_point(aes(y=HRD_median), shape=4, position=pd,size=3) + 
+  geom_point(aes(y=HRD_point), shape=1, position=pd,size=2) + 
 
   geom_errorbar(aes(ymin=HRD_low_quant, ymax=HRD_top_quant), width=.1, position=pd) +
-  theme_bw() + 
+  theme_bw(base_size=18) + 
   facet_grid(.~as.factor(sample),scale="free",space = "free")+
   
   labs(x="INDEL VAF",y="Probability of HRD",color="SNP VAF") + 
@@ -96,12 +96,12 @@ test_VAF05_summary$BRCA[is.na(test_VAF05_summary$BRCA1) & is.na(test_VAF05_summa
 plot_grid(
 
 ggplot(test_VAF05_summary,aes(x=purity,y=HRD_point,color=Study.y)) + 
-  geom_point() + facet_grid(.~BRCA) +theme_bw() +
+  geom_point(size=2) + facet_grid(.~BRCA) +theme_bw(base_size=18) +
   labs(x="Purity",y="Probability HRD",color="Study")+
   scale_color_manual(values=c("#65bc45","#0099ad")) #+ stat_smooth(method = "lm",se=FALSE )
 ,
 ggplot(test_VAF05_summary,aes(x=purity,y=HRD_confidence,color=Study.y)) + 
-  geom_point() + facet_grid(.~BRCA) +theme_bw() +
+  geom_point(size=2) + facet_grid(.~BRCA) +theme_bw(base_size=18) +
   labs(x="Purity",y="HRD Confidence (size of C.I.)",color="Study")+
   scale_color_manual(values=c("#65bc45","#0099ad")) #+ stat_smooth(method = "lm",se=FALSE )
 ,ncol = 1, align = 'v')
@@ -110,14 +110,14 @@ summary(purity_test)
 
 
 
-test_VAF05_summary
+
 ggplot(test_VAF05_summary %>% filter(V2 %in% c("OCT_010221")),
        aes(x=V2)) + 
-  geom_point(aes(y=HRD_median), shape=4, position=pd,size=3) + 
-  geom_point(aes(y=HRD_point), shape=1, position=pd,size=2) + 
+  geom_point(aes(y=HRD_median), shape=4, position=pd,size=6) + 
+  geom_point(aes(y=HRD_point), shape=1, position=pd,size=5) + 
   
   geom_errorbar(aes(ymin=HRD_low_quant, ymax=HRD_top_quant), width=.1, position=pd) +
-  theme_bw(base_size=18) + labs(x="Sample",y="HR Proficient            HR Deficient",color="VAF (<)") + 
+  theme_bw(base_size=25) + labs(x="Sample",y="HR Proficient            HR Deficient",color="VAF (<)") + 
   ylim(0,1) + guides(alpha="none")+
   # scale_shape_manual(values=c(4,1)) + 
  # facet_grid(.~as.factor(Study),scale="free",space = "free")+
@@ -125,5 +125,6 @@ ggplot(test_VAF05_summary %>% filter(V2 %in% c("OCT_010221")),
   theme(axis.title.x=element_blank(),
         axis.text.x=element_blank(),
         axis.ticks.x=element_blank()) +
-  scale_color_manual(values=c("#65bc45","#000000","#0099ad"))
-
+  scale_color_manual(values=c("#65bc45","#000000","#0099ad")) +
+theme(axis.text.y = element_text(angle = 90, vjust = 0.5, hjust=.5)) 
+  
