@@ -1,12 +1,11 @@
 {
   "sigTooler.rScript": "/.mounts/labs/CGI/scratch/fbeaudry/sigtools_workflow/sigTools_runthrough.R",
   "sigTooler.tissue": "Pancreas",
-  "sigTooler.sampleName": "String",
-  "sigTooler.segFile": "File",
-  "sigTooler.smallsVcfFile": "File",
-  "sigTooler.smallsVcfIndex": "File",
-  "sigTooler.structuralVcfFile": "File",
+  "sigTooler.sampleName": "PANX_1309",
+  "sigTooler.segFile": "/.mounts/labs/gsi/testdata/sigtools/1.0/input_data/PANX_1309_Lv_M_WG_100-PM-033_LCM4_segments.txt",
+  "sigTooler.smallsVcfFile": "/.mounts/labs/gsi/testdata/sigtools/1.0/input_data/PANX_1309_Lv_M_WG_100-PM-033_LCM4.filter.deduped.realigned.recalibrated.mutect2.vcf.gz",
+  "sigTooler.smallsVcfIndex": "/.mounts/labs/gsi/testdata/sigtools/1.0/input_data/PANX_1309_Lv_M_WG_100-PM-033_LCM4.filter.deduped.realigned.recalibrated.mutect2.vcf.gz.tbi",
+  "sigTooler.structuralVcfFile": "/.mounts/labs/gsi/testdata/sigtools/1.0/input_data/PANX_1309_Lv_M_WG_100-PM-033_LCM4_somatic.somatic_filtered.delly.merged.vcf.gz",
   "sigTooler.snvVAF": "05",
   "sigTooler.indelVAF": "05"
 }
-

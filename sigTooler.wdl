@@ -7,7 +7,6 @@ workflow sigTooler {
     	File smallsVcfFile
     	File smallsVcfIndex
     	File segFile
-    	Int structuralVAF
     	Int indelVAF
     	Int snvVAF
     	String tissue
@@ -20,7 +19,6 @@ workflow sigTooler {
     	smallsVcfFile: "Input VCF file of SNV and indels (small mutations) (eg. from mutect2)"
     	smallsVcfIndex: "Index of input VCF file of SNV and indels"
     	segFile: "File for segmentations, used to estimate number of segments in Loss of heterozygosity (LOH) (eg. from sequenza)"
-    	structuralVAF: "Variant Allele Frequency for filtering of structural variants. default: 0"
     	indelVAF: "Variant Allele Frequency for filtering of indel mutations"
     	snvVAF: "Variant Allele Frequency for filtering of SNVs"
     	tissue: "Cancerous-tissue of origin"
@@ -31,7 +29,6 @@ workflow sigTooler {
 	call filterStructural {
 		input: 
 			structuralVcfFile = structuralVcfFile,
-			structuralVAF = structuralVAF,
 			sampleName = sampleName
 	}
 
