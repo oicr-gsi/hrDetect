@@ -76,8 +76,8 @@ workflow sigTooler {
       			url: ""
       		},
       		{
-        		name: "sigtools",
-        		url: " "
+      			name: "bcftools"
+      			url: ""
       		}
 
     	]
