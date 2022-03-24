@@ -83,71 +83,63 @@ Output | Type | Description
 
 
 ## Commands
- This section lists command(s) run by WORKFLOW workflow
+ This section lists commands run by sigtools_workflow. It launches four tasks to make input files for sigtools, and then runs the sigtools packages in an .R script.  
+
+### Convert structural variant .vcf to .bedpe 
+
  
- * Running WORKFLOW
+        echo  -e "chrom1\tstart1\tend1\tchrom2\tstart2\tend2\tsample\tsvclass"  >~{basename}.bedpe
  
- === Description here ===.
+        $BCFTOOLS_ROOT/bin/bcftools query -f "%CHROM\t%POS\t%INFO/END\t%FILTER\t%ALT\t%INFO/CIPOS\t%INFO/CIEND\t[%DR\t]\t[%DV\t]\t[%RR\t]\t[%RV\t]\n" ~{structuralVcfFile} | \
+        awk '$5 !~ ":" {print}' | \
+        awk '$4 ~ "PASS" {print}' | \
+        awk -v VAF=0.~{structuralVAF} '($10+$14)/($8+$10+$12+$14) > VAF {print}' | \
+        awk -v sampleName=~{sampleName} 'split($6,a,",") split($7,b,",") {print $1"\t"$2+a[1]-1"\t"$2+a[2]"\t"$1"\t"$3+b[1]-1"\t"$2+b[2]"\t"sampleName"\t"$5} ' | \
+        sed 's/<//g; s/>//g' >>~{basename}.bedpe
  
- <<<
- 		set -euo pipefail
+### Pull INDELs from small variants .vcf
  
- 		echo  -e "chrom1\tstart1\tend1\tchrom2\tstart2\tend2\tsample\tsvclass"  >~{basename}.bedpe
+        gatk SelectVariants \
+        -V ~{smallsVcfFile} \
+        -R ~{genome}  \
+        --exclude-intervals ~{difficultRegions} \
+        --select-type-to-include INDEL \
+        -O ~{basename}.INDEL.vcf
  
- 		$BCFTOOLS_ROOT/bin/bcftools query -f "%CHROM\t%POS\t%INFO/END\t%FILTER\t%ALT\t%INFO/CIPOS\t%INFO/CIEND\t[%DR\t]\t[%DV\t]\t[%RR\t]\t[%RV\t]\n" ~{structuralVcfFile} | \
- 		awk '$5 !~ ":" {print}' | \
- 		awk '$4 ~ "PASS" {print}' | \
- 		awk -v VAF=0.~{structuralVAF} '($10+$14)/($8+$10+$12+$14) > VAF {print}' | \
- 		awk -v sampleName=~{sampleName} 'split($6,a,",") split($7,b,",") {print $1"\t"$2+a[1]-1"\t"$2+a[2]"\t"$1"\t"$3+b[1]-1"\t"$2+b[2]"\t"sampleName"\t"$5} ' | \
- 		sed 's/<//g; s/>//g' >>~{basename}.bedpe
- 	>>>
- <<<
- 		set -euo pipefail
+        $BCFTOOLS_ROOT/bin/bcftools filter -i "(FORMAT/AD[0:1])/(FORMAT/AD[0:0]+FORMAT/AD[0:1]) >= 0.~{indelVAF}" ~{basename}.INDEL.vcf >~{basename}.INDEL.VAF.vcf
  
- 		gatk SelectVariants \
- 		-V ~{smallsVcfFile} \
- 		-R ~{genome}  \
- 		--exclude-intervals ~{difficultRegions} \
- 		--select-type-to-include INDEL \
- 		-O ~{basename}.INDEL.vcf
+        bgzip ~{basename}.INDEL.VAF.vcf
  
- 		$BCFTOOLS_ROOT/bin/bcftools filter -i "(FORMAT/AD[0:1])/(FORMAT/AD[0:0]+FORMAT/AD[0:1]) >= 0.~{indelVAF}" ~{basename}.INDEL.vcf >~{basename}.INDEL.VAF.vcf
+        tabix -p vcf ~{basename}.INDEL.VAF.vcf.gz
+
+### Pull SNPs from small variants .vcf
  
- 		bgzip ~{basename}.INDEL.VAF.vcf
+        gatk SelectVariants \
+        -V ~{smallsVcfFile} \
+        -R ~{genome}  \
+        --exclude-intervals ~{difficultRegions} \
+        --select-type-to-include SNP \
+        -O ~{basename}.SNP.vcf
  
- 		tabix -p vcf ~{basename}.INDEL.VAF.vcf.gz
- 	>>>
- <<<
- 		set -euo pipefail
+        $BCFTOOLS_ROOT/bin/bcftools filter -i "(FORMAT/AD[0:1])/(FORMAT/AD[0:0]+FORMAT/AD[0:1]) >= 0.~{snvVAF}" ~{basename}.SNP.vcf >~{basename}.SNP.VAF.vcf
  
- 		gatk SelectVariants \
- 		-V ~{smallsVcfFile} \
- 		-R ~{genome}  \
- 		--exclude-intervals ~{difficultRegions} \
- 		--select-type-to-include SNP \
- 		-O ~{basename}.SNP.vcf
+        bgzip ~{basename}.SNP.VAF.vcf
  
- 		$BCFTOOLS_ROOT/bin/bcftools filter -i "(FORMAT/AD[0:1])/(FORMAT/AD[0:0]+FORMAT/AD[0:1]) >= 0.~{snvVAF}" ~{basename}.SNP.vcf >~{basename}.SNP.VAF.vcf
+        tabix -p vcf ~{basename}.SNP.VAF.vcf.gz
  
- 		bgzip ~{basename}.SNP.VAF.vcf
+    
+### Convert .seg file to ASCAT format
  
- 		tabix -p vcf ~{basename}.SNP.VAF.vcf.gz
+        set -euo pipefail
  
- 	>>>
- <<<
+        echo  -e "seg_no\tChromosome\tchromStart\tchromEnd\ttotal.copy.number.inNormal\tminor.copy.number.inNormal\ttotal.copy.number.inTumour\tminor.copy.number.inTumour" >~{basename}_segments.cna.txt
  
- 		set -euo pipefail
- 
- 		echo  -e "seg_no\tChromosome\tchromStart\tchromEnd\ttotal.copy.number.inNormal\tminor.copy.number.inNormal\ttotal.copy.number.inTumour\tminor.copy.number.inTumour" >~{basename}_segments.cna.txt
- 
- 		tail -n +2 ~{segFile} | \
- 		awk 'split($1,a,"\"") split(a[2],b,"chr") {print NR"\t"b[2]"\t"$2"\t"$3"\t"2"\t"1"\t"$10"\t"$12}' >>~{basename}_segments.cna.txt
- 	>>>
- <<<
- 		set -euo pipefail
- 
- 		Rscript --vanilla ~{rScript} ~{sampleName} ~{tissue} ~{snvVcfFiltered} ~{indelVcfFiltered} ~{structuralBedpeFiltered} ~{lohSegFile}
- 	>>>
+        tail -n +2 ~{segFile} | \
+        awk 'split($1,a,"\"") split(a[2],b,"chr") {print NR"\t"b[2]"\t"$2"\t"$3"\t"2"\t"1"\t"$10"\t"$12}' >>~{basename}_segments.cna.txt
+
+### Run the sigtools package in R
+        Rscript --vanilla ~{rScript} ~{sampleName} ~{tissue} ~{snvVcfFiltered} ~{indelVcfFiltered} ~{structuralBedpeFiltered} ~{lohSegFile}
+
  ## Support
 
 For support, please file an issue on the [Github project](https://github.com/oicr-gsi) or send an email to gsi@oicr.on.ca .
