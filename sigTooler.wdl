@@ -59,8 +59,6 @@ workflow sigTooler {
 
 	}
 
-
-
   	meta {
     	author: "Felix Beaudry"
     	email: "fbeaudry@oicr.on.ca"
@@ -82,14 +80,14 @@ workflow sigTooler {
 
     	]
     	output_meta: {
-   			
+   			sigToolsOutput : "point estimate and bootstraped confidence intervals for HRD from sigtools"
     	}
 	}
 
 	output {
-		
-
-  }
+		File sigToolsOutput = "~{basename}.sigtools.hrd.txt"
+  	}
+  	
 }
 
 task filterStructural {
