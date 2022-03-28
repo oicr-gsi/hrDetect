@@ -10,65 +10,60 @@ test1_dcast <- dcast(test1,formula=V1+V2+V3~V4)
 
 #sampleSummaries <- fread('cgi/scratch/fbeaudry/sigTools_test/sigTools.summaries.txt',header=F)
 #sampleSummaries_dcast <- dcast(sampleSummaries,formula=V1+V2~V3)
-#sampleSummaries_dcast <- sampleSummaries_dcast %>% filter(purity >.3 & V1 != "VNWGTS")
- 
+
 TGL_brca2 <- fread('cgi/scratch/fbeaudry/sigTools_test/BRCA_mutations.TGL62.2.txt',header=FALSE)
-#TGL_brca1 <- fread('cgi/scratch/fbeaudry/sigTools_test/BRCA_mutations.TGL62.txt',header=FALSE) %>% filter(V5 == "OCT_010558") %>% select(V1,V2,V3,V5,V6)
-#names(TGL_brca1) <- names(TGL_brca2)
 PASS01_brca <- fread('cgi/scratch/fbeaudry/sigTools_test/BRCA_mutations.PASS01.txt',header=FALSE)
 PASS01.2_brca <- fread('cgi/scratch/fbeaudry/sigTools_test/BRCA_mutations.PASS01.2.txt',header=FALSE)
-
-#VNWGTS_brca <- fread('cgi/scratch/fbeaudry/sigTools_test/BRCA_mutations.VNWGTS.txt',header=FALSE)
 
 brca <- rbind.data.frame(TGL_brca2,PASS01_brca,PASS01.2_brca) %>% select(V1,V2,V4,V5)
 
 brca_dcast <- dcast(brca,formula=V4+V5~V1,value.var="V2")
 allSamples <- fread('cgi/scratch/fbeaudry/sigTools_test/sigTools.samples.txt',header=F)
 brca_dcast <- left_join(allSamples,brca_dcast,by=c("V1"="V5","V2"="V4"))
-#sampleSummaries_full <- left_join(sampleSummaries_dcast,brca_dcast,by=c("V1"="V5","V2"="V4"))
 
-test1_dcast$Study <- 
-  factor(test1_dcast$V1,  levels = c("TGL62","PASS01"))
-brca_dcast$Study <- 
-  factor(brca_dcast$V1,  levels = c("TGL62","PASS01"))
 
-test1_dcast$Samples <- 
-  factor(test1_dcast$V2,  levels = brca_dcast$V2[order(brca_dcast$BRCA1,brca_dcast$BRCA2)])
+test1_dcast_MAF5 <- test1_dcast %>% filter(V3 %in% c("5"))
+                       
+test1_dcast_MAF5$Study <-  factor(test1_dcast_MAF5$V1,  levels = c("TGL62","PASS01"))
+brca_dcast$Study  <-   factor(brca_dcast$V1,  levels = c("TGL62","PASS01"))
+
+test1_dcast_MAF5$Samples <- 
+  factor(test1_dcast_MAF5$V2,  levels = test1_dcast_MAF5$V2[order(test1_dcast_MAF5$HRD_median)])
 brca_dcast$Samples <- 
-  factor(brca_dcast$V2, levels = brca_dcast$V2[order(brca_dcast$BRCA1,brca_dcast$BRCA2)])
+  factor(brca_dcast$V2, levels = test1_dcast_MAF5$V2[order(test1_dcast_MAF5$HRD_median)])
 
 pd <- position_dodge(0.5)
 
 HRD_plot <- 
-ggplot(test1_dcast %>% filter(V3 %in% c("5","1")),
-       aes(x=Samples,color=as.factor(V3/100))) + 
+ggplot(test1_dcast_MAF5,
+       aes(x=Samples,color=Study)) + 
   geom_point(aes(y=HRD_median), shape=4, position=pd,size=3) + 
   geom_point(aes(y=HRD_point), shape=1, position=pd,size=2) + 
   
   geom_errorbar(aes(ymin=HRD_low_quant, ymax=HRD_top_quant), width=.1, position=pd) +
-  theme_bw() + labs(x="Sample",y="Probability of HRD",color="VAF (<)") + 
+  theme_bw() + labs(x="Sample",y="Probability of HRD",color="Study") + 
   ylim(0,1) + guides(alpha="none")+
  # scale_shape_manual(values=c(4,1)) + 
-  facet_grid(.~as.factor(Study),scale="free",space = "free")+
+ # facet_grid(.~as.factor(Study),scale="free",space = "free")+
    theme(axis.text.x = element_text(angle = -75, vjust = 0.5, hjust=0)) +
   theme(axis.title.x=element_blank(),
         axis.text.x=element_blank(),
         axis.ticks.x=element_blank()) +
   scale_color_manual(values=c("#65bc45","#000000","#0099ad"))
 
-
-
 BRCA_info_plot <- 
 ggplot(brca_dcast ) + 
   geom_point(aes(x=Samples,y="BRCA1",color=BRCA1),size=6,shape=15) +
   geom_point(aes(x=Samples,y="BRCA2",color=BRCA2),size=6,shape=15) +
-  facet_grid(.~as.factor(Study),scale="free",space = "free")+
+ # facet_grid(.~as.factor(Study),scale="free",space = "free")+
   theme_bw() + 
   theme(axis.text.x = element_text(angle = -75, vjust = 0.5, hjust=0)) +
   labs(x="Sample",y="",size="VAF",color="Mutation") +scale_color_discrete(na.value="white")
 
 
 plot_grid(HRD_plot, BRCA_info_plot, ncol = 1, rel_heights = c(2, 1),align = 'v')
+
+
 
 
 VAFvar_OCT <- fread('cgi/scratch/fbeaudry/sigTools_test/OCT_010958.VAFvar.txt')
