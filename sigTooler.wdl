@@ -95,12 +95,19 @@ workflow sigTooler {
 			}
 		]
 		output_meta: {
-			sigToolsOutput : "point estimate and bootstraped confidence intervals for HRD from sigtools"
+			sigTools_hrd_Output : "point estimate and bootstraped confidence intervals for HRD from sigtools"
+			sigTools_model_Output : "parameters raw values and weights for estimation of HRD from sigtools"
+			sigTools_sigs_Output : "signature breakdown from sigtools" 
+			sigTools_sigs_plot_Output: "plot of signature breakdown from sigtools"
+			sigTools_hrd_plot_Output: "plot of point estimate and bootstraped confidence intervals for HRD from sigtools"
 		}
 	}
-
 	output {
-		File sigToolsOutput = "~{sampleName}.sigtools.hrd.txt"
+		File sigTools_hrd_Output = "~{sampleName}.sigtools.hrd.txt"
+		File sigTools_model_Output = "~{sampleName}.sigtools.model.txt"
+		File sigTools_sigs_Output = "~{sampleName}.sigtools.sigs.txt"
+		File sigTools_sigs_plot_Output = "~{sampleName}.sigtools.sigs.png"
+		File sigTools_hrd_plot_Output = "~{sampleName}.sigtools.hrd.png"
 	}
 }
 
@@ -341,6 +348,7 @@ task hrdResults {
 		String rScript
 		String sampleName
 		String modules = "sigtools/0.0.0.9000"
+		Int sigtoolsBootstrap = 2500
 		Int jobMemory = 20
 		Int threads = 1
 		Int timeout = 2
@@ -357,6 +365,7 @@ task hrdResults {
 		rScript: "Temporary variable to call the .R script containing sigtools, will be modulated. default: ~/sigtools_workflow/sigTools_runthrough.R"
 		sampleName: "Name of sample matching the tumor sample in .vcf"		
 		modules: "Required environment modules"
+		sigtoolsBootstrap: "Number of bootstraps for sigtools"
 		jobMemory: "Memory allocated for this job (GB)"
 		threads: "Requested CPU threads"
 		timeout: "Hours before task timeout"
@@ -365,7 +374,9 @@ task hrdResults {
 	command <<<
 		set -euo pipefail
 
-		Rscript --vanilla ~{rScript} ~{sampleName} ~{tissue} ~{snvVcfFiltered} ~{indelVcfFiltered} ~{structuralBedpeFiltered} ~{lohSegFile}
+		Rscript --vanilla ~{rScript}_runthrough.R ~{sampleName} ~{tissue} ~{snvVcfFiltered} ~{indelVcfFiltered} ~{structuralBedpeFiltered} ~{lohSegFile} ~{sigtoolsBootstrap}
+		Rscript --vanilla ~{rScript}_plotter.R ~{sampleName}
+
 	>>> 
 
 	runtime {
@@ -376,12 +387,20 @@ task hrdResults {
 	}
 
 	output {
-		File sigToolsOutput = "~{sampleName}.sigtools.hrd.txt"
+		File sigTools_hrd_Output = "~{sampleName}.sigtools.hrd.txt"
+		File sigTools_model_Output = "~{sampleName}.sigtools.model.txt"
+		File sigTools_sigs_Output = "~{sampleName}.sigtools.sigs.txt"
+		File sigTools_sigs_plot_Output = "~{sampleName}.sigtools.sigs.png"
+		File sigTools_hrd_plot_Output = "~{sampleName}.sigtools.hrd.png"
 	}
 
 	meta {
 		output_meta: {
-			sigToolsOutput : "point estimate and bootstraped confidence intervals for HRD from sigtools"
+			sigTools_hrd_Output : "point estimate and bootstraped confidence intervals for HRD from sigtools"
+			sigTools_model_Output : "parameters raw values and weights for estimation of HRD from sigtools"
+			sigTools_sigs_Output : "signature breakdown from sigtools" 
+			sigTools_sigs_plot_Output: "plot of signature breakdown from sigtools"
+			sigTools_hrd_plot_Output: "plot of point estimate and bootstraped confidence intervals for HRD from sigtools"
 		}
 	}
 }
