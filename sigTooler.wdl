@@ -11,6 +11,7 @@ workflow sigTooler {
 		String tissue
 		String rScript
 		String sampleName
+		Boolean plotIt
 	}
 
 	parameter_meta {
@@ -63,6 +64,16 @@ workflow sigTooler {
 			sampleName = sampleName
 	}
 
+	if(plotIt == true){
+		call plotResults {
+			input:
+				sigTools_hrd_input = hrdResults.sigTools_hrd_Output ,
+				sigTools_sigs_input = hrdResults.sigTools_sigs_Output,
+				rScript = rScript,
+				sampleName = sampleName
+		}
+	}
+
 	meta {
 		author: "Felix Beaudry"
 		email: "fbeaudry@oicr.on.ca"
@@ -86,6 +97,10 @@ workflow sigTooler {
 				url: "https://github.com/Nik-Zainal-Group/signature.tools.lib"
 			},
 			{
+				name: "rstats-cairo/4.0",
+				url: "https://utstat.toronto.edu/cran/src/base/R-4/R-4.0.2.tar.gz"
+			},
+			{
 				name: "grch38-alldifficultregions/3.0",
 				url: "https://ftp-trace.ncbi.nlm.nih.gov/giab/ftp/release/genome-stratifications/v3.0/GRCh38/union/"
 			},
@@ -95,10 +110,10 @@ workflow sigTooler {
 			}
 		]
 		output_meta: {
-			sigTools_hrd_Output : "point estimate and bootstraped confidence intervals for HRD from sigtools"
-			sigTools_model_Output : "parameters raw values and weights for estimation of HRD from sigtools"
-			sigTools_sigs_Output : "signature breakdown from sigtools" 
-			sigTools_sigs_plot_Output: "plot of signature breakdown from sigtools"
+			sigTools_hrd_Output : "point estimate and bootstraped confidence intervals for HRD from sigtools",
+			sigTools_model_Output : "parameters raw values and weights for estimation of HRD from sigtools",
+			sigTools_sigs_Output : "signature breakdown from sigtools" ,
+			sigTools_sigs_plot_Output: "plot of signature breakdown from sigtools",
 			sigTools_hrd_plot_Output: "plot of point estimate and bootstraped confidence intervals for HRD from sigtools"
 		}
 	}
@@ -106,8 +121,8 @@ workflow sigTooler {
 		File sigTools_hrd_Output = "~{sampleName}.sigtools.hrd.txt"
 		File sigTools_model_Output = "~{sampleName}.sigtools.model.txt"
 		File sigTools_sigs_Output = "~{sampleName}.sigtools.sigs.txt"
-		File sigTools_sigs_plot_Output = "~{sampleName}.sigtools.sigs.png"
-		File sigTools_hrd_plot_Output = "~{sampleName}.sigtools.hrd.png"
+		File? sigTools_sigs_plot_Output = "~{sampleName}.sigtools.sigs.png"
+		File? sigTools_hrd_plot_Output = "~{sampleName}.sigtools.hrd.png"
 	}
 }
 
@@ -375,7 +390,6 @@ task hrdResults {
 		set -euo pipefail
 
 		Rscript --vanilla ~{rScript}_runthrough.R ~{sampleName} ~{tissue} ~{snvVcfFiltered} ~{indelVcfFiltered} ~{structuralBedpeFiltered} ~{lohSegFile} ~{sigtoolsBootstrap}
-		Rscript --vanilla ~{rScript}_plotter.R ~{sampleName}
 
 	>>> 
 
@@ -390,16 +404,60 @@ task hrdResults {
 		File sigTools_hrd_Output = "~{sampleName}.sigtools.hrd.txt"
 		File sigTools_model_Output = "~{sampleName}.sigtools.model.txt"
 		File sigTools_sigs_Output = "~{sampleName}.sigtools.sigs.txt"
+	}
+
+	meta {
+		output_meta: {
+			sigTools_hrd_Output : "point estimate and bootstraped confidence intervals for HRD from sigtools",
+			sigTools_model_Output : "parameters raw values and weights for estimation of HRD from sigtools",
+			sigTools_sigs_Output : "signature breakdown from sigtools" 
+		}
+	}
+}
+
+task plotResults {
+	input {
+		File sigTools_hrd_input 
+		File sigTools_sigs_input 
+		String rScript
+		String sampleName
+		String modules = "rstats-cairo/4.0"
+		Int jobMemory = 20
+		Int threads = 1
+		Int timeout = 2
+	}
+
+	parameter_meta {
+		rScript: "Temporary variable to call the .R script containing sigtools, will be modulated. default: ~/sigtools_workflow/sigTools_runthrough.R"
+		sampleName: "Name of sample matching the tumor sample in .vcf"		
+		modules: "Required environment modules"
+		jobMemory: "Memory allocated for this job (GB)"
+		threads: "Requested CPU threads"
+		timeout: "Hours before task timeout"
+	}
+
+	command <<<
+		set -euo pipefail
+
+		Rscript --vanilla ~{rScript}_plotter.R ~{sampleName}
+
+	>>> 
+
+	runtime {
+		modules: "~{modules}"
+		memory:  "~{jobMemory} GB"
+		cpu:     "~{threads}"
+		timeout: "~{timeout}"
+	}
+
+	output {
 		File sigTools_sigs_plot_Output = "~{sampleName}.sigtools.sigs.png"
 		File sigTools_hrd_plot_Output = "~{sampleName}.sigtools.hrd.png"
 	}
 
 	meta {
 		output_meta: {
-			sigTools_hrd_Output : "point estimate and bootstraped confidence intervals for HRD from sigtools"
-			sigTools_model_Output : "parameters raw values and weights for estimation of HRD from sigtools"
-			sigTools_sigs_Output : "signature breakdown from sigtools" 
-			sigTools_sigs_plot_Output: "plot of signature breakdown from sigtools"
+			sigTools_sigs_plot_Output: "plot of signature breakdown from sigtools",
 			sigTools_hrd_plot_Output: "plot of point estimate and bootstraped confidence intervals for HRD from sigtools"
 		}
 	}

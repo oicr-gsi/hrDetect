@@ -27,7 +27,7 @@ snvFile_loc  <- args[3]
 indel_vcf_file <- args[4]
 SV_bedpe_file <- args[5]
 LOH_seg_file <- args[6]
-boots <- args[7]
+boots <- as.numeric(args[7])
 
 ####Import files####
 
@@ -70,8 +70,6 @@ input_matrix <- matrix(NA,nrow = 1,
 
 input_matrix[sample_name,"hrd"] <- hrd_index
 
-for(rep in seq(1:20)){
-  cat(rep)
   HRDetect_res <- HRDetect_pipeline(data_matrix=input_matrix,
                                     bootstrapHRDetectScores=TRUE,
                                     SV_catalogues=SV_catalogue_reformat,
@@ -92,7 +90,7 @@ for(rep in seq(1:20)){
       "HRD_point"=HRDetect_res$hrdetect_output[8],
       quantiles
     ),
-    file = paste(sample_name,".rep",rep,".sigtools.hrd.txt",sep=""),
+    file = paste(sample_name,".sigtools.hrd.txt",sep=""),
     append = F, quote = FALSE, sep = "\t", 
     eol = "\n", na = "NA",dec = ".", row.names = TRUE, 
     col.names = FALSE
@@ -103,7 +101,7 @@ for(rep in seq(1:20)){
     "value"=HRDetect_res$data_matrix,
     "BLUP"=HRDetect_res$hrdetect_output[c(2:7)]
     ),
-    file = paste(sample_name,".rep",rep,".sigtools.model.txt",sep=""),
+    file = paste(sample_name,".sigtools.model.txt",sep=""),
     append = F, quote = FALSE, sep = "\t", 
     eol = "\n", na = "NA",dec = ".", row.names = TRUE, 
     col.names = TRUE
@@ -129,5 +127,4 @@ for(rep in seq(1:20)){
     eol = "\n", na = "NA",dec = ".", row.names = TRUE, 
     col.names = TRUE
   )
-}
 
