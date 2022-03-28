@@ -6,8 +6,8 @@ workflow sigTooler {
 		File smallsVcfFile
 		File smallsVcfIndex
 		File segFile
-		Int indelVAF
-		Int snvVAF
+		String indelVAF
+		String snvVAF
 		String tissue
 		String rScript
 		String sampleName
@@ -132,7 +132,7 @@ task filterStructural {
 		String basename = basename("~{structuralVcfFile}", ".vcf.gz")
 		String modules = "bcftools/1.9"
 		String sampleName
-		Int structuralVAF = 0
+		String structuralVAF = 0
 		Int jobMemory = 5
 		Int threads = 1
 		Int timeout = 1
@@ -188,7 +188,7 @@ task filterINDELs {
 		String modules = "gatk/4.2.0.0 tabix/1.9 bcftools/1.9 grch38-alldifficultregions/3.0 hg38/p12"
 		String genome = "$HG38_ROOT/hg38_random.fa"
 		String difficultRegions = "$GRCH38_ALLDIFFICULTREGIONS_ROOT/GRCh38_alldifficultregions.bed"
-		Int indelVAF
+		String indelVAF
 		Int jobMemory = 10
 		Int threads = 1
 		Int timeout = 2
@@ -211,7 +211,7 @@ task filterINDELs {
 
 		gatk SelectVariants \
 		-V ~{smallsVcfFile} \
-		-R ~{genome}  \
+		-R ~{genome} \
 		--exclude-intervals ~{difficultRegions} \
 		--select-type-to-include INDEL \
 		-O ~{basename}.INDEL.vcf
@@ -251,7 +251,7 @@ task filterSNVs {
 		String modules = "gatk/4.2.0.0 tabix/1.9 bcftools/1.9 grch38-alldifficultregions/3.0 hg38/p12"
 		String genome = "$HG38_ROOT/hg38_random.fa"
 		String difficultRegions = "$GRCH38_ALLDIFFICULTREGIONS_ROOT/GRCh38_alldifficultregions.bed"
-		Int snvVAF
+		String snvVAF
 		Int jobMemory = 10
 		Int threads = 1
 		Int timeout = 2
