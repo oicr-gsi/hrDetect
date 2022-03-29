@@ -235,12 +235,11 @@ task filterINDELs {
 		$BCFTOOLS_ROOT/bin/bcftools filter -i "(FORMAT/AD[0:1])/(FORMAT/AD[0:0]+FORMAT/AD[0:1]) >= 0.~{indelVAF}" ~{basename}.INDEL.vcf >~{basename}.INDEL.VAF.vcf
 
 		bgzip ~{basename}.INDEL.VAF.vcf
-
 		tabix -p vcf ~{basename}.INDEL.VAF.vcf.gz
 
-		awk '$1 !~ "#" {print}' ~{smallsVcfFile} | wc -l >~{sampleName}.INDEL.filteringReport.txt
+		zcat ~{smallsVcfFile} | awk '$1 !~ "#" {print}'  | wc -l >~{sampleName}.INDEL.filteringReport.txt
 		awk '$1 !~ "#" {print}' ~{basename}.INDEL.vcf | wc -l >>~{sampleName}.INDEL.filteringReport.txt
-		awk '$1 !~ "#" {print}' ~{basename}.INDEL.VAF.vcf | wc -l >>~{sampleName}.INDEL.filteringReport.txt
+		zcat ~{basename}.INDEL.VAF.vcf.gz | awk '$1 !~ "#" {print}'  | wc -l >>~{sampleName}.INDEL.filteringReport.txt
 
 	>>> 
 
@@ -310,9 +309,9 @@ task filterSNVs {
 
 		tabix -p vcf ~{basename}.SNP.VAF.vcf.gz
 
-		awk '$1 !~ "#" {print}' ~{smallsVcfFile} | wc -l >~{sampleName}.SNP.filteringReport.txt
+		zcat ~{smallsVcfFile} | awk '$1 !~ "#" {print}'  | wc -l >~{sampleName}.SNP.filteringReport.txt
 		awk '$1 !~ "#" {print}' ~{basename}.SNP.vcf | wc -l >>~{sampleName}.SNP.filteringReport.txt
-		awk '$1 !~ "#" {print}' ~{basename}.SNP.VAF.vcf | wc -l >>~{sampleName}.SNP.filteringReport.txt
+		zcat ~{basename}.SNP.VAF.vcf.gz | awk '$1 !~ "#" {print}'  | wc -l >>~{sampleName}.SNP.filteringReport.txt
 
 	>>> 
 
