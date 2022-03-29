@@ -31,16 +31,35 @@ boots <- as.numeric(args[7])
 
 ####Import files####
 
+##indel##
+
+t <- try(read.table(indel_vcf_file,comment.char= "#"))
+if("try-error" %in% class(t)) {
+  write.table(
+    c("indel error: no indels after filtering"),
+    file = paste(sample_name,".sigtools.hrd.txt",sep=""),append = F, quote = FALSE, row.names = FALSE, col.names = FALSE
+  )
+  
+  write.table(
+    c("indel error: no indels after filtering"),
+    file = paste(sample_name,".sigtools.model.txt",sep=""),append = F, quote = FALSE, row.names = FALSE, col.names = FALSE
+  )
+  
+  write.table(
+    c("indel error: no indels after filtering"),
+    file = paste(sample_name,".sigtools.sigs.txt",sep=""),append = F, quote = FALSE, row.names = FALSE, col.names = FALSE
+  )
+  
+}else{
+
+names(indel_vcf_file)[1] <- sample_name
+
 ##SNV##
 
 
 snv_catalogue <- vcfToSNVcatalogue(vcfFilename = snvFile_loc,genome.v = "hg38")
 
 snv_catalogue_reformat <- sigTools_formatter(input=snv_catalogue,sampleName=sample_name)
-
-##indel##
-
-names(indel_vcf_file)[1] <- sample_name
 
 ##structural variants##
 
@@ -144,4 +163,4 @@ if(length(HRDetect_res$exposures_rearr)>0){
       col.names = TRUE
     )
   }
-
+}
