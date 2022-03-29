@@ -114,10 +114,16 @@ workflow sigTooler {
 			sigTools_model_Output : "parameters raw values and weights for estimation of HRD from sigtools",
 			sigTools_sigs_Output : "signature breakdown from sigtools" ,
 			sigTools_sigs_plot_Output: "plot of signature breakdown from sigtools",
-			sigTools_hrd_plot_Output: "plot of point estimate and bootstraped confidence intervals for HRD from sigtools"
+			sigTools_hrd_plot_Output: "plot of point estimate and bootstraped confidence intervals for HRD from sigtools",
+			indelFilteringReport: "counts of INDELs pre and post filtering",
+			snvFilteringReport: "counts of SNVs pre and post filtering",
+			structuralFilteringReport: "counts of structural variants pre and post filtering"
 		}
 	}
 	output {
+		File indelFilteringReport = "~{sampleName}.INDEL.filteringReport.txt"
+		File snvFilteringReport = "~{sampleName}.SNP.filteringReport.txt"
+		File structuralFilteringReport = "~{sampleName}.structural.filteringReport.txt"
 		File sigTools_hrd_Output = "~{sampleName}.sigtools.hrd.txt"
 		File sigTools_model_Output = "~{sampleName}.sigtools.model.txt"
 		File sigTools_sigs_Output = "~{sampleName}.sigtools.sigs.txt"
@@ -160,6 +166,10 @@ task filterStructural {
 		awk -v VAF=0.~{structuralVAF} '($10+$14)/($8+$10+$12+$14) > VAF {print}' | \
 		awk -v sampleName=~{sampleName} 'split($6,a,",") split($7,b,",") {print $1"\t"$2+a[1]-1"\t"$2+a[2]"\t"$1"\t"$3+b[1]-1"\t"$2+b[2]"\t"sampleName"\t"$5} ' | \
 		sed 's/<//g; s/>//g' >>~{basename}.bedpe
+
+		awk '$1 !~ "#" {print}' ~{structuralVcfFile} | wc -l >~{sampleName}.structural.filteringReport.txt
+		awk '$1 !~ "#" {print}' ~{basename}.bedpe | wc -l >>~{sampleName}.structural.filteringReport.txt
+
 	>>>
 
 	runtime {
@@ -171,11 +181,13 @@ task filterStructural {
 
 	output {
 		File structuralbedpe = "~{basename}.bedpe"
+		File structuralFilteringReport = "~{sampleName}.structural.filteringReport.txt"
 	}
 
 	meta {
 		output_meta: {
-			structuralbedpe: "filtered structural .bedpe"
+			structuralbedpe: "filtered structural .bedpe",
+			structuralFilteringReport: "counts of variants pre and post filtering"
 		}
 	}
 }
@@ -221,6 +233,11 @@ task filterINDELs {
 		bgzip ~{basename}.INDEL.VAF.vcf
 
 		tabix -p vcf ~{basename}.INDEL.VAF.vcf.gz
+
+		awk '$1 !~ "#" {print}' ~{smallsVcfFile} | wc -l >~{sampleName}.INDEL.filteringReport.txt
+		awk '$1 !~ "#" {print}' ~{basename}.INDEL.vcf | wc -l >>~{sampleName}.INDEL.filteringReport.txt
+		awk '$1 !~ "#" {print}' ~{basename}.INDEL.VAF.vcf | wc -l >>~{sampleName}.INDEL.filteringReport.txt
+
 	>>> 
 
 	runtime {
@@ -233,12 +250,14 @@ task filterINDELs {
 	output {
 		File indelVcfOutput = "~{basename}.INDEL.VAF.vcf.gz"
 		File indelVcfIndexOutput = "~{basename}.INDEL.VAF.vcf.gz.tbi"
+		File indelFilteringReport = "~{sampleName}.INDEL.filteringReport.txt"
 	}
 
 	meta {
 		output_meta: {
 			indelVcfOutput: "filtered INDEL .vcf",
-			indelVcfIndexOutput: "filtered INDEL .vcf.tbi indexed"
+			indelVcfIndexOutput: "filtered INDEL .vcf.tbi indexed",
+			indelFilteringReport: "counts of variants pre and post filtering"
 		}
 	}
 }
@@ -285,6 +304,10 @@ task filterSNVs {
 
 		tabix -p vcf ~{basename}.SNP.VAF.vcf.gz
 
+		awk '$1 !~ "#" {print}' ~{smallsVcfFile} | wc -l >~{sampleName}.SNP.filteringReport.txt
+		awk '$1 !~ "#" {print}' ~{basename}.SNP.vcf | wc -l >>~{sampleName}.SNP.filteringReport.txt
+		awk '$1 !~ "#" {print}' ~{basename}.SNP.VAF.vcf | wc -l >>~{sampleName}.SNP.filteringReport.txt
+
 	>>> 
 
 	runtime {
@@ -297,12 +320,14 @@ task filterSNVs {
 	output {
 		File snvVcfOutput = "~{basename}.SNP.VAF.vcf.gz"
 		File snvVcfIndexOutput = "~{basename}.SNP.VAF.vcf.gz.tbi"
+		File snvFilteringReport = "~{sampleName}.SNP.filteringReport.txt"
 	}
 
 	meta {
 		output_meta: {
 			snvVcfOutput: "filtered SNV .vcf",
 			snvVcfIndexOutput: "filtered SNV .vcf.tbi (indexed)"
+			snvFilteringReport: "counts of variants pre and post filtering"
 		}
 	}
 }
