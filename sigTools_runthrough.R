@@ -54,6 +54,12 @@ if("try-error" %in% class(t)) {
 
 names(indel_vcf_file)[1] <- sample_name
 
+vcfToIndelsClassification(
+  indelsVCF.file=indel_vcf_file,
+  sampleID=sample_name,
+  genome.v="hg38"
+  )
+
 ##SNV##
 
 
@@ -126,30 +132,47 @@ input_matrix[sample_name,"hrd"] <- hrd_index
     col.names = TRUE
   )
 
-if(length(HRDetect_res$exposures_rearr)>0){  
-  write.table(
-    rbind.data.frame(
-      cbind.data.frame(
-        setColNames(HRDetect_res$exposures_subs, "sig_weight_norm"),
-        setColNames(HRDetect_res$exposures_subs/sum(HRDetect_res$exposures_subs), "sig_weight_rel"),
-        setColNames(HRDetect_res$exposures_subs/sum(HRDetect_res$SNV_catalogues), "sig_weight_rel_adj"),
-        "sig_type"="SNV"
+if(length(HRDetect_res$exposures_rearr)>0){
+  if(length(HRDetect_res$exposures_subs)>0){
+    
+    write.table(
+      rbind.data.frame(
+        cbind.data.frame(
+          setColNames(HRDetect_res$exposures_subs, "sig_weight_norm"),
+          setColNames(HRDetect_res$exposures_subs/sum(HRDetect_res$exposures_subs), "sig_weight_rel"),
+          setColNames(HRDetect_res$exposures_subs/sum(HRDetect_res$SNV_catalogues), "sig_weight_rel_adj"),
+          "sig_type"="SNV"
+        ),
+        cbind.data.frame(
+          setColNames(HRDetect_res$exposures_rearr, "sig_weight_norm"),
+          setColNames(HRDetect_res$exposures_rearr/sum(HRDetect_res$exposures_rearr), "sig_weight_rel"),
+          setColNames(HRDetect_res$exposures_rearr/sum(HRDetect_res$SV_catalogues), "sig_weight_rel_adj"),
+          "sig_type"="structural"
+        )
       ),
-      cbind.data.frame(
-        setColNames(HRDetect_res$exposures_rearr, "sig_weight_norm"),
-        setColNames(HRDetect_res$exposures_rearr/sum(HRDetect_res$exposures_rearr), "sig_weight_rel"),
-        setColNames(HRDetect_res$exposures_rearr/sum(HRDetect_res$SV_catalogues), "sig_weight_rel_adj"),
-        "sig_type"="structural"
-      )
-    ),
-    file = paste(sample_name,".sigtools.sigs.txt",sep=""),
-    append = F, quote = FALSE, sep = "\t", 
-    eol = "\n", na = "NA",dec = ".", row.names = TRUE, 
-    col.names = TRUE
-  )
+      file = paste(sample_name,".sigtools.sigs.txt",sep=""),
+      append = F, quote = FALSE, sep = "\t", 
+      eol = "\n", na = "NA",dec = ".", row.names = TRUE, 
+      col.names = TRUE
+    )
+  }
+  if(length(HRDetect_res$exposures_subs)==0){
+    write.table(
+        cbind.data.frame(
+          setColNames(HRDetect_res$exposures_rearr, "sig_weight_norm"),
+          setColNames(HRDetect_res$exposures_rearr/sum(HRDetect_res$exposures_rearr), "sig_weight_rel"),
+          setColNames(HRDetect_res$exposures_rearr/sum(HRDetect_res$SV_catalogues), "sig_weight_rel_adj"),
+          "sig_type"="structural"
+        ),
+      file = paste(sample_name,".sigtools.sigs.txt",sep=""),
+      append = F, quote = FALSE, sep = "\t", 
+      eol = "\n", na = "NA",dec = ".", row.names = TRUE, 
+      col.names = TRUE
+    )
+  }  
 }
   
-  if(length(HRDetect_res$exposures_rearr)==0){  
+if(length(HRDetect_res$exposures_rearr)==0){  
     write.table(
         cbind.data.frame(
           setColNames(HRDetect_res$exposures_subs, "sig_weight_norm"),
