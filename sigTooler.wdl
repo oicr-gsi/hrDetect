@@ -36,14 +36,16 @@ workflow sigTooler {
 		input: 
 			smallsVcfFile = smallsVcfFile,
 			smallsVcfIndex = smallsVcfIndex,
-			indelVAF = indelVAF
+			indelVAF = indelVAF,
+			sampleName = sampleName
 	}
 
 	call filterSNVs {
 		input: 
 			smallsVcfFile = smallsVcfFile,
 			smallsVcfIndex = smallsVcfIndex,
-			snvVAF = snvVAF
+			snvVAF = snvVAF,
+			sampleName = sampleName
 	}
 
 	call convertSegFile {
@@ -198,6 +200,7 @@ task filterINDELs {
 		File smallsVcfIndex
 		String basename = basename("~{smallsVcfFile}", ".vcf.gz")
 		String modules = "gatk/4.2.0.0 tabix/1.9 bcftools/1.9 grch38-alldifficultregions/3.0 hg38/p12"
+		String sampleName
 		String genome = "$HG38_ROOT/hg38_random.fa"
 		String difficultRegions = "$GRCH38_ALLDIFFICULTREGIONS_ROOT/GRCh38_alldifficultregions.bed"
 		String indelVAF
@@ -210,6 +213,7 @@ task filterINDELs {
 		smallsVcfFile: "Vcf input file"
 		basename: "Base name"
 		modules: "Required environment modules"
+		sampleName: "Name of sample matching the tumor sample in .vcf"
 		genome: "Path to loaded genome"
 		difficultRegions: "Path to loaded difficult regions to align to"
 		indelVAF: "VAF for indels"
@@ -268,6 +272,7 @@ task filterSNVs {
 		File smallsVcfIndex
 		String basename = basename("~{smallsVcfFile}", ".vcf.gz")
 		String modules = "gatk/4.2.0.0 tabix/1.9 bcftools/1.9 grch38-alldifficultregions/3.0 hg38/p12"
+		String sampleName
 		String genome = "$HG38_ROOT/hg38_random.fa"
 		String difficultRegions = "$GRCH38_ALLDIFFICULTREGIONS_ROOT/GRCh38_alldifficultregions.bed"
 		String snvVAF
@@ -281,6 +286,7 @@ task filterSNVs {
 		snvVAF: "VAF for SNV filtering"
 		basename: "Base name"
 		modules: "Required environment modules"
+		sampleName: "Name of sample matching the tumor sample in .vcf"
 		genome: "Path to loaded genome"
 		difficultRegions: "Path to loaded difficult regions to align to"
 		jobMemory: "Memory allocated for this job (GB)"
@@ -326,7 +332,7 @@ task filterSNVs {
 	meta {
 		output_meta: {
 			snvVcfOutput: "filtered SNV .vcf",
-			snvVcfIndexOutput: "filtered SNV .vcf.tbi (indexed)"
+			snvVcfIndexOutput: "filtered SNV .vcf.tbi (indexed)",
 			snvFilteringReport: "counts of variants pre and post filtering"
 		}
 	}
