@@ -194,7 +194,7 @@ task filterINDELs {
 		String modules = "gatk/4.2.0.0 tabix/1.9 bcftools/1.9 hg38/p12 grch38-alldifficultregions/3.0"
 		String sampleName
 		String genome = "$HG38_ROOT/hg38_random.fa"
-		String? difficultRegions = "--exclude-intervals $GRCH38_ALLDIFFICULTREGIONS_ROOT/GRCh38_alldifficultregions.bed"
+		String? difficultRegions
 		String indelVAF
 		Int jobMemory = 10
 		Int threads = 1
@@ -207,7 +207,7 @@ task filterINDELs {
 		modules: "Required environment modules"
 		sampleName: "Name of sample matching the tumor sample in .vcf"
 		genome: "Path to loaded genome"
-		difficultRegions: "Path to .bed of difficult regions to align to, string must include the --exclude-intervals flag"
+		difficultRegions: "Path to .bed of difficult regions to align to, string must include the --exclude-intervals flag, eg: --exclude-intervals $GRCH38_ALLDIFFICULTREGIONS_ROOT/GRCh38_alldifficultregions.bed"
 		indelVAF: "VAF for indels"
 		jobMemory: "Memory allocated for this job (GB)"
 		threads: "Requested CPU threads"
@@ -221,8 +221,7 @@ task filterINDELs {
 		-V ~{smallsVcfFile} \
 		-R ~{genome} ~{difficultRegions} \
 		--select-type-to-include INDEL \
-		-O ~{basename}.INDEL.vcf 
-		 
+		-O ~{basename}.INDEL.vcf  
 
 		$BCFTOOLS_ROOT/bin/bcftools filter -i "(FORMAT/AD[0:1])/(FORMAT/AD[0:0]+FORMAT/AD[0:1]) >= 0.~{indelVAF}" ~{basename}.INDEL.vcf >~{basename}.INDEL.VAF.vcf
 
@@ -265,7 +264,7 @@ task filterSNVs {
 		String modules = "gatk/4.2.0.0 tabix/1.9 bcftools/1.9 grch38-alldifficultregions/3.0 hg38/p12"
 		String sampleName
 		String genome = "$HG38_ROOT/hg38_random.fa"
-		String? difficultRegions = "--exclude-intervals $GRCH38_ALLDIFFICULTREGIONS_ROOT/GRCh38_alldifficultregions.bed"
+		String? difficultRegions 
 		String snvVAF
 		Int jobMemory = 10
 		Int threads = 1
@@ -279,7 +278,7 @@ task filterSNVs {
 		modules: "Required environment modules"
 		sampleName: "Name of sample matching the tumor sample in .vcf"
 		genome: "Path to loaded genome"
-		difficultRegions: "Path to .bed of difficult regions to align to, string must include the --exclude-intervals flag"
+		difficultRegions: "Path to .bed of difficult regions to align to, string must include the --exclude-intervals flag, eg: --exclude-intervals $GRCH38_ALLDIFFICULTREGIONS_ROOT/GRCh38_alldifficultregions.bed"
 		jobMemory: "Memory allocated for this job (GB)"
 		threads: "Requested CPU threads"
 		timeout: "Hours before task timeout"
