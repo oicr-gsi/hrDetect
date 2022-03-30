@@ -101,14 +101,6 @@ workflow sigTooler {
 			{
 				name: "rstats-cairo/4.0",
 				url: "https://utstat.toronto.edu/cran/src/base/R-4/R-4.0.2.tar.gz"
-			},
-			{
-				name: "grch38-alldifficultregions/3.0",
-				url: "https://ftp-trace.ncbi.nlm.nih.gov/giab/ftp/release/genome-stratifications/v3.0/GRCh38/union/"
-			},
-			{
-				name: "hg38/p12",
-				url: "https://www.ncbi.nlm.nih.gov/assembly/GCF_000001405.38/"
 			}
 		]
 		output_meta: {
@@ -199,10 +191,10 @@ task filterINDELs {
 		File smallsVcfFile
 		File smallsVcfIndex
 		String basename = basename("~{smallsVcfFile}", ".vcf.gz")
-		String modules = "gatk/4.2.0.0 tabix/1.9 bcftools/1.9 grch38-alldifficultregions/3.0 hg38/p12"
+		String modules = "gatk/4.2.0.0 tabix/1.9 bcftools/1.9 hg38/p12 grch38-alldifficultregions/3.0"
 		String sampleName
 		String genome = "$HG38_ROOT/hg38_random.fa"
-		String difficultRegions = "$GRCH38_ALLDIFFICULTREGIONS_ROOT/GRCh38_alldifficultregions.bed"
+		String? difficultRegions = "--exclude-intervals $GRCH38_ALLDIFFICULTREGIONS_ROOT/GRCh38_alldifficultregions.bed"
 		String indelVAF
 		Int jobMemory = 10
 		Int threads = 1
@@ -215,7 +207,7 @@ task filterINDELs {
 		modules: "Required environment modules"
 		sampleName: "Name of sample matching the tumor sample in .vcf"
 		genome: "Path to loaded genome"
-		difficultRegions: "Path to loaded difficult regions to align to"
+		difficultRegions: "Path to .bed of difficult regions to align to, string must include the --exclude-intervals flag"
 		indelVAF: "VAF for indels"
 		jobMemory: "Memory allocated for this job (GB)"
 		threads: "Requested CPU threads"
@@ -227,10 +219,10 @@ task filterINDELs {
 
 		gatk SelectVariants \
 		-V ~{smallsVcfFile} \
-		-R ~{genome} \
-		--exclude-intervals ~{difficultRegions} \
+		-R ~{genome} ~{difficultRegions} \
 		--select-type-to-include INDEL \
-		-O ~{basename}.INDEL.vcf
+		-O ~{basename}.INDEL.vcf 
+		 
 
 		$BCFTOOLS_ROOT/bin/bcftools filter -i "(FORMAT/AD[0:1])/(FORMAT/AD[0:0]+FORMAT/AD[0:1]) >= 0.~{indelVAF}" ~{basename}.INDEL.vcf >~{basename}.INDEL.VAF.vcf
 
@@ -273,7 +265,7 @@ task filterSNVs {
 		String modules = "gatk/4.2.0.0 tabix/1.9 bcftools/1.9 grch38-alldifficultregions/3.0 hg38/p12"
 		String sampleName
 		String genome = "$HG38_ROOT/hg38_random.fa"
-		String difficultRegions = "$GRCH38_ALLDIFFICULTREGIONS_ROOT/GRCh38_alldifficultregions.bed"
+		String? difficultRegions = "--exclude-intervals $GRCH38_ALLDIFFICULTREGIONS_ROOT/GRCh38_alldifficultregions.bed"
 		String snvVAF
 		Int jobMemory = 10
 		Int threads = 1
@@ -287,7 +279,7 @@ task filterSNVs {
 		modules: "Required environment modules"
 		sampleName: "Name of sample matching the tumor sample in .vcf"
 		genome: "Path to loaded genome"
-		difficultRegions: "Path to loaded difficult regions to align to"
+		difficultRegions: "Path to .bed of difficult regions to align to, string must include the --exclude-intervals flag"
 		jobMemory: "Memory allocated for this job (GB)"
 		threads: "Requested CPU threads"
 		timeout: "Hours before task timeout"
@@ -298,8 +290,7 @@ task filterSNVs {
 
 		gatk SelectVariants \
 		-V ~{smallsVcfFile} \
-		-R ~{genome}  \
-		--exclude-intervals ~{difficultRegions} \
+		-R ~{genome} ~{difficultRegions} \
 		--select-type-to-include SNP \
 		-O ~{basename}.SNP.vcf
 
