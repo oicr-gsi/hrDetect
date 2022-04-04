@@ -223,7 +223,7 @@ task filterINDELs {
 		--select-type-to-include INDEL \
 		-O ~{basename}.INDEL.vcf  
 
-		$BCFTOOLS_ROOT/bin/bcftools filter -i "(FORMAT/AD[0:1])/(FORMAT/AD[0:0]+FORMAT/AD[0:1]) >= 0.~{indelVAF}" ~{basename}.INDEL.vcf >~{basename}.INDEL.VAF.vcf
+		$BCFTOOLS_ROOT/bin/bcftools view -f 'PASS,clustered_events' ~{basename}.INDEL.vcf  |  $BCFTOOLS_ROOT/bin/bcftools filter -i "(FORMAT/AD[0:1])/(FORMAT/AD[0:0]+FORMAT/AD[0:1]) >= 0.~{indelVAF}" >~{basename}.INDEL.VAF.vcf
 
 		bgzip ~{basename}.INDEL.VAF.vcf
 		tabix -p vcf ~{basename}.INDEL.VAF.vcf.gz
@@ -293,7 +293,7 @@ task filterSNVs {
 		--select-type-to-include SNP \
 		-O ~{basename}.SNP.vcf
 
-		$BCFTOOLS_ROOT/bin/bcftools filter -i "(FORMAT/AD[0:1])/(FORMAT/AD[0:0]+FORMAT/AD[0:1]) >= 0.~{snvVAF}" ~{basename}.SNP.vcf >~{basename}.SNP.VAF.vcf
+		$BCFTOOLS_ROOT/bin/bcftools view -f 'PASS,clustered_events' ~{basename}.SNP.vcf  |  $BCFTOOLS_ROOT/bin/bcftools filter -i "(FORMAT/AD[0:1])/(FORMAT/AD[0:0]+FORMAT/AD[0:1]) >= 0.~{indelVAF}" >~{basename}.SNP.VAF.vcf
 
 		bgzip ~{basename}.SNP.VAF.vcf
 
