@@ -293,7 +293,7 @@ task filterSNVs {
 		--select-type-to-include SNP \
 		-O ~{basename}.SNP.vcf
 
-		$BCFTOOLS_ROOT/bin/bcftools view -f 'PASS,clustered_events' ~{basename}.SNP.vcf  |  $BCFTOOLS_ROOT/bin/bcftools filter -i "(FORMAT/AD[0:1])/(FORMAT/AD[0:0]+FORMAT/AD[0:1]) >= 0.~{indelVAF}" >~{basename}.SNP.VAF.vcf
+		$BCFTOOLS_ROOT/bin/bcftools view -f 'PASS,clustered_events' ~{basename}.SNP.vcf  |  $BCFTOOLS_ROOT/bin/bcftools filter -i "(FORMAT/AD[0:1])/(FORMAT/AD[0:0]+FORMAT/AD[0:1]) >= 0.~{snvVAF}" >~{basename}.SNP.VAF.vcf
 
 		bgzip ~{basename}.SNP.VAF.vcf
 
