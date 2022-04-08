@@ -132,7 +132,6 @@ task filterStructural {
 		String basename = basename("~{structuralVcfFile}", ".vcf.gz")
 		String modules = "bcftools/1.9"
 		String sampleName
-		String structuralVAF = 0
 		Int jobMemory = 5
 		Int threads = 1
 		Int timeout = 1
@@ -143,7 +142,6 @@ task filterStructural {
 		basename: "Base name"
 		modules: "Required environment modules"
 		sampleName: "Name of sample matching the tumor sample in .vcf"
-		structuralVAF: "VAF for structural variants"
 		jobMemory: "Memory allocated for this job (GB)"
 		threads: "Requested CPU threads"
 		timeout: "Hours before task timeout"
