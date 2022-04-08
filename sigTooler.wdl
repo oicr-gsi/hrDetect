@@ -154,12 +154,10 @@ task filterStructural {
 
 		echo  -e "chrom1\tstart1\tend1\tchrom2\tstart2\tend2\tsample\tsvclass"  >~{basename}.bedpe
 
-		$BCFTOOLS_ROOT/bin/bcftools query -f "%CHROM\t%POS\t%INFO/END\t%FILTER\t%ALT\t%INFO/CIPOS\t%INFO/CIEND\t[%DR\t]\t[%DV\t]\t[%RR\t]\t[%RV\t]\n" ~{structuralVcfFile} | \
-		awk '$5 !~ ":" {print}' | \
-		awk '$4 ~ "PASS" {print}' | \
-		awk -v VAF=0.~{structuralVAF} '($10+$14)/($8+$10+$12+$14) > VAF {print}' | \
-		awk -v sampleName=~{sampleName} 'split($6,a,",") split($7,b,",") {print $1"\t"$2+a[1]-1"\t"$2+a[2]"\t"$1"\t"$3+b[1]-1"\t"$2+b[2]"\t"sampleName"\t"$5} ' | \
-		sed 's/<//g; s/>//g' >>~{basename}.bedpe
+		$BCFTOOLS_ROOT/bin/bcftools view -f 'PASS' ~{structuralVcfFile} |\
+		$BCFTOOLS_ROOT/bin/bcftools filter -e 'INFO/SVTYPE = "BND"' |\
+		$BCFTOOLS_ROOT/bin/bcftools query -f "%CHROM\t%POS\t%INFO/END\t%FILTER\t%INFO/SVTYPE\t%INFO/CIPOS\t%INFO/CIEND\n" |\
+		awk -v sampleName=~{sampleName} 'split($6,a,",") split($7,b,",") {print $1"\t"$2+a[1]-1"\t"$2+a[2]"\t"$1"\t"$3+b[1]-1"\t"$2+b[2]"\t"sampleName"\t"$5} ' 
 
 		awk '$1 !~ "#" {print}' ~{structuralVcfFile} | wc -l >~{sampleName}.structural.filteringReport.txt
 		awk '$1 !~ "#" {print}' ~{basename}.bedpe | wc -l >>~{sampleName}.structural.filteringReport.txt
