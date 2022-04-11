@@ -3,7 +3,7 @@
     "sigTooler.snvVAF": "05",
     "sigTooler.indelVAF": "05",
     "sigTooler.tissue": "Pancreas",
-    "sigTooler.plotIt":"TRUE",
+    "sigTooler.plotIt":"FALSE",
     "sigTooler.filterSNVs.difficultRegions": "--exclude-intervals $GRCH38_ALLDIFFICULTREGIONS_ROOT/GRCh38_alldifficultregions.bed",
     "sigTooler.filterINDELs.difficultRegions":"--exclude-intervals $GRCH38_ALLDIFFICULTREGIONS_ROOT/GRCh38_alldifficultregions.bed",
     "sigTooler.sampleName": "PANX_1309",
