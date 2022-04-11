@@ -101,6 +101,10 @@ workflow sigTooler {
 			{
 				name: "rstats-cairo/4.0",
 				url: "https://utstat.toronto.edu/cran/src/base/R-4/R-4.0.2.tar.gz"
+			},
+			{
+				name: "ggplot2/rstats-cairo-4.0",
+				url: "https://ggplot2.tidyverse.org/"
 			}
 		]
 		output_meta: {
@@ -437,7 +441,7 @@ task plotResults {
 		File sigTools_sigs_input 
 		String rScript
 		String sampleName
-		String modules = "rstats-cairo/4.0"
+		String modules = "rstats-cairo/4.0 ggplot2/rstats-cairo-4.0"
 		Int jobMemory = 20
 		Int threads = 1
 		Int timeout = 2

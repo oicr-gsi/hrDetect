@@ -1,4 +1,4 @@
-library(ggplot2)
+library(tidyverse)
 
 args = commandArgs(trailingOnly=TRUE)
 sample_name <- args[1]
