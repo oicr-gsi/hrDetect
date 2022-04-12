@@ -24,6 +24,7 @@ workflow sigTooler {
 		tissue: "Cancerous-tissue of origin"
 		rScript: "Temporary variable to call the .R script containing sigtools, will be modulated. default: ~/sigtools_workflow/sigTools_runthrough.R"
 		sampleName: "Name of sample matching the tumor sample in .vcf"
+		plotIt: "Create plots of sigtools results"
 	}
 
 	call filterStructural {
