@@ -1,4 +1,4 @@
-library(tidyverse)
+library(ggplot2)
 
 args = commandArgs(trailingOnly=TRUE)
 sample_name <- args[1]
@@ -9,7 +9,7 @@ hrd_raw = read.table(paste(sample_name,".sigtools.hrd.txt",sep=""),
 hrd <- as.data.frame(t(hrd_raw$V2))
 names(hrd) <- hrd_raw$V1
 
-png(paste(sample_name,".sigtools.hrd.png",sep=""), width = 350, height = 150)
+pdf(paste(sample_name,".sigtools.hrd.pdf",sep=""), width = 3.5, height = 1.5)
 
 ggplot(hrd,
        aes(y="")) + 
@@ -33,7 +33,7 @@ sigs = read.table(paste(sample_name,".sigtools.sigs.txt",sep=""),
                   stringsAsFactors = FALSE,check.names = FALSE)
 sigs$sigs <- rownames(sigs)
 
-png(paste(sample_name,".sigtools.sigs.png",sep=""), width = 350, height = 150)
+pdf(paste(sample_name,".sigtools.sigs.pdf",sep=""), width = 3.5, height = 1.5)
 
 ggplot(sigs,aes(y="",x=sig_weight_rel_adj,fill=sigs)) + 
 
