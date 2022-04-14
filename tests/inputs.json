@@ -1,0 +1,14 @@
+{
+    "sigTooler.rScript": "/.mounts/labs/CGI/scratch/fbeaudry/sigtools_workflow/sigTools",
+    "sigTooler.snvVAF": "05",
+    "sigTooler.indelVAF": "05",
+    "sigTooler.tissue": "Pancreas",
+    "sigTooler.plotIt":"FALSE",
+    "sigTooler.filterSNVs.difficultRegions": "--exclude-intervals $GRCH38_ALLDIFFICULTREGIONS_ROOT/GRCh38_alldifficultregions.bed",
+    "sigTooler.filterINDELs.difficultRegions":"--exclude-intervals $GRCH38_ALLDIFFICULTREGIONS_ROOT/GRCh38_alldifficultregions.bed",
+    "sigTooler.sampleName": "PANX_1309",
+    "sigTooler.segFile": "/.mounts/labs/gsi/testdata/sigTooler/1.0/input_data/PANX_1309_Lv_M_WG_100-PM-033_LCM4_segments.txt",
+    "sigTooler.smallsVcfFile": "/.mounts/labs/gsi/testdata/sigTooler/1.0/input_data/PANX_1309_Lv_M_WG_100-PM-033_LCM4.filter.deduped.realigned.recalibrated.mutect2.filtered.vcf.gz",
+    "sigTooler.smallsVcfIndex": "/.mounts/labs/gsi/testdata/sigTooler/1.0/input_data/PANX_1309_Lv_M_WG_100-PM-033_LCM4.filter.deduped.realigned.recalibrated.mutect2.filtered.vcf.gz.tbi",
+    "sigTooler.structuralVcfFile": "/.mounts/labs/gsi/testdata/sigTooler/1.0/input_data/PANX_1309_Lv_M_WG_100-PM-033_LCM4_somatic.somatic_filtered.delly.merged.vcf.gz"
+}

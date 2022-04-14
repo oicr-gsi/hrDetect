@@ -1,0 +1,102 @@
+[
+    {
+        "arguments": {
+            "sigTooler.smallsVcfFile": {
+                "contents": {
+                    "configuration": "/.mounts/labs/gsi/testdata/sigTooler/1.0/input_data/PANX_1309_Lv_M_WG_100-PM-033_LCM4.filter.deduped.realigned.recalibrated.mutect2.filtered.vcf.gz",
+                    "externalIds": [
+                        {
+                            "id": "TEST",
+                            "provider": "TEST"
+                        }
+                    ]
+                },
+                "type": "EXTERNAL"
+            },
+            "sigTooler.smallsVcfIndex": {
+                "contents": {
+                    "configuration": "/.mounts/labs/gsi/testdata/sigTooler/1.0/input_data/PANX_1309_Lv_M_WG_100-PM-033_LCM4.filter.deduped.realigned.recalibrated.mutect2.filtered.vcf.gz.tbi",
+                    "externalIds": [
+                        {
+                            "id": "TEST",
+                            "provider": "TEST"
+                        }
+                    ]
+                },
+                "type": "EXTERNAL"
+            },
+            "sigTooler.segFile": {
+                "contents": {
+                    "configuration": "/.mounts/labs/gsi/testdata/sigTooler/1.0/input_data/PANX_1309_Lv_M_WG_100-PM-033_LCM4_segments.txt",
+                    "externalIds": [
+                        {
+                            "id": "TEST",
+                            "provider": "TEST"
+                        }
+                    ]
+                },
+                "type": "EXTERNAL"
+            },
+            "sigTooler.structuralVcfFile": {
+                "contents": {
+                    "configuration": "/.mounts/labs/gsi/testdata/sigTooler/1.0/input_data/PANX_1309_Lv_M_WG_100-PM-033_LCM4_somatic.somatic_filtered.delly.merged.vcf.gz",
+                    "externalIds": [
+                        {
+                            "id": "TEST",
+                            "provider": "TEST"
+                        }
+                    ]
+                },
+                "type": "EXTERNAL"
+            },
+            "sigTooler.rScript": "/.mounts/labs/CGI/scratch/fbeaudry/sigtools_workflow/sigTools",
+            "sigTooler.snvVAF": "05",
+            "sigTooler.indelVAF": "05",
+            "sigTooler.tissue": "Pancreas",
+            "sigTooler.plotIt":"FALSE",
+            "sigTooler.filterSNVs.difficultRegions": "--exclude-intervals $GRCH38_ALLDIFFICULTREGIONS_ROOT/GRCh38_alldifficultregions.bed",
+            "sigTooler.filterINDELs.difficultRegions":"--exclude-intervals $GRCH38_ALLDIFFICULTREGIONS_ROOT/GRCh38_alldifficultregions.bed",
+            "sigTooler.sampleName": "PANX_1309"
+        },
+        "description": "sigTooler workflow test",
+        "engineArguments": {
+          "write_to_cache": false,
+          "read_from_cache": false
+        },
+        "id": "PANX_1309Test",
+        "metadata": {
+            "sigTooler.sigTools_hrd_Output": {
+                "contents": [
+                    {
+                        "outputDirectory": "@SCRATCH@/@DATE@_Workflow_sigTooler_PANX_1309Test_@JENKINSID@"
+                    }
+                ],
+                "type": "ALL"
+            },
+            "sigTooler.sigTools_model_Output": {
+                "contents": [
+                    {
+                        "outputDirectory": "@SCRATCH@/@DATE@_Workflow_sigTooler_PANX_1309Test_@JENKINSID@"
+                    }
+                ],
+                "type": "ALL"
+            },
+            "sigTooler.sigTools_sigs_Output": {
+                "contents": [
+                    {
+                        "outputDirectory": "@SCRATCH@/@DATE@_Workflow_sigTooler_PANX_1309Test_@JENKINSID@"
+                    }
+                ],
+                "type": "ALL"
+            }
+        },
+        "validators": [
+            {
+                "metrics_calculate": "@CHECKOUT@/tests/calculate.sh",
+                "metrics_compare": "@CHECKOUT@/tests/compare.sh",
+                "output_metrics": "/.mounts/labs/gsi/testdata/sigTooler/1.0/output_metrics/PANX_1309Test.metrics",
+                "type": "script"
+            }
+        ]
+    }
+]
