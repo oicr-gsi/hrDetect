@@ -6,9 +6,6 @@ workflow HRDetect {
 		File smallsVcfFile
 		File smallsVcfIndex
 		File segFile
-		String indelVAF
-		String snvVAF
-		String tissue
 		String sampleName
 		Boolean plotIt
 	}
@@ -18,10 +15,7 @@ workflow HRDetect {
 		smallsVcfFile: "Input VCF file of SNV and indels (small mutations) (eg. from mutect2)"
 		smallsVcfIndex: "Index of input VCF file of SNV and indels"
 		segFile: "File for segmentations, used to estimate number of segments in Loss of heterozygosity (LOH) (eg. from sequenza)"
-		indelVAF: "Variant Allele Frequency for filtering of indel mutations"
-		snvVAF: "Variant Allele Frequency for filtering of SNVs"
 		tissue: "Cancerous-tissue of origin"
-		rScript: "Temporary variable to call the .R script containing sigtools, will be modulated. default: ~/sigtools_workflow/sigTools_runthrough.R"
 		sampleName: "Name of sample matching the tumor sample in .vcf"
 		plotIt: "Create plots of sigtools results"
 	}
@@ -36,18 +30,16 @@ workflow HRDetect {
 		input: 
 			smallsVcfFile = smallsVcfFile,
 			smallsVcfIndex = smallsVcfIndex,
-			indelVAF = indelVAF,
 			sampleName = sampleName,
-			type = INDEL
+			smallType = "INDEL"
 	}
 
 	call filterSMALLs as filterSNVs {
 		input: 
 			smallsVcfFile = smallsVcfFile,
 			smallsVcfIndex = smallsVcfIndex,
-			snvVAF = snvVAF,
 			sampleName = sampleName,
-			type = SNP
+			smallType = "SNP"
 	}
 
 	call convertSegFile {
@@ -63,7 +55,6 @@ workflow HRDetect {
 			snvVcfFiltered = filterSNVs.snvVcfOutput,
 			snvVcfIndexFiltered = filterSNVs.snvVcfIndexOutput,
 			lohSegFile = convertSegFile.segmentsOutput,
-			tissue = tissue,
 			sampleName = sampleName
 	}
 
@@ -121,8 +112,8 @@ workflow HRDetect {
 		File sigTools_hrd_Output = "~{sampleName}.sigtools.hrd.txt"
 		File sigTools_model_Output = "~{sampleName}.sigtools.model.txt"
 		File sigTools_sigs_Output = "~{sampleName}.sigtools.sigs.txt"
-		File? sigTools_sigs_plot_Output = "~{sampleName}.sigtools.sigs.png"
-		File? sigTools_hrd_plot_Output = "~{sampleName}.sigtools.hrd.png"
+		File? sigTools_sigs_plot_Output = "~{sampleName}.sigtools.sigs.pdf"
+		File? sigTools_hrd_plot_Output = "~{sampleName}.sigtools.hrd.pdf"
 	}
 }
 
@@ -144,6 +135,8 @@ task filterStructural {
 		basename: "Base name"
 		modules: "Required environment modules"
 		sampleName: "Name of sample matching the tumor sample in .vcf"
+		structuralQUALfilter: "filter for filter calls to keep, eg. PASS"
+		structuralTYPEfilter: "filter for tye of structural calls to remove, eg. BND"
 		jobMemory: "Memory allocated for this job (GB)"
 		threads: "Requested CPU threads"
 		timeout: "Hours before task timeout"
@@ -157,7 +150,7 @@ task filterStructural {
 		$BCFTOOLS_ROOT/bin/bcftools view -f ~{structuralQUALfilter} ~{structuralVcfFile} |\
 		$BCFTOOLS_ROOT/bin/bcftools filter -e 'INFO/SVTYPE = ~{structuralTYPEfilter}' |\
 		$BCFTOOLS_ROOT/bin/bcftools query -f "%CHROM\t%POS\t%INFO/END\t%FILTER\t%INFO/SVTYPE\t%INFO/CIPOS\t%INFO/CIEND\n" |\
-		awk -v sampleName=~{sampleName} 'split($6,a,",") split($7,b,",") {print $1"\t"$2+a[1]-1"\t"$2+a[2]"\t"$1"\t"$3+b[1]-1"\t"$2+b[2]"\t"sampleName"\t"$5} '  >>~{basename}.bedpe
+		awk -v sampleName=~{sampleName} 'split($6,a,",") split($7,b,",") {print $1"\t"$2+a[1]-1"\t"$2+a[2]"\t"$1"\t"$3+b[1]-1"\t"$2+b[2]"\t"sampleName"\t"$5}' >>~{basename}.bedpe
 
 		awk '$1 !~ "#" {print}' ~{structuralVcfFile} | wc -l >~{sampleName}.structural.filteringReport.txt
 		awk '$1 !~ "#" {print}' ~{basename}.bedpe | wc -l >>~{sampleName}.structural.filteringReport.txt
@@ -203,13 +196,16 @@ task filterSMALLs {
 
 	parameter_meta {
 		smallsVcfFile: "Vcf input file"
+		smallsVcfIndex: "Vcf input index file"
 		basename: "Base name"
 		modules: "Required environment modules"
 		sampleName: "Name of sample matching the tumor sample in .vcf"
-		genome: "Path to loaded genome"
+		genome: "Path to loaded genome .fa"
 		difficultRegions: "Path to .bed of difficult regions to align to, string must include the --exclude-intervals flag, eg: --exclude-intervals $GRCH38_ALLDIFFICULTREGIONS_ROOT/GRCh38_alldifficultregions.bed"
-		VAF: "VAF for indels"
+		VAF: "minimum variant allele frequency to retain variant"
+		smallType: "type of variant to keep: SNP or INDEL"
 		jobMemory: "Memory allocated for this job (GB)"
+		QUALfilter: "filter for filter calls to keep, eg. PASS"
 		threads: "Requested CPU threads"
 		timeout: "Hours before task timeout"
 	}
@@ -253,8 +249,8 @@ task filterSMALLs {
 
 	meta {
 		output_meta: {
-			indelVcfOutput: "filtered INDEL .vcf",
-			indelVcfIndexOutput: "filtered INDEL .vcf.tbi indexed",
+			indelVcfOutput: "filtered .vcf",
+			indelVcfIndexOutput: "filtered .vcf.tbi indexed",
 			indelFilteringReport: "counts of variants pre and post filtering"
 		}
 	}
@@ -313,7 +309,7 @@ task hrdResults {
 		File snvVcfIndexFiltered
 		File lohSegFile
 		String tissue
-		String rScript
+		String sigtoolrScript
 		String sampleName
 		String modules = "sigtools/0.0.0.9000"
 		String genomeVersion = "hg38"
@@ -331,7 +327,7 @@ task hrdResults {
 		snvVcfIndexFiltered: "filtered SNV .vcf.tbi (indexed)"
 		lohSegFile: "reformatted segmentation file"
 		tissue: "Cancerous-tissue of origin"
-		rScript: "Temporary variable to call the .R script containing sigtools, will be modulated. default: ~/sigtools_workflow/sigTools_runthrough.R"
+		sigtoolrScript: "Temporary variable to call the .R script containing sigtools, will be modulated. default: ~/sigtools_workflow/sigTools_runthrough.R"
 		sampleName: "Name of sample matching the tumor sample in .vcf"		
 		modules: "Required environment modules"
 		sigtoolsBootstrap: "Number of bootstraps for sigtools"
@@ -343,7 +339,7 @@ task hrdResults {
 	command <<<
 		set -euo pipefail
 
-		Rscript --vanilla ~{rScript}_runthrough.R ~{sampleName} ~{tissue} ~{snvVcfFiltered} ~{indelVcfFiltered} ~{structuralBedpeFiltered} ~{lohSegFile} ~{sigtoolsBootstrap} ~{genomeVersion}
+		Rscript --vanilla ~{sigtoolrScript} ~{sampleName} ~{tissue} ~{snvVcfFiltered} ~{indelVcfFiltered} ~{structuralBedpeFiltered} ~{lohSegFile} ~{sigtoolsBootstrap} ~{genomeVersion}
 
 	>>> 
 
@@ -373,7 +369,7 @@ task plotResults {
 	input {
 		File sigTools_hrd_input 
 		File sigTools_sigs_input 
-		String rScript
+		String plotrScript
 		String sampleName
 		String modules = "bis-rlibs/0.1"
 		Int jobMemory = 20
@@ -382,7 +378,7 @@ task plotResults {
 	}
 
 	parameter_meta {
-		rScript: "Temporary variable to call the .R script containing sigtools, will be modulated. default: ~/sigtools_workflow/sigTools_runthrough.R"
+		plotrScript: "Temporary variable to call the .R script containing sigtools, will be modulated. default: ~/sigtools_workflow/sigTools_plotter.R"
 		sampleName: "Name of sample matching the tumor sample in .vcf"		
 		modules: "Required environment modules"
 		jobMemory: "Memory allocated for this job (GB)"
@@ -393,7 +389,7 @@ task plotResults {
 	command <<<
 		set -euo pipefail
 
-		Rscript --vanilla ~{rScript}_plotter.R ~{sampleName}
+		Rscript --vanilla ~{plotrScript} ~{sampleName}
 
 	>>> 
 
