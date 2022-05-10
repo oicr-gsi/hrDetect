@@ -1,10 +1,11 @@
+##version 1.1
 
 ####packages####
 
 library(signature.tools.lib)
 
-
 ####functions####
+
 sigTools_formatter <- function(input,sampleName){
   cat_list <- list()
   names(input)[1] <- "catalogue"
@@ -19,7 +20,7 @@ setColNames <- function (object = nm, nm) {
   object
 }
 
-#setwd('/Volumes/')
+####arguments####
 
 args = commandArgs(trailingOnly=TRUE)
 sample_name <- args[1]
@@ -29,36 +30,28 @@ indel_vcf_file <- args[4]
 SV_bedpe_file <- args[5]
 LOH_seg_file <- args[6]
 boots <- as.numeric(args[7])
+genomeVersion <- args[8]
 
 ####Import files####
 
-##indel##
-
+#HRDetect_pipeline() will throw error if there are no indels, which happens
 t <- try(read.table(indel_vcf_file,comment.char= "#"))
 if("try-error" %in% class(t)) {
-  write.table(
-    c("indel error: no indels after filtering"),
-    file = paste(sample_name,".sigtools.hrd.txt",sep=""),append = F, quote = FALSE, row.names = FALSE, col.names = FALSE
-  )
   
-  write.table(
-    c("indel error: no indels after filtering"),
-    file = paste(sample_name,".sigtools.model.txt",sep=""),append = F, quote = FALSE, row.names = FALSE, col.names = FALSE
-  )
-  
-  write.table(
-    c("indel error: no indels after filtering"),
-    file = paste(sample_name,".sigtools.sigs.txt",sep=""),append = F, quote = FALSE, row.names = FALSE, col.names = FALSE
-  )
+  for( fileType in c("hrd","model","sigs")){
+    write.table(
+      c("no indels after filtering"),
+      file = paste(sample_name,".sigtools.",fileType,".txt",sep=""),append = F, quote = FALSE, row.names = FALSE, col.names = FALSE
+    )
+  }
   
 }else{
   
-  names(indel_vcf_file)[1] <- sample_name
+  ####Take in files####
   
   ##SNV##
   
-  
-  snv_catalogue <- vcfToSNVcatalogue(vcfFilename = snvFile_loc,genome.v = "hg38")
+  snv_catalogue <- vcfToSNVcatalogue(vcfFilename = snvFile_loc,genome.v = genomeVersion)
   
   snv_catalogue_reformat <- sigTools_formatter(input=snv_catalogue,sampleName=sample_name)
   
@@ -68,7 +61,7 @@ if("try-error" %in% class(t)) {
                          sep = "\t",header = TRUE,
                          stringsAsFactors = FALSE,check.names = FALSE)
   
-  #replace svclass name (even though documentation suggests this isn't necessary)
+  #replace svclass name 
   SV_bedpe$svclass[SV_bedpe$svclass == "DEL"] <- "deletion"
   SV_bedpe$svclass[SV_bedpe$svclass == "DUP"] <- "tandem-duplication" 
   SV_bedpe$svclass[SV_bedpe$svclass == "INV"] <- "inversion" 
@@ -80,33 +73,40 @@ if("try-error" %in% class(t)) {
   ##LOH##
   
   ascat.data <- read.table(LOH_seg_file,sep="\t",header=TRUE)
+  
   hrd_index <- ascatToHRDLOH(ascat.data=ascat.data,SAMPLE.ID=sample_name)
   
+  ##INDEL##
+  
+  names(indel_vcf_file)[1] <- sample_name
+  
   ####HRD test####
+  
   col_hrdetect <- c("del.mh.prop", "SNV3", "SV3", "SV5", "hrd", "SNV8")
+  
   input_matrix <- matrix(NA,nrow = 1,
                          ncol = length(col_hrdetect),
                          dimnames = list(sample_name,col_hrdetect))
   
   input_matrix[sample_name,"hrd"] <- hrd_index
   
-    HRDetect_res <- HRDetect_pipeline(data_matrix=input_matrix,
+  HRDetect_res <- HRDetect_pipeline(data_matrix=input_matrix,
                                       bootstrapHRDetectScores=TRUE,
                                       SV_catalogues=SV_catalogue_reformat,
                                       SNV_catalogues=snv_catalogue_reformat,
                                       signature_type=tissue,
                                       Indels_vcf_files=indel_vcf_file,
-                                      genome.v = "hg38",
+                                      genome.v = genomeVersion,
                                       nbootFit=boots
                                       )
     
-    ####output####
+  ####output####
     
-    quantiles <- HRDetect_res$q_5_50_95
-    names(quantiles) <- c("HRD_low_quant","HRD_median","HRD_top_quant")
+  quantiles <- HRDetect_res$q_5_50_95
+  names(quantiles) <- c("HRD_low_quant","HRD_median","HRD_top_quant")
     
-    write.table(
-      c(
+  write.table(
+    c(
         "HRD_point"=HRDetect_res$hrdetect_output[8],
         quantiles
       ),
@@ -116,7 +116,7 @@ if("try-error" %in% class(t)) {
       col.names = FALSE
     )
     
-    write.table(
+  write.table(
       rbind(
       "value"=HRDetect_res$data_matrix,
       "BLUP"=HRDetect_res$hrdetect_output[c(2:7)]
@@ -125,9 +125,11 @@ if("try-error" %in% class(t)) {
       append = F, quote = FALSE, sep = "\t", 
       eol = "\n", na = "NA",dec = ".", row.names = TRUE, 
       col.names = TRUE
-    )
+  )
   
+  ## signature objects will be empty if too few SNPs or SVs
   if(length(HRDetect_res$exposures_rearr)>0){
+    
     if(length(HRDetect_res$exposures_subs)>0){
       
       write.table(
@@ -150,8 +152,11 @@ if("try-error" %in% class(t)) {
         eol = "\n", na = "NA",dec = ".", row.names = TRUE, 
         col.names = TRUE
       )
+      
     }
+    
     if(length(HRDetect_res$exposures_subs)==0){
+      
       write.table(
           cbind.data.frame(
             setColNames(HRDetect_res$exposures_rearr, "sig_weight_norm"),
@@ -164,10 +169,12 @@ if("try-error" %in% class(t)) {
         eol = "\n", na = "NA",dec = ".", row.names = TRUE, 
         col.names = TRUE
       )
+      
     }  
   }
     
   if(length(HRDetect_res$exposures_rearr)==0){  
+    
       write.table(
           cbind.data.frame(
             setColNames(HRDetect_res$exposures_subs, "sig_weight_norm"),
@@ -180,9 +187,8 @@ if("try-error" %in% class(t)) {
         eol = "\n", na = "NA",dec = ".", row.names = TRUE, 
         col.names = TRUE
       )
+    
   }
     
-    
-
-  }
+}
 

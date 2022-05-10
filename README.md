@@ -1,4 +1,4 @@
-# sigTooler
+# HRDetect
 
 Homologous Recombination Deficiency (HRD) Prediction Workflow using sig.tools
 
@@ -17,7 +17,7 @@ Homologous Recombination Deficiency (HRD) Prediction Workflow using sig.tools
 
 ### Cromwell
 ```
-java -jar cromwell.jar run sigTooler.wdl --inputs inputs.json
+java -jar cromwell.jar run HRDetect.wdl --inputs inputs.json
 ```
 
 ### Inputs
