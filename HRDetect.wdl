@@ -331,6 +331,7 @@ task hrdResults {
 		sigtoolrScript: "Temporary variable to call the .R script containing sigtools, will be modulated. default: ~/sigtools_workflow/sigTools_runthrough.R"
 		sampleName: "Name of sample matching the tumor sample in .vcf"		
 		modules: "Required environment modules"
+		genomeVersion: "version of genome, eg hg38"
 		sigtoolsBootstrap: "Number of bootstraps for sigtools"
 		jobMemory: "Memory allocated for this job (GB)"
 		threads: "Requested CPU threads"
