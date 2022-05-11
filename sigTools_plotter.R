@@ -2,14 +2,16 @@ library(ggplot2)
 
 args = commandArgs(trailingOnly=TRUE)
 sample_name <- args[1]
+hrd_score_file <- args[2]
+sig_file <- args[3]
 
-hrd_raw = read.table(paste(sample_name,".sigtools.hrd.txt",sep=""),
+hrd_raw = read.table(hrd_score_file,
            sep = "\t",header = FALSE,
            stringsAsFactors = FALSE,check.names = FALSE)
 hrd <- as.data.frame(t(hrd_raw$V2))
 names(hrd) <- hrd_raw$V1
 
-pdf(paste(sample_name,".sigtools.hrd.pdf",sep=""), width = 3.5, height = 1.5)
+png(paste(sample_name,".sigtools.hrd.png",sep=""), width = 350, height = 150,type="cairo")
 
 ggplot(hrd,
        aes(y="")) + 
@@ -28,12 +30,12 @@ ggplot(hrd,
 
 dev.off()
 
-sigs = read.table(paste(sample_name,".sigtools.sigs.txt",sep=""),
+sigs = read.table(sig_file,
                   sep = "\t",header = TRUE,
                   stringsAsFactors = FALSE,check.names = FALSE)
 sigs$sigs <- rownames(sigs)
 
-pdf(paste(sample_name,".sigtools.sigs.pdf",sep=""), width = 3.5, height = 1.5)
+png(paste(sample_name,".sigtools.sigs.png",sep=""), width = 350, height = 150,type="cairo")
 
 ggplot(sigs,aes(y="",x=sig_weight_rel_adj,fill=sigs)) + 
 
