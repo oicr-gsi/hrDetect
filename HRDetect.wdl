@@ -188,7 +188,7 @@ task filterSMALLs {
 		String? difficultRegions
 		String VAF
 		String smallType
-		String QUALfilter = "'PASS,clustered_events'"
+		String QUALfilter 
 		Int jobMemory = 10
 		Int threads = 1
 		Int timeout = 2
