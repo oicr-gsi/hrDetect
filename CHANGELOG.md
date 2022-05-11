@@ -1,6 +1,7 @@
 # CHANGELOG
 
 ## 1.1 - 2022-05-11
+- Changed name of workflow to HRDetect
 - Changed plotting from .pdf to .png, and changes intake format
 - Annotated HRDetect R results script, and added loop for low indel results
 - merged SNV and INDEL filtering using alias in wdl
