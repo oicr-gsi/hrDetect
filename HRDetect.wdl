@@ -1,4 +1,4 @@
-version 1.1
+version 1.0
 
 workflow HRDetect {
 	input {
@@ -50,10 +50,10 @@ workflow HRDetect {
 	call hrdResults {
 		input:
 			structuralBedpeFiltered = filterStructural.structuralbedpe,
-			indelVcfFiltered = filterINDELs.indelVcfOutput,
-			indelVcfIndexFiltered = filterINDELs.indelVcfIndexOutput,
-			snvVcfFiltered = filterSNVs.snvVcfOutput,
-			snvVcfIndexFiltered = filterSNVs.snvVcfIndexOutput,
+			indelVcfFiltered = filterINDELs.smallsVcfOutput,
+			indelVcfIndexFiltered = filterINDELs.smallsVcfIndexOutput,
+			snvVcfFiltered = filterSNVs.smallsVcfOutput,
+			snvVcfIndexFiltered = filterSNVs.smallsVcfIndexOutput,
 			lohSegFile = convertSegFile.segmentsOutput,
 			sampleName = sampleName
 	}
@@ -112,8 +112,8 @@ workflow HRDetect {
 		File sigTools_hrd_Output = "~{sampleName}.sigtools.hrd.txt"
 		File sigTools_model_Output = "~{sampleName}.sigtools.model.txt"
 		File sigTools_sigs_Output = "~{sampleName}.sigtools.sigs.txt"
-		File? sigTools_sigs_plot_Output = "~{sampleName}.sigtools.sigs.pdf"
-		File? sigTools_hrd_plot_Output = "~{sampleName}.sigtools.hrd.pdf"
+		File? sigTools_sigs_plot_Output = "~{sampleName}.sigtools.sigs.png"
+		File? sigTools_hrd_plot_Output = "~{sampleName}.sigtools.hrd.png"
 	}
 }
 
@@ -124,7 +124,7 @@ task filterStructural {
 		String modules = "bcftools/1.9"
 		String sampleName
 		String structuralQUALfilter = "'PASS'"
-		String structuralTYPEfilter = "'BND'"
+		String structuralTYPEfilter = "BND"
 		Int jobMemory = 5
 		Int threads = 1
 		Int timeout = 1
@@ -148,7 +148,7 @@ task filterStructural {
 		echo  -e "chrom1\tstart1\tend1\tchrom2\tstart2\tend2\tsample\tsvclass"  >~{basename}.bedpe
 
 		$BCFTOOLS_ROOT/bin/bcftools view -f ~{structuralQUALfilter} ~{structuralVcfFile} |\
-		$BCFTOOLS_ROOT/bin/bcftools filter -e 'INFO/SVTYPE = ~{structuralTYPEfilter}' |\
+		$BCFTOOLS_ROOT/bin/bcftools filter -e 'INFO/SVTYPE = "~{structuralTYPEfilter}"' |\
 		$BCFTOOLS_ROOT/bin/bcftools query -f "%CHROM\t%POS\t%INFO/END\t%FILTER\t%INFO/SVTYPE\t%INFO/CIPOS\t%INFO/CIEND\n" |\
 		awk -v sampleName=~{sampleName} 'split($6,a,",") split($7,b,",") {print $1"\t"$2+a[1]-1"\t"$2+a[2]"\t"$1"\t"$3+b[1]-1"\t"$2+b[2]"\t"sampleName"\t"$5}' >>~{basename}.bedpe
 
@@ -205,7 +205,7 @@ task filterSMALLs {
 		VAF: "minimum variant allele frequency to retain variant"
 		smallType: "type of variant to keep: SNP or INDEL"
 		jobMemory: "Memory allocated for this job (GB)"
-		QUALfilter: "filter for filter calls to keep, eg. PASS"
+		QUALfilter: "filter for filter calls to remove, eg. weak_evidence | strand_bias "
 		threads: "Requested CPU threads"
 		timeout: "Hours before task timeout"
 	}
@@ -219,18 +219,19 @@ task filterSMALLs {
 		--select-type-to-include ~{smallType} \
 		-O ~{basename}.~{smallType}.vcf  
 
-		$BCFTOOLS_ROOT/bin/bcftools view -f ~{QUALfilter} ~{basename}.~{smallType}.vcf  | \
-		$BCFTOOLS_ROOT/bin/bcftools filter -i "(FORMAT/AD[0:1])/(FORMAT/AD[0:0]+FORMAT/AD[0:1]) >= 0.~{VAF}" >~{basename}.~{smallType}.VAF.vcf
+		$BCFTOOLS_ROOT/bin/bcftools view ~{basename}.~{smallType}.vcf  | \
+		$BCFTOOLS_ROOT/bin/bcftools filter -i "(FORMAT/AD[0:1])/(FORMAT/AD[0:0]+FORMAT/AD[0:1]) >= 0.~{VAF}" | \
+		$BCFTOOLS_ROOT/bin/bcftools filter -e "~{QUALfilter}" >~{basename}.VAF.vcf
 
-		bgzip ~{basename}.~{smallType}.VAF.vcf
+		bgzip ~{basename}.VAF.vcf
 		
-		tabix -p vcf ~{basename}.~{smallType}.VAF.vcf.gz
+		tabix -p vcf ~{basename}.VAF.vcf.gz
 
-		zcat ~{smallsVcfFile} | awk '$1 !~ "#" {print}'  | wc -l >~{sampleName}.~{smallType}.filteringReport.txt
+		zcat ~{smallsVcfFile} | awk '$1 !~ "#" {print}'  | wc -l >~{sampleName}.filteringReport.txt
 		
-		awk '$1 !~ "#" {print}' ~{basename}.~{smallType}.vcf | wc -l >>~{sampleName}.~{smallType}.filteringReport.txt
+		awk '$1 !~ "#" {print}' ~{basename}.~{smallType}.vcf | wc -l >>~{sampleName}.filteringReport.txt
 		
-		zcat ~{basename}.~{smallType}.VAF.vcf.gz | awk '$1 !~ "#" {print}'  | wc -l >>~{sampleName}.~{smallType}.filteringReport.txt
+		zcat ~{basename}.VAF.vcf.gz | awk '$1 !~ "#" {print}'  | wc -l >>~{sampleName}.filteringReport.txt
 
 	>>> 
 
@@ -242,16 +243,16 @@ task filterSMALLs {
 	}
 
 	output {
-		File indelVcfOutput = "~{basename}.~{smallType}.VAF.vcf.gz"
-		File indelVcfIndexOutput = "~{basename}.~{smallType}.VAF.vcf.gz.tbi"
-		File indelFilteringReport = "~{sampleName}.~{smallType}.filteringReport.txt"
+		File smallsVcfOutput = "~{basename}.VAF.vcf.gz"
+		File smallsVcfIndexOutput = "~{basename}.VAF.vcf.gz.tbi"
+		File smallsFilteringReport = "~{sampleName}.filteringReport.txt"
 	}
 
 	meta {
 		output_meta: {
-			indelVcfOutput: "filtered .vcf",
-			indelVcfIndexOutput: "filtered .vcf.tbi indexed",
-			indelFilteringReport: "counts of variants pre and post filtering"
+			smallsVcfOutput: "filtered .vcf",
+			smallsVcfIndexOutput: "filtered .vcf.tbi indexed",
+			smallsFilteringReport: "counts of variants pre and post filtering"
 		}
 	}
 }
@@ -389,7 +390,7 @@ task plotResults {
 	command <<<
 		set -euo pipefail
 
-		Rscript --vanilla ~{plotrScript} ~{sampleName}
+		Rscript --vanilla ~{plotrScript} ~{sampleName} ~{sigTools_hrd_input} ~{sigTools_sigs_input}
 
 	>>> 
 
