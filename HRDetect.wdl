@@ -31,7 +31,7 @@ workflow HRDetect {
 			smallsVcfFile = smallsVcfFile,
 			smallsVcfIndex = smallsVcfIndex,
 			sampleName = sampleName,
-			smallType = "INDEL"
+			smallType = "indel"
 	}
 
 	call filterSMALLs as filterSNVs {
@@ -39,7 +39,7 @@ workflow HRDetect {
 			smallsVcfFile = smallsVcfFile,
 			smallsVcfIndex = smallsVcfIndex,
 			sampleName = sampleName,
-			smallType = "SNP"
+			smallType = "snp"
 	}
 
 	call convertSegFile {
@@ -74,10 +74,6 @@ workflow HRDetect {
 		dependencies: 
 		[
 			{
-				name: "gatk/4.2.0.0",
-				url: "https://github.com/broadinstitute/gatk/releases"
-			},
-			{
 				name: "tabix/1.9",
 				url: "http://www.htslib.org/doc/tabix.html"
 			},
@@ -90,7 +86,7 @@ workflow HRDetect {
 				url: "https://github.com/Nik-Zainal-Group/signature.tools.lib"
 			},
 			{
-				name: "bis-rlibs/0.1",
+				name: "ggplot2/3.3.6",
 				url: "https://ggplot2.tidyverse.org/"
 			}
 		]
@@ -182,11 +178,11 @@ task filterSMALLs {
 		File smallsVcfFile
 		File smallsVcfIndex
 		String basename = basename("~{smallsVcfFile}", ".vcf.gz")
-		String modules = "gatk/4.2.0.0 tabix/1.9 bcftools/1.9 hg38/p12 grch38-alldifficultregions/3.0"
+		String modules = "tabix/1.9 bcftools/1.9"
 		String sampleName
-		String genome = "$HG38_ROOT/hg38_random.fa"
+		String genome 
 		String? difficultRegions
-		String VAF
+		Float VAF
 		String smallType
 		String QUALfilter 
 		Int jobMemory = 10
@@ -201,11 +197,11 @@ task filterSMALLs {
 		modules: "Required environment modules"
 		sampleName: "Name of sample matching the tumor sample in .vcf"
 		genome: "Path to loaded genome .fa"
-		difficultRegions: "Path to .bed of difficult regions to align to, string must include the --exclude-intervals flag, eg: --exclude-intervals $GRCH38_ALLDIFFICULTREGIONS_ROOT/GRCh38_alldifficultregions.bed"
+		difficultRegions: "Path to .bed excluding difficult regions, string must include the flag --regions-file "
 		VAF: "minimum variant allele frequency to retain variant"
-		smallType: "type of variant to keep: SNP or INDEL"
+		smallType: "type of variant to keep: snp or indel"
 		jobMemory: "Memory allocated for this job (GB)"
-		QUALfilter: "filter for filter calls to remove, eg. weak_evidence | strand_bias "
+		QUALfilter: "filter for filter calls to remove, eg. FILTER~'weak_evidence' | FILTER~'strand_bias' "
 		threads: "Requested CPU threads"
 		timeout: "Hours before task timeout"
 	}
@@ -213,24 +209,17 @@ task filterSMALLs {
 	command <<<
 		set -euo pipefail
 
-		gatk SelectVariants \
-		-V ~{smallsVcfFile} \
-		-R ~{genome} ~{difficultRegions} \
-		--select-type-to-include ~{smallType} \
-		-O ~{basename}.~{smallType}.vcf  
-
-		$BCFTOOLS_ROOT/bin/bcftools view ~{basename}.~{smallType}.vcf  | \
-		$BCFTOOLS_ROOT/bin/bcftools filter -i "(FORMAT/AD[0:1])/(FORMAT/AD[0:0]+FORMAT/AD[0:1]) >= 0.~{VAF}" | \
-		$BCFTOOLS_ROOT/bin/bcftools filter -e "~{QUALfilter}" >~{basename}.VAF.vcf
+		$BCFTOOLS_ROOT/bin/bcftools norm --multiallelics - --fasta-ref ~{genome} ~{difficultRegions} ~{smallsVcfFile} |\
+		$BCFTOOLS_ROOT/bin/bcftools filter -i "TYPE='~{smallType}'" |\
+		$BCFTOOLS_ROOT/bin/bcftools filter -e "~{QUALfilter}" |\
+		$BCFTOOLS_ROOT/bin/bcftools filter -i "(FORMAT/AD[0:1])/(FORMAT/AD[0:0]+FORMAT/AD[0:1]) >= ~{VAF}" >~{basename}.VAF.vcf
 
 		bgzip ~{basename}.VAF.vcf
 		
 		tabix -p vcf ~{basename}.VAF.vcf.gz
 
 		zcat ~{smallsVcfFile} | awk '$1 !~ "#" {print}'  | wc -l >~{sampleName}.filteringReport.txt
-		
-		awk '$1 !~ "#" {print}' ~{basename}.~{smallType}.vcf | wc -l >>~{sampleName}.filteringReport.txt
-		
+				
 		zcat ~{basename}.VAF.vcf.gz | awk '$1 !~ "#" {print}'  | wc -l >>~{sampleName}.filteringReport.txt
 
 	>>> 
@@ -310,9 +299,9 @@ task hrdResults {
 		File snvVcfIndexFiltered
 		File lohSegFile
 		String tissue
-		String sigtoolrScript
 		String sampleName
-		String modules = "sigtools/0.0.0.9000"
+		String modules = "hrdetect-scripts/1.1"
+		String sigtoolrScript = "$HRDETECT_SCRIPTS_ROOT/bin/sigTools_runthrough.R"
 		String genomeVersion = "hg38"
 		Int sigtoolsBootstrap = 2500
 		Int jobMemory = 20
@@ -328,7 +317,7 @@ task hrdResults {
 		snvVcfIndexFiltered: "filtered SNV .vcf.tbi (indexed)"
 		lohSegFile: "reformatted segmentation file"
 		tissue: "Cancerous-tissue of origin"
-		sigtoolrScript: "Temporary variable to call the .R script containing sigtools, will be modulated. default: ~/sigtools_workflow/sigTools_runthrough.R"
+		sigtoolrScript: ".R script containing sigtools"
 		sampleName: "Name of sample matching the tumor sample in .vcf"		
 		modules: "Required environment modules"
 		genomeVersion: "version of genome, eg hg38"
@@ -371,16 +360,16 @@ task plotResults {
 	input {
 		File sigTools_hrd_input 
 		File sigTools_sigs_input 
-		String plotrScript
 		String sampleName
-		String modules = "bis-rlibs/0.1"
+		String modules = "hrdetect-scripts/1.1"
+		String plotrScript = "$HRDETECT_SCRIPTS_ROOT/bin/sigTools_plotter.R"
 		Int jobMemory = 20
 		Int threads = 1
 		Int timeout = 2
 	}
 
 	parameter_meta {
-		plotrScript: "Temporary variable to call the .R script containing sigtools, will be modulated. default: ~/sigtools_workflow/sigTools_plotter.R"
+		plotrScript: ".R plotting script"
 		sampleName: "Name of sample matching the tumor sample in .vcf"		
 		modules: "Required environment modules"
 		jobMemory: "Memory allocated for this job (GB)"
