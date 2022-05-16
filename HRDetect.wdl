@@ -178,14 +178,13 @@ task filterSMALLs {
 		File smallsVcfFile
 		File smallsVcfIndex
 		String basename = basename("~{smallsVcfFile}", ".vcf.gz")
-		String modules = "tabix/1.9 bcftools/1.9 hg38/p12 hg38-dac-exclusion/1.0"
+		String modules = "tabix/1.9 bcftools/1.9"
 		String sampleName
-		String genome = "$HG38_ROOT/hg38_random.fa"
-		String difficultRegions = "--regions-file $HG38_DAC_EXCLUSION_ROOT/hg38-dac-exclusion.v2.bed"
-		Int VAF = 0.01
+		String genome 
+		String? difficultRegions
+		Float VAF
 		String smallType
-		String QUALfilter = "FILTER~'weak_evidence' | FILTER~'strand_bias' | FILTER~'position' | FILTER~'normal_artifact' | FILTER~'multiallelic' | FILTER~'map_qual' | FILTER~'germline' | FILTER~'fragment' | FILTER~'contamination' | FILTER~'base_qual'",
-  "HRDetect.filterINDELs.QUALfilter": "FILTER~'weak_evidence' | FILTER~'strand_bias' | FILTER~'position' | FILTER~'normal_artifact' | FILTER~'multiallelic' | FILTER~'map_qual' | FILTER~'germline' | FILTER~'fragment' | FILTER~'contamination' | FILTER~'base_qual'"
+		String QUALfilter 
 		Int jobMemory = 10
 		Int threads = 1
 		Int timeout = 2
@@ -198,11 +197,11 @@ task filterSMALLs {
 		modules: "Required environment modules"
 		sampleName: "Name of sample matching the tumor sample in .vcf"
 		genome: "Path to loaded genome .fa"
-		difficultRegions: "Path to .bed excluding difficult regions to align to, string must include the --regions-file flag, eg: --regions-file $HG38_DAC_EXCLUSION_ROOT/hg38-dac-exclusion.v2.bed"
+		difficultRegions: "Path to .bed excluding difficult regions, string must include the flag --regions-file "
 		VAF: "minimum variant allele frequency to retain variant"
 		smallType: "type of variant to keep: snp or indel"
 		jobMemory: "Memory allocated for this job (GB)"
-		QUALfilter: "filter for filter calls to remove, eg. weak_evidence | strand_bias "
+		QUALfilter: "filter for filter calls to remove, eg. FILTER~'weak_evidence' | FILTER~'strand_bias' "
 		threads: "Requested CPU threads"
 		timeout: "Hours before task timeout"
 	}
