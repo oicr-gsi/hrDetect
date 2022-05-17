@@ -1,7 +1,7 @@
-##version 1.1
+##version 1.2
 
 ####packages####
-
+#install_github('Nik-Zainal-Group/signature.tools.lib',ref='v2.1.2')
 library(signature.tools.lib)
 
 ####functions####
@@ -32,11 +32,27 @@ LOH_seg_file <- args[6]
 boots <- as.numeric(args[7])
 genomeVersion <- args[8]
 
+if(hasArg(args[9])){
+  indelCutoff <- as.numeric(args[9])
+}else{
+  indelCutoff <- 10
+}
+
+##test
+#sample_name <-  "PANX_1309" 
+#tissue <- "Pancreas" 
+#snvFile_loc  <- "cgi/scratch/fbeaudry/sigTools_test/PASS01/PANX_1309/PANX_1309_Lv_M_WG_100-PM-033_LCM4.filter.deduped.realigned.recalibrated.mutect2.filtered.VAF.SNP.vcf.gz" 
+#indel_vcf_file <- "cgi/scratch/fbeaudry/sigTools_test/PASS01/PANX_1309/PANX_1309_Lv_M_WG_100-PM-033_LCM4.filter.deduped.realigned.recalibrated.mutect2.filtered.VAF.indel.vcf.gz" 
+#SV_bedpe_file <- "cgi/scratch/fbeaudry/sigTools_test/PASS01/PANX_1309/PANX_1309_Lv_M_WG_100-PM-033_LCM4_somatic.somatic_filtered.delly.merged.bedpe"
+#LOH_seg_file <- "cgi/scratch/fbeaudry/sigTools_test/PASS01/PANX_1309/PANX_1309_Lv_M_WG_100-PM-033_LCM4_segments.cna.txt" 
+#boots <- 2500 
+#genomeVersion <- "hg38"
+
 ####Import files####
 
-#HRDetect_pipeline() will throw error if there are no indels, which happens
+#HRDetect_pipeline() will throw error if there are no indels
 t <- try(read.table(indel_vcf_file,comment.char= "#"))
-if("try-error" %in% class(t)) {
+if("try-error" %in% class(t) | length(t) < indelCutoff) {
   
   for( fileType in c("hrd","model","sigs")){
     write.table(
@@ -94,7 +110,7 @@ if("try-error" %in% class(t)) {
                                       bootstrapHRDetectScores=TRUE,
                                       SV_catalogues=SV_catalogue_reformat,
                                       SNV_catalogues=snv_catalogue_reformat,
-                                      signature_type=tissue,
+                                      organ=tissue,
                                       Indels_vcf_files=indel_vcf_file,
                                       genome.v = genomeVersion,
                                       nbootFit=boots
@@ -190,5 +206,5 @@ if("try-error" %in% class(t)) {
     
   }
     
-}
+} #end of if(few indels)
 
