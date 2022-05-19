@@ -3,6 +3,7 @@
 ####packages####
 #install_github('Nik-Zainal-Group/signature.tools.lib',ref='v2.1.2')
 library(signature.tools.lib)
+library(optparse)
 
 ####functions####
 
@@ -21,22 +22,31 @@ setColNames <- function (object = nm, nm) {
 }
 
 ####arguments####
+option_list = list(
+  make_option(c("-s", "--sampleName"), type="character", default=NULL, help="sample name", metavar="character"),
+  make_option(c("-t", "--tissue"), type="character", default=NULL, help="tissue/organ for HRDetect signatures", metavar="character"),
+  make_option(c("-S", "--snvFile"), type="character", default=NULL, help="SNV vcf file", metavar="character"),
+  make_option(c("-I", "--indelFile"), type="character", default=NULL, help="indel vcf file", metavar="character"),
+  make_option(c("-V", "--SVFile"), type="character", default=NULL, help="Structural variant bed file", metavar="character"),
+  make_option(c("-L", "--LOHFile"), type="character", default=NULL, help="LOH file", metavar="character"),
+  make_option(c("-b", "--bootstraps"), type="numeric", default=2500, help="number of bootstraps for signature detection", metavar="numeric"),
+  make_option(c("-g", "--genomeVersion"), type="character", default="hg38", help="genome version", metavar="character"),
+  make_option(c("-i", "--indelCutoff"), type="numeric", default=10, help="minimum number of indels for analysis", metavar="numeric")
+  
+)
 
-args = commandArgs(trailingOnly=TRUE)
-sample_name <- args[1]
-tissue <- args[2]
-snvFile_loc  <- args[3]
-indel_vcf_file <- args[4]
-SV_bedpe_file <- args[5]
-LOH_seg_file <- args[6]
-boots <- as.numeric(args[7])
-genomeVersion <- args[8]
+opt_parser <- OptionParser(option_list=option_list, add_help_option=FALSE);
+opt <- parse_args(opt_parser);
 
-if(hasArg(args[9])){
-  indelCutoff <- as.numeric(args[9])
-}else{
-  indelCutoff <- 10
-}
+sample_name <- opt$sampleName
+tissue <-  opt$tissue
+snvFile_loc  <-  opt$snvFile
+indel_vcf_file <-  opt$indelFile
+SV_bedpe_file <-  opt$SVFile
+LOH_seg_file <-  opt$LOHFile
+boots <-  opt$bootstraps
+genomeVersion <-  opt$genomeVersion
+indelCutoff <-  opt$indelCutoff
 
 ##test
 #sample_name <-  "PANX_1309" 
@@ -47,6 +57,7 @@ if(hasArg(args[9])){
 #LOH_seg_file <- "cgi/scratch/fbeaudry/sigTools_test/PASS01/PANX_1309/PANX_1309_Lv_M_WG_100-PM-033_LCM4_segments.cna.txt" 
 #boots <- 2500 
 #genomeVersion <- "hg38"
+#indelCutoff <- 10
 
 ####Import files####
 
