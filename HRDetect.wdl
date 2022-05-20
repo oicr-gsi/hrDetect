@@ -119,7 +119,7 @@ task filterStructural {
 		String basename = basename("~{structuralVcfFile}", ".vcf.gz")
 		String modules = "bcftools/1.9"
 		String sampleName
-		String structuralQUALfilter = "'PASS'"
+		String structuralQUALfilter = "PASS"
 		String structuralTYPEfilter = "BND"
 		Int jobMemory = 5
 		Int threads = 1
@@ -143,7 +143,7 @@ task filterStructural {
 
 		echo  -e "chrom1\tstart1\tend1\tchrom2\tstart2\tend2\tsample\tsvclass"  >~{basename}.bedpe
 
-		$BCFTOOLS_ROOT/bin/bcftools view -f ~{structuralQUALfilter} ~{structuralVcfFile} |\
+		$BCFTOOLS_ROOT/bin/bcftools view -f '~{structuralQUALfilter}' ~{structuralVcfFile} |\
 		$BCFTOOLS_ROOT/bin/bcftools filter -e 'INFO/SVTYPE = "~{structuralTYPEfilter}"' |\
 		$BCFTOOLS_ROOT/bin/bcftools query -f "%CHROM\t%POS\t%INFO/END\t%FILTER\t%INFO/SVTYPE\t%INFO/CIPOS\t%INFO/CIEND\n" |\
 		awk -v sampleName=~{sampleName} 'split($6,a,",") split($7,b,",") {print $1"\t"$2+a[1]-1"\t"$2+a[2]"\t"$1"\t"$3+b[1]-1"\t"$2+b[2]"\t"sampleName"\t"$5}' >>~{basename}.bedpe
