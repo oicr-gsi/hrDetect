@@ -32,7 +32,6 @@ option_list = list(
   make_option(c("-b", "--bootstraps"), type="numeric", default=2500, help="number of bootstraps for signature detection", metavar="numeric"),
   make_option(c("-g", "--genomeVersion"), type="character", default="hg38", help="genome version", metavar="character"),
   make_option(c("-i", "--indelCutoff"), type="numeric", default=10, help="minimum number of indels for analysis", metavar="numeric")
-  
 )
 
 opt_parser <- OptionParser(option_list=option_list, add_help_option=FALSE);
