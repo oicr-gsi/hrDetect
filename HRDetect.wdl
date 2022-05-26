@@ -304,6 +304,7 @@ task hrdResults {
 		String sigtoolrScript = "$HRDETECT_SCRIPTS_ROOT/bin/sigTools_runthrough.R"
 		String genomeVersion = "hg38"
 		Int sigtoolsBootstrap = 2500
+		Int indelCutoff = 10
 		Int jobMemory = 20
 		Int threads = 1
 		Int timeout = 2
@@ -322,6 +323,7 @@ task hrdResults {
 		modules: "Required environment modules"
 		genomeVersion: "version of genome, eg hg38"
 		sigtoolsBootstrap: "Number of bootstraps for sigtools"
+		indelCutoff: "minimum number of indels to run analysis"
 		jobMemory: "Memory allocated for this job (GB)"
 		threads: "Requested CPU threads"
 		timeout: "Hours before task timeout"
@@ -330,7 +332,7 @@ task hrdResults {
 	command <<<
 		set -euo pipefail
 
-		Rscript --vanilla ~{sigtoolrScript} ~{sampleName} ~{tissue} ~{snvVcfFiltered} ~{indelVcfFiltered} ~{structuralBedpeFiltered} ~{lohSegFile} ~{sigtoolsBootstrap} ~{genomeVersion}
+		Rscript --vanilla ~{sigtoolrScript} -s ~{sampleName} -t ~{tissue} -S ~{snvVcfFiltered} -I  ~{indelVcfFiltered} -V ~{structuralBedpeFiltered} -L ~{lohSegFile} -b ~{sigtoolsBootstrap} -g ~{genomeVersion} -i ~{indelCutoff}
 
 	>>> 
 
