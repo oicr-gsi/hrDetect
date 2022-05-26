@@ -34,8 +34,8 @@ option_list = list(
   make_option(c("-i", "--indelCutoff"), type="numeric", default=10, help="minimum number of indels for analysis", metavar="numeric")
 )
 
-opt_parser <- OptionParser(option_list=option_list, add_help_option=FALSE);
-opt <- parse_args(opt_parser);
+opt_parser <- OptionParser(option_list=option_list, add_help_option=FALSE)
+opt <- parse_args(opt_parser)
 
 sample_name <- opt$sampleName
 tissue <-  opt$tissue
