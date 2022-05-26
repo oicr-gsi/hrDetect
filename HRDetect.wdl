@@ -119,7 +119,7 @@ task filterStructural {
 		String basename = basename("~{structuralVcfFile}", ".vcf.gz")
 		String modules = "bcftools/1.9"
 		String sampleName
-		String structuralQUALfilter = "'PASS'"
+		String structuralQUALfilter = "PASS"
 		String structuralTYPEfilter = "BND"
 		Int jobMemory = 5
 		Int threads = 1
@@ -143,7 +143,7 @@ task filterStructural {
 
 		echo  -e "chrom1\tstart1\tend1\tchrom2\tstart2\tend2\tsample\tsvclass"  >~{basename}.bedpe
 
-		$BCFTOOLS_ROOT/bin/bcftools view -f ~{structuralQUALfilter} ~{structuralVcfFile} |\
+		$BCFTOOLS_ROOT/bin/bcftools view -f '~{structuralQUALfilter}' ~{structuralVcfFile} |\
 		$BCFTOOLS_ROOT/bin/bcftools filter -e 'INFO/SVTYPE = "~{structuralTYPEfilter}"' |\
 		$BCFTOOLS_ROOT/bin/bcftools query -f "%CHROM\t%POS\t%INFO/END\t%FILTER\t%INFO/SVTYPE\t%INFO/CIPOS\t%INFO/CIEND\n" |\
 		awk -v sampleName=~{sampleName} 'split($6,a,",") split($7,b,",") {print $1"\t"$2+a[1]-1"\t"$2+a[2]"\t"$1"\t"$3+b[1]-1"\t"$2+b[2]"\t"sampleName"\t"$5}' >>~{basename}.bedpe
@@ -304,6 +304,7 @@ task hrdResults {
 		String sigtoolrScript = "$HRDETECT_SCRIPTS_ROOT/bin/sigTools_runthrough.R"
 		String genomeVersion = "hg38"
 		Int sigtoolsBootstrap = 2500
+		Int indelCutoff = 10
 		Int jobMemory = 20
 		Int threads = 1
 		Int timeout = 2
@@ -322,6 +323,7 @@ task hrdResults {
 		modules: "Required environment modules"
 		genomeVersion: "version of genome, eg hg38"
 		sigtoolsBootstrap: "Number of bootstraps for sigtools"
+		indelCutoff: "minimum number of indels to run analysis"
 		jobMemory: "Memory allocated for this job (GB)"
 		threads: "Requested CPU threads"
 		timeout: "Hours before task timeout"
@@ -330,7 +332,7 @@ task hrdResults {
 	command <<<
 		set -euo pipefail
 
-		Rscript --vanilla ~{sigtoolrScript} ~{sampleName} ~{tissue} ~{snvVcfFiltered} ~{indelVcfFiltered} ~{structuralBedpeFiltered} ~{lohSegFile} ~{sigtoolsBootstrap} ~{genomeVersion}
+		Rscript --vanilla ~{sigtoolrScript} -s ~{sampleName} -t ~{tissue} -S ~{snvVcfFiltered} -I  ~{indelVcfFiltered} -V ~{structuralBedpeFiltered} -L ~{lohSegFile} -b ~{sigtoolsBootstrap} -g ~{genomeVersion} -i ~{indelCutoff}
 
 	>>> 
 
