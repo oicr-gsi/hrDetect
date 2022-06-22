@@ -1,14 +1,16 @@
+##version 1.3
+
 library(ggplot2)
 library(jsonlite)
 library(cowplot)
 
 #
 args = commandArgs(trailingOnly=TRUE)
-jsonIn <- args[1]
+jsonInLoc <- args[1]
 
 #test args
-setwd('/Volumes/')
-jsonInLoc  <- "cgi/scratch/fbeaudry/sigTools_test/PASS01/PANX_1309/PANX_1309.signatures.json" 
+#setwd('/Volumes/')
+#jsonInLoc  <- "cgi/scratch/fbeaudry/sigTools_test/PASS01/PANX_1309/PANX_1309.signatures.json" 
 
 JSONin <- read_json(jsonInLoc, simplifyVector = FALSE)
 
