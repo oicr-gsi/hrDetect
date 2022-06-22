@@ -61,8 +61,7 @@ workflow HRDetect {
 	if(plotIt == true){
 		call plotResults {
 			input:
-				sigTools_hrd_input = hrdResults.sigTools_hrd_Output ,
-				sigTools_sigs_input = hrdResults.sigTools_sigs_Output,
+				JSONin = hrdResults.JSONout,
 				sampleName = sampleName
 		}
 	}
@@ -91,9 +90,7 @@ workflow HRDetect {
 			}
 		]
 		output_meta: {
-			sigTools_hrd_Output : "point estimate and bootstraped confidence intervals for HRD from sigtools",
-			sigTools_model_Output : "parameters raw values and weights for estimation of HRD from sigtools",
-			sigTools_sigs_Output : "signature breakdown from sigtools" ,
+			JSONout : "sigtools and CHORD results in JSON",
 			sigTools_sigs_plot_Output: "plot of signature breakdown from sigtools",
 			sigTools_hrd_plot_Output: "plot of point estimate and bootstraped confidence intervals for HRD from sigtools",
 			indelFilteringReport: "counts of INDELs pre and post filtering",
@@ -105,9 +102,7 @@ workflow HRDetect {
 		File indelFilteringReport = "~{sampleName}.INDEL.filteringReport.txt"
 		File snvFilteringReport = "~{sampleName}.SNP.filteringReport.txt"
 		File structuralFilteringReport = "~{sampleName}.structural.filteringReport.txt"
-		File sigTools_hrd_Output = "~{sampleName}.sigtools.hrd.txt"
-		File sigTools_model_Output = "~{sampleName}.sigtools.model.txt"
-		File sigTools_sigs_Output = "~{sampleName}.sigtools.sigs.txt"
+		File JSONout = "~{sampleName}.signatures.json"
 		File? sigTools_sigs_plot_Output = "~{sampleName}.sigtools.sigs.png"
 		File? sigTools_hrd_plot_Output = "~{sampleName}.sigtools.hrd.png"
 	}
@@ -146,7 +141,7 @@ task filterStructural {
 		$BCFTOOLS_ROOT/bin/bcftools view -f '~{structuralQUALfilter}' ~{structuralVcfFile} |\
 		$BCFTOOLS_ROOT/bin/bcftools filter -e 'INFO/SVTYPE = "~{structuralTYPEfilter}"' |\
 		$BCFTOOLS_ROOT/bin/bcftools query -f "%CHROM\t%POS\t%INFO/END\t%FILTER\t%INFO/SVTYPE\t%INFO/CIPOS\t%INFO/CIEND\n" |\
-		awk -v sampleName=~{sampleName} 'split($6,a,",") split($7,b,",") {print $1"\t"$2+a[1]-1"\t"$2+a[2]"\t"$1"\t"$3+b[1]-1"\t"$2+b[2]"\t"sampleName"\t"$5}' >>~{basename}.bedpe
+		awk -v sampleName=~{sampleName} 'split($6,a,",") split($7,b,",") {print $1"\t"$2+a[1]-1"\t"$2+a[2]"\t"$1"\t"$3+b[1]-1"\t"$3+b[2]"\t"sampleName"\t"$5}' >>~{basename}.bedpe
 
 		awk '$1 !~ "#" {print}' ~{structuralVcfFile} | wc -l >~{sampleName}.structural.filteringReport.txt
 		awk '$1 !~ "#" {print}' ~{basename}.bedpe | wc -l >>~{sampleName}.structural.filteringReport.txt
@@ -300,7 +295,7 @@ task hrdResults {
 		File lohSegFile
 		String tissue
 		String sampleName
-		String modules = "hrdetect-scripts/1.1"
+		String modules = "hrdetect-scripts/1.3"
 		String sigtoolrScript = "$HRDETECT_SCRIPTS_ROOT/bin/sigTools_runthrough.R"
 		String genomeVersion = "hg38"
 		Int sigtoolsBootstrap = 2500
@@ -344,26 +339,21 @@ task hrdResults {
 	}
 
 	output {
-		File sigTools_hrd_Output = "~{sampleName}.sigtools.hrd.txt"
-		File sigTools_model_Output = "~{sampleName}.sigtools.model.txt"
-		File sigTools_sigs_Output = "~{sampleName}.sigtools.sigs.txt"
+		File JSONout = "~{sampleName}.signatures.json"
 	}
 
 	meta {
 		output_meta: {
-			sigTools_hrd_Output : "point estimate and bootstraped confidence intervals for HRD from sigtools",
-			sigTools_model_Output : "parameters raw values and weights for estimation of HRD from sigtools",
-			sigTools_sigs_Output : "signature breakdown from sigtools" 
+			JSONout : "JSON file of sigtools and CHORD signatures"
 		}
 	}
 }
 
 task plotResults {
 	input {
-		File sigTools_hrd_input 
-		File sigTools_sigs_input 
+		File JSONin 
 		String sampleName
-		String modules = "hrdetect-scripts/1.1"
+		String modules = "hrdetect-scripts/1.3"
 		String plotrScript = "$HRDETECT_SCRIPTS_ROOT/bin/sigTools_plotter.R"
 		Int jobMemory = 20
 		Int threads = 1
@@ -372,7 +362,8 @@ task plotResults {
 
 	parameter_meta {
 		plotrScript: ".R plotting script"
-		sampleName: "Name of sample matching the tumor sample in .vcf"		
+		sampleName: "Name of sample matching the tumor sample in .vcf"
+		JSONin: "JSON file of sigtools and CHORD signatures"		
 		modules: "Required environment modules"
 		jobMemory: "Memory allocated for this job (GB)"
 		threads: "Requested CPU threads"
@@ -382,7 +373,7 @@ task plotResults {
 	command <<<
 		set -euo pipefail
 
-		Rscript --vanilla ~{plotrScript} ~{sampleName} ~{sigTools_hrd_input} ~{sigTools_sigs_input}
+		Rscript --vanilla ~{plotrScript} ~{JSONin}
 
 	>>> 
 
