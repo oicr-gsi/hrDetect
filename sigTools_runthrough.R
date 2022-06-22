@@ -1,9 +1,12 @@
-##version 1.2
+##version 1.3
 
 ####packages####
 #install_github('Nik-Zainal-Group/signature.tools.lib',ref='v2.1.2')
 library(signature.tools.lib)
 library(optparse)
+
+library(CHORD)
+library(jsonlite)
 
 ####functions####
 
@@ -19,6 +22,44 @@ sigTools_formatter <- function(input,sampleName){
 setColNames <- function (object = nm, nm) {
   colnames(object) <- nm
   object
+}
+
+extend_segments <-  function(ascat.data){
+  df_total = data.frame()
+  
+  for(chrom in unique(ascat.data$seg_no)){
+    
+    first.seg <- min(unique(ascat.data$seg_no[ascat.data$Chromosome == chrom]))
+    
+    start <- ascat.data$chromStart[ascat.data$seg_no == first.seg]
+    end   <- ascat.data$chromEnd[ascat.data$seg_no == first.seg]
+    nT    <- ascat.data$total.copy.number.inTumour[ascat.data$seg_no == first.seg]
+    nB    <- ascat.data$minor.copy.number.inTumour[ascat.data$seg_no == first.seg]
+    
+    for(seg in unique(ascat.data$seg_no[ascat.data$Chromosome == chrom])){
+      
+      if(ascat.data$total.copy.number.inTumour[ascat.data$seg_no == seg] == nT & 
+         ascat.data$minor.copy.number.inTumour[ascat.data$seg_no == seg] == nB){
+        
+        end <- ascat.data$chromEnd[ascat.data$seg_no == first.seg]
+        
+      }
+      if(ascat.data$total.copy.number.inTumour[ascat.data$seg_no == seg] != nT | 
+         ascat.data$minor.copy.number.inTumour[ascat.data$seg_no == seg] != nB){
+        
+        end <- ascat.data$chromEnd[ascat.data$seg_no == seg]
+        
+        df_total <- rbind(df_total,data.frame(seg,chrom,start,end,2,1,nT,nB))
+        
+        start <- ascat.data$chromStart[ascat.data$seg_no == seg]
+        nT <- ascat.data$total.copy.number.inTumour[ascat.data$seg_no == seg]
+        nB <- ascat.data$minor.copy.number.inTumour[ascat.data$seg_no == seg]
+        
+      }
+    }  
+  } 
+  names(df_total) <- names(ascat.data)
+  return(df_total)
 }
 
 ####arguments####
@@ -37,17 +78,18 @@ option_list = list(
 opt_parser <- OptionParser(option_list=option_list, add_help_option=FALSE)
 opt <- parse_args(opt_parser)
 
-sample_name <- opt$sampleName
-tissue <-  opt$tissue
-snvFile_loc  <-  opt$snvFile
+sample_name    <-  opt$sampleName
+tissue         <-  opt$tissue
+snvFile_loc    <-  opt$snvFile
 indel_vcf_file <-  opt$indelFile
-SV_bedpe_file <-  opt$SVFile
-LOH_seg_file <-  opt$LOHFile
-boots <-  opt$bootstraps
-genomeVersion <-  opt$genomeVersion
-indelCutoff <-  opt$indelCutoff
+SV_bedpe_file  <-  opt$SVFile
+LOH_seg_file   <-  opt$LOHFile
+boots          <-  opt$bootstraps
+genomeVersion  <-  opt$genomeVersion
+indelCutoff    <-  opt$indelCutoff
 
 ##test
+#setwd('/Volumes/')
 #sample_name <-  "PANX_1309" 
 #tissue <- "Pancreas" 
 #snvFile_loc  <- "cgi/scratch/fbeaudry/sigTools_test/PASS01/PANX_1309/PANX_1309_Lv_M_WG_100-PM-033_LCM4.filter.deduped.realigned.recalibrated.mutect2.filtered.VAF.SNP.vcf.gz" 
@@ -58,56 +100,206 @@ indelCutoff <-  opt$indelCutoff
 #genomeVersion <- "hg38"
 #indelCutoff <- 10
 
-####Import files####
+####LOH####
+ascat.data <- read.table(LOH_seg_file,sep="\t",header=TRUE)
+  
+#extend disrupted segments by assuming homozygosity within missing chunk 
+#is same on both sides of missing chunk; increases # of LOH segs
+ascat.data.ext <- extend_segments(ascat.data)
 
-#HRDetect_pipeline() will throw error if there are no indels
-t <- try(read.table(indel_vcf_file,comment.char= "#"))
-if("try-error" %in% class(t) | length(t) < indelCutoff) {
+#count number of LOH segments
+LOH_table <- ascatToHRDLOH(ascat.data=ascat.data.ext,
+                           SAMPLE.ID=sample_name,
+                           return.loc = T)
   
-  for( fileType in c("hrd","model","sigs")){
-    write.table(
-      c("no indels after filtering"),
-      file = paste(sample_name,".sigtools.",fileType,".txt",sep=""),append = F, quote = FALSE, row.names = FALSE, col.names = FALSE
-    )
-  }
+#save LOH segments and LOH count to ls   
+LOH_ls <- list(nrow(LOH_table),as.matrix(LOH_table[,c("Chromosome","Start","End","totalCN")]))
+names(LOH_ls) <- c("LOHcount","LOHsegments")
   
-}else{
+#HRDetect only needs count of LOH segments
+hrd_index <- nrow(LOH_table)
+
+####Structural Variants####
+SV_bedpe <- try(read.table(SV_bedpe_file,
+                           sep = "\t",header = TRUE,
+                           stringsAsFactors = FALSE,check.names = FALSE))
+
+if("try-error" %in% class(SV_bedpe) ) {
   
-  ####Take in files####
+  print("no SVs!")
+  SV_ls <- 0
   
-  ##SNV##
+} else {
   
-  snv_catalogue <- vcfToSNVcatalogue(vcfFilename = snvFile_loc,genome.v = genomeVersion)
-  
-  snv_catalogue_reformat <- sigTools_formatter(input=snv_catalogue,sampleName=sample_name)
-  
-  ##structural variants##
-  
-  SV_bedpe <- read.table(SV_bedpe_file,
-                         sep = "\t",header = TRUE,
-                         stringsAsFactors = FALSE,check.names = FALSE)
+  #start sigtools SV analysis
+  SV_bedpe_sigtools <- SV_bedpe
   
   #replace svclass name 
-  SV_bedpe$svclass[SV_bedpe$svclass == "DEL"] <- "deletion"
-  SV_bedpe$svclass[SV_bedpe$svclass == "DUP"] <- "tandem-duplication" 
-  SV_bedpe$svclass[SV_bedpe$svclass == "INV"] <- "inversion" 
+  SV_bedpe_sigtools$svclass[SV_bedpe_sigtools$svclass == "DEL"] <- "deletion"
+  SV_bedpe_sigtools$svclass[SV_bedpe_sigtools$svclass == "DUP"] <- "tandem-duplication" 
+  SV_bedpe_sigtools$svclass[SV_bedpe_sigtools$svclass == "INV"] <- "inversion" 
   
-  SV_catalogue <- bedpeToRearrCatalogue(SV_bedpe)
-  
+  #make SV catalog
+  SV_catalogue <- bedpeToRearrCatalogue(SV_bedpe_sigtools)
   SV_catalogue_reformat <- sigTools_formatter(input=SV_catalogue,sampleName=sample_name)
   
-  ##LOH##
+  #get organ signature
+  SV_sigs <- getOrganSignatures(organ = tissue, 
+                     version = "1", 
+                     typemut = "rearr", 
+                     verbose = FALSE)
   
-  ascat.data <- read.table(LOH_seg_file,sep="\t",header=TRUE)
+  #fit organ signature
+  SV_fit_sigs <- Fit(catalogues = SV_catalogue_reformat,
+                      signatures = SV_sigs,
+                      useBootstrap = TRUE,
+                      nboot = boots,
+                      nparallel = 1)
   
-  hrd_index <- ascatToHRDLOH(ascat.data=ascat.data,SAMPLE.ID=sample_name)
+  #extract signature exposures
+  SV_exp_tissue <- SV_fit_sigs$exposures
   
-  ##INDEL##
+  #start CHORD SV analysis
+  SV_bedpe_CHORD <- SV_bedpe
+  SV_bedpe_CHORD$length <-  SV_bedpe_CHORD$start2 - SV_bedpe_CHORD$start1
   
+  structuraldf <- SV_bedpe_CHORD[,c("svclass","length")]
+  names(structuraldf) <- c("sv_type", "sv_len") 
+  #package documentation says col. names aren't necessary, but had trouble running without _these_ names
+  
+  #extract ALL CHORD signatures
+  CHORD_contexts <- extractSigsChord(
+    vcf.snv = snvFile_loc,
+    vcf.indel = indel_vcf_file,
+    df.sv = structuraldf,
+    ref.genome=BSgenome.Hsapiens.UCSC.hg38,
+    verbose=T
+  )
+    
+  #reformat results for JSON
+  CHORD_SV <- as.data.frame(t(CHORD_contexts[1,c(127:145)]))
+  unlist(CHORD_contexts[1,c(127:145)])
+  
+  rearr_catalogue <- as.data.frame(t(SV_catalogue$rearr_catalogue[,1]))
+  names(rearr_catalogue) <- rownames(SV_catalogue$rearr_catalogue)
+  
+  SV_exp_tissue_df <- as.data.frame(t(SV_exp_tissue[1,]))
+  
+  #make SV list
+  SV_ls <- list(nrow(SV_bedpe),CHORD_SV,rearr_catalogue,SV_exp_tissue_df)
+  names(SV_ls) <- c("SVcount","SV_CHORD_catalog","SV_sigtools_catalog","SV_sigtools_exposures")
+
+}
+
+####INDEL####
+
+indelTable <- try(read.table(indel_vcf_file,comment.char= "#"))
+
+if("try-error" %in% class(indelTable) | nrow(indelTable) < indelCutoff) {
+  
+  indel_ls <- 0
+  print("no indels!")
+  
+} else {
+  
+  #sigtools indel classification
+  indels_class <- vcfToIndelsClassification(indel_vcf_file,
+                                              sampleID =sample_name,
+                                              genome.v = genomeVersion
+                                            )
+  
+  indel_info <- indels_class$count_proportion[c("all.indels","ins","del.mh","del.rep","del.none","del.mh.prop","del.rep.prop","del.none.prop")]
+  
+  if("try-error" %in% class(SV_bedpe) ) {
+    #CHORD will only extract signatures if all files exist
+    CHORD_indel <- NA
+  } else {
+    CHORD_indel <- CHORD_contexts[1,c(97:126)]
+  }
+  
+  #reformat for JSON
+  CHORD_indel_df <- as.data.frame(t(CHORD_indel))
+  
+  #make indel list
+  indel_ls <- list(unlist(indel_info[1]),indel_info,CHORD_indel_df)
+  names(indel_ls) <- c("indelCount","indel_sigtools_catalog","indel_CHORD_catalog")
+  
+  #rename indel file for HRDetect input
   names(indel_vcf_file)[1] <- sample_name
   
-  ####HRD test####
+}
+
+####SNV####
+
+SNVTable <- try(read.table(snvFile_loc,comment.char= "#"))
+
+if("try-error" %in% class(SNVTable) ) {
   
+  SNV_ls <- 0
+  print("no SNVs!")
+  
+} else {
+  
+  #catalog SNVs
+  snv_catalogue <- vcfToSNVcatalogue(vcfFilename = snvFile_loc,
+                                     genome.v = genomeVersion)
+  
+  snv_catalogue_reformat <- sigTools_formatter(input=snv_catalogue,
+                                               sampleName=sample_name)
+  
+  #fit COSMIC v2 signatures, aka 'classic' signatures
+  print("fitting classic signatures")
+
+  subs_COSMICV2_res <- Fit(catalogues = snv_catalogue_reformat,
+                            signatures = COSMIC30_subs_signatures,
+                            useBootstrap = TRUE,
+                            nboot = boots)
+ 
+  
+  #get organ-specific signatures and fit, a la Degasperi et al 2020
+  print("fitting tissue signatures")
+  
+  SNV_sigs <- getOrganSignatures(organ = tissue, 
+                                version = "1", 
+                                typemut = "subs")
+  
+  
+  SNV_fit_sigs <- Fit(catalogues = snv_catalogue_reformat,
+                     signatures = SNV_sigs,
+                     useBootstrap = TRUE,
+                     nboot = boots)
+  
+  #add extra step for fitting rare signatures, a la Degasperi et al 2022 
+  
+  print("fitting rare signatures")
+  
+  rare_fit <- FitMS(catalogues = snv_catalogue_reformat,"Pancreas",
+                         useBootstrap = TRUE,
+                         nboot = boots)
+
+  #reformat for JSON
+  classic_fit <- as.data.frame(t(subs_COSMICV2_res$exposures[1,]))
+  
+  tissue_fit <- as.data.frame(t(SNV_fit_sigs$exposures[1,]))
+  
+  rare_fit_df <-  as.data.frame(t(rare_fit$exposures[1,]))
+  
+  #make list
+  SNV_ls <- list(classic_fit,tissue_fit,rare_fit_df)
+  names(SNV_ls) <- c("classic_sigs","tissue_sigs","rare_sigs")
+  
+}
+  
+####HRD tests####
+
+if("try-error" %in% class(SNVTable) | "try-error" %in% class(indelTable) |  "try-error" %in% class(SV_bedpe) ) {
+
+  HRD_ls <- NA
+  print("data missing, no HRD call!")
+  
+} else {
+  
+  #make HRDetect input matrix
   col_hrdetect <- c("del.mh.prop", "SNV3", "SV3", "SV5", "hrd", "SNV8")
   
   input_matrix <- matrix(NA,nrow = 1,
@@ -116,6 +308,7 @@ if("try-error" %in% class(t) | length(t) < indelCutoff) {
   
   input_matrix[sample_name,"hrd"] <- hrd_index
   
+  #call HRDetect
   HRDetect_res <- HRDetect_pipeline(data_matrix=input_matrix,
                                       bootstrapHRDetectScores=TRUE,
                                       SV_catalogues=SV_catalogue_reformat,
@@ -123,98 +316,37 @@ if("try-error" %in% class(t) | length(t) < indelCutoff) {
                                       organ=tissue,
                                       Indels_vcf_files=indel_vcf_file,
                                       genome.v = genomeVersion,
+                                      SNV_signature_version = "RefSigv2",
                                       nbootFit=boots
                                       )
-    
-  ####output####
-    
-  quantiles <- HRDetect_res$q_5_50_95
-  names(quantiles) <- c("HRD_low_quant","HRD_median","HRD_top_quant")
-    
-  write.table(
-    c(
-        "HRD_point"=HRDetect_res$hrdetect_output[8],
-        quantiles
-      ),
-      file = paste(sample_name,".sigtools.hrd.txt",sep=""),
-      append = F, quote = FALSE, sep = "\t", 
-      eol = "\n", na = "NA",dec = ".", row.names = TRUE, 
-      col.names = FALSE
-    )
-    
-  write.table(
-      rbind(
-      "value"=HRDetect_res$data_matrix,
-      "BLUP"=HRDetect_res$hrdetect_output[c(2:7)]
-      ),
-      file = paste(sample_name,".sigtools.model.txt",sep=""),
-      append = F, quote = FALSE, sep = "\t", 
-      eol = "\n", na = "NA",dec = ".", row.names = TRUE, 
-      col.names = TRUE
-  )
   
-  ## signature objects will be empty if too few SNPs or SVs
-  if(length(HRDetect_res$exposures_rearr)>0){
-    
-    if(length(HRDetect_res$exposures_subs)>0){
-      
-      write.table(
-        rbind.data.frame(
-          cbind.data.frame(
-            setColNames(HRDetect_res$exposures_subs, "sig_weight_norm"),
-            setColNames(HRDetect_res$exposures_subs/sum(HRDetect_res$exposures_subs), "sig_weight_rel"),
-            setColNames(HRDetect_res$exposures_subs/sum(HRDetect_res$SNV_catalogues), "sig_weight_rel_adj"),
-            "sig_type"="SNV"
-          ),
-          cbind.data.frame(
-            setColNames(HRDetect_res$exposures_rearr, "sig_weight_norm"),
-            setColNames(HRDetect_res$exposures_rearr/sum(HRDetect_res$exposures_rearr), "sig_weight_rel"),
-            setColNames(HRDetect_res$exposures_rearr/sum(HRDetect_res$SV_catalogues), "sig_weight_rel_adj"),
-            "sig_type"="structural"
-          )
-        ),
-        file = paste(sample_name,".sigtools.sigs.txt",sep=""),
-        append = F, quote = FALSE, sep = "\t", 
-        eol = "\n", na = "NA",dec = ".", row.names = TRUE, 
-        col.names = TRUE
-      )
-      
-    }
-    
-    if(length(HRDetect_res$exposures_subs)==0){
-      
-      write.table(
-          cbind.data.frame(
-            setColNames(HRDetect_res$exposures_rearr, "sig_weight_norm"),
-            setColNames(HRDetect_res$exposures_rearr/sum(HRDetect_res$exposures_rearr), "sig_weight_rel"),
-            setColNames(HRDetect_res$exposures_rearr/sum(HRDetect_res$SV_catalogues), "sig_weight_rel_adj"),
-            "sig_type"="structural"
-          ),
-        file = paste(sample_name,".sigtools.sigs.txt",sep=""),
-        append = F, quote = FALSE, sep = "\t", 
-        eol = "\n", na = "NA",dec = ".", row.names = TRUE, 
-        col.names = TRUE
-      )
-      
-    }  
-  }
-    
-  if(length(HRDetect_res$exposures_rearr)==0){  
-    
-      write.table(
-          cbind.data.frame(
-            setColNames(HRDetect_res$exposures_subs, "sig_weight_norm"),
-            setColNames(HRDetect_res$exposures_subs/sum(HRDetect_res$exposures_subs), "sig_weight_rel"),
-            setColNames(HRDetect_res$exposures_subs/sum(HRDetect_res$SNV_catalogues), "sig_weight_rel_adj"),
-            "sig_type"="SNV"
-          ),
-        file = paste(sample_name,".sigtools.sigs.txt",sep=""),
-        append = F, quote = FALSE, sep = "\t", 
-        eol = "\n", na = "NA",dec = ".", row.names = TRUE, 
-        col.names = TRUE
-      )
-    
-  }
-    
-} #end of if(few indels)
+  #call CHORD
+  CHORD_call <- chordPredict(CHORD_contexts, do.bootstrap=T, verbose=T,bootstrap.iters = boots)
+  
+  #assemble list
+  HRD_in <- as.data.frame(t(HRDetect_res$data_matrix[1,]))
+  
+  quantiles <- as.data.frame(t(HRDetect_res$q_5_50_95[1,]))
+  colnames(quantiles) <- c("HRD_low_quant","HRD_median","HRD_top_quant")
+  
+  HRD_point <- HRDetect_res$hrdetect_output[8]
+  
+  modelWeights <- as.data.frame(t(HRDetect_res$hrdetect_output[1,c(2:7)]))
+  
+  HRDetect_call <- list(HRD_point,quantiles,modelWeights,HRD_in)
+  names(HRDetect_call) <- c("point","quantiles","modelWeights","HRD_in")
+
+  HR_calls <- list(HRDetect_call,CHORD_call)
+  names(HR_calls) <- c("HRDetect","CHORD")
+}   
+
+#stick all the results together
+all.results <- list(LOH_ls,SV_ls,indel_ls,SNV_ls,HR_calls)
+names(all.results) <- c("LOH","SV","indel","SNV","HRD")
+
+#conver to JSON and write
+ListJSON <- jsonlite::toJSON(all.results,pretty=TRUE,auto_unbox=TRUE)
+
+write(ListJSON,file = paste(sample_name,".signatures.json",sep=""))
+
 
