@@ -6,6 +6,7 @@ library(signature.tools.lib)
 library(optparse)
 
 library(CHORD)
+library(BSgenome.Hsapiens.UCSC.hg38)
 library(jsonlite)
 
 ####functions####
@@ -101,6 +102,7 @@ indelCutoff    <-  opt$indelCutoff
 #indelCutoff <- 10
 
 ####LOH####
+print("summarizing LOH")
 ascat.data <- read.table(LOH_seg_file,sep="\t",header=TRUE)
   
 #extend disrupted segments by assuming homozygosity within missing chunk 
@@ -120,6 +122,7 @@ names(LOH_ls) <- c("LOHcount","LOHsegments")
 hrd_index <- nrow(LOH_table)
 
 ####Structural Variants####
+print("summarizing SVs")
 SV_bedpe <- try(read.table(SV_bedpe_file,
                            sep = "\t",header = TRUE,
                            stringsAsFactors = FALSE,check.names = FALSE))
@@ -192,6 +195,7 @@ if("try-error" %in% class(SV_bedpe) ) {
 }
 
 ####INDEL####
+print("summarizing INDELs")
 
 indelTable <- try(read.table(indel_vcf_file,comment.char= "#"))
 
@@ -230,6 +234,7 @@ if("try-error" %in% class(indelTable) | nrow(indelTable) < indelCutoff) {
 }
 
 ####SNV####
+print("summarizing SNVs")
 
 SNVTable <- try(read.table(snvFile_loc,comment.char= "#"))
 
@@ -291,6 +296,7 @@ if("try-error" %in% class(SNVTable) ) {
 }
   
 ####HRD tests####
+print("Performing HRD tests")
 
 if("try-error" %in% class(SNVTable) | "try-error" %in% class(indelTable) |  "try-error" %in% class(SV_bedpe) ) {
 
@@ -341,8 +347,8 @@ if("try-error" %in% class(SNVTable) | "try-error" %in% class(indelTable) |  "try
 }   
 
 #stick all the results together
-all.results <- list(LOH_ls,SV_ls,indel_ls,SNV_ls,HR_calls)
-names(all.results) <- c("LOH","SV","indel","SNV","HRD")
+all.results <- list(sample_name,LOH_ls,SV_ls,indel_ls,SNV_ls,HR_calls)
+names(all.results) <- c("Sample","LOH","SV","indel","SNV","HRD")
 
 #conver to JSON and write
 ListJSON <- jsonlite::toJSON(all.results,pretty=TRUE,auto_unbox=TRUE)
