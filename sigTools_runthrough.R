@@ -130,7 +130,9 @@ SV_bedpe <- try(read.table(SV_bedpe_file,
 if("try-error" %in% class(SV_bedpe) ) {
   
   print("no SVs!")
-  SV_ls <- 0
+  SV_ls <- list(0,NA,NA,NA)
+  names(SV_ls) <- c("SVcount","SV_CHORD_catalog","SV_sigtools_catalog","SV_sigtools_exposures")
+  
   
 } else {
   
@@ -181,8 +183,7 @@ if("try-error" %in% class(SV_bedpe) ) {
     
   #reformat results for JSON
   CHORD_SV <- as.data.frame(t(CHORD_contexts[1,c(127:145)]))
-  unlist(CHORD_contexts[1,c(127:145)])
-  
+
   rearr_catalogue <- as.data.frame(t(SV_catalogue$rearr_catalogue[,1]))
   names(rearr_catalogue) <- rownames(SV_catalogue$rearr_catalogue)
   
@@ -201,7 +202,8 @@ indelTable <- try(read.table(indel_vcf_file,comment.char= "#"))
 
 if("try-error" %in% class(indelTable) | nrow(indelTable) < indelCutoff) {
   
-  indel_ls <- 0
+  indel_ls <- list(nrow(indelTable),NA,NA)
+  names(indel_ls) <- c("indelCount","indel_sigtools_catalog","indel_CHORD_catalog")
   print("no indels!")
   
 } else {
@@ -240,7 +242,9 @@ SNVTable <- try(read.table(snvFile_loc,comment.char= "#"))
 
 if("try-error" %in% class(SNVTable) ) {
   
-  SNV_ls <- 0
+  SNV_ls <- list(0,NA,NA,NA)
+  names(SNV_ls) <- c("SNVCount","classic_sigs","tissue_sigs","rare_sigs")
+  
   print("no SNVs!")
   
 } else {
@@ -290,17 +294,18 @@ if("try-error" %in% class(SNVTable) ) {
   rare_fit_df <-  as.data.frame(t(rare_fit$exposures[1,]))
   
   #make list
-  SNV_ls <- list(classic_fit,tissue_fit,rare_fit_df)
-  names(SNV_ls) <- c("classic_sigs","tissue_sigs","rare_sigs")
+  SNV_ls <- list(nrow(SNVTable),classic_fit,tissue_fit,rare_fit_df)
+  names(SNV_ls) <- c("SNVCount","classic_sigs","tissue_sigs","rare_sigs")
   
 }
   
 ####HRD tests####
 print("Performing HRD tests")
 
-if("try-error" %in% class(SNVTable) | "try-error" %in% class(indelTable) |  "try-error" %in% class(SV_bedpe) ) {
+if("try-error" %in% class(SNVTable) | "try-error" %in% class(indelTable) | nrow(indelTable) < indelCutoff |  "try-error" %in% class(SV_bedpe) ) {
 
-  HRD_ls <- NA
+  HR_calls <- list(NA,NA)
+  names(HR_calls) <- c("HRDetect","CHORD")
   print("data missing, no HRD call!")
   
 } else {
