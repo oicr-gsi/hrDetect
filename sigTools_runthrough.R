@@ -110,7 +110,7 @@ ascat.data <- read.table(LOH_seg_file,sep="\t",header=TRUE)
 ascat.data.ext <- extend_segments(ascat.data)
 
 #count number of LOH segments
-LOH_table <- ascatToHRDLOH(ascat.data=ascat.data.ext,
+LOH_table <- ascatToHRDLOH(ascat.data=ascat.data,
                            SAMPLE.ID=sample_name,
                            return.loc = T)
   
