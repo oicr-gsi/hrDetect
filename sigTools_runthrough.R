@@ -76,17 +76,68 @@ summarize_LOH <- function(LOH_seg_file,sample_name){
   print("summarizing LOH")
   ascat.data <- read.table(LOH_seg_file,sep="\t",header=TRUE)
   
+  seg <- ascat.data[,c("Chromosome","chromStart","chromEnd","total.copy.number.inTumour","minor.copy.number.inTumour"),] 
+  seg$length <- (seg$chromEnd - seg$chromStart)/1000
+  seg$Aallele <- seg$total.copy.number.inTumour - seg$minor.copy.number.inTumour
+  
+  ##Class1
+  #"HET" heterozygous segments with copy number of (A > 0, B > 0); 
+  seg$BASEclass[seg$minor.copy.number.inTumour > 0 & seg$Aallele > 0] <- "HET"
+  #"LOH": segments with LOH with copy number of (A > 0, B = 0);
+  seg$BASEclass[seg$minor.copy.number.inTumour == 0 & seg$Aallele > 0] <- "LOH"
+  #"HD": segments with homozygous deletions (A = 0, B = 0) 
+  seg$BASEclass[seg$minor.copy.number.inTumour == 0 & seg$Aallele == 0] <- "HD"
+  
+  #Segments were further subclassified into five classes 
+  #on the basis of the sum of major and minor alleles (TCN) 
+  #TCN = 0 (homozygous deletion); 
+  #TCN = 1 (deletion leading to LOH);
+  #TCN = 2 (wild type, including copy-neutral LOH); 
+  #TCN = 3 or 4 (minor gain); 
+  #TCN = 5–8 (moderate gain); and 
+  #TCN ≥ 9 (high-level amplification)
+  seg$TCNclass[seg$total.copy.number.inTumour == 0] <- "0"
+  seg$TCNclass[seg$total.copy.number.inTumour == 1] <- "1"
+  seg$TCNclass[seg$total.copy.number.inTumour == 2] <- "2"
+  seg$TCNclass[seg$total.copy.number.inTumour == 3 | seg$total.copy.number.inTumour == 4 ] <- "3-4"
+  seg$TCNclass[seg$total.copy.number.inTumour >= 5 & seg$total.copy.number.inTumour <= 8] <- "5-8"
+  seg$TCNclass[seg$total.copy.number.inTumour >= 9] <- "9+"
+  
+  # Each of the heterozygous and LOH TCN states were then subclassified into five classes 
+  #on basis of the size of their segments: 
+  seg$LENGTHclass[seg$length <= 100] <- "0–100kb"
+  seg$LENGTHclass[seg$length > 100 & seg$length <= 1000] <- "100kb–1Mb"
+  seg$LENGTHclass[seg$length > 1000 & seg$length <= 10000] <- "1Mb–10Mb"
+  seg$LENGTHclass[seg$length > 10000 & seg$length <= 40000] <- "10Mb–40Mb"
+  seg$LENGTHclass[seg$length > 40000] <- "40Mb+"
+  seg$LENGTHclass[seg$length > 1000 & seg$BASEclass == "HD"] <- "1Mb+"
+  
+  CNV_sigs <- seg %>% group_by(LENGTHclass,TCNclass,BASEclass) %>% tally()
+  CNV_sigs$prop <- CNV_sigs$n / sum(CNV_sigs$n)
+  
+  CNVsigs.class <- fread('~/Documents/GitHub/sigtools_workflow/CNVsigs.class.txt')
+  CNVsigs.classifications <- fread('~/Documents/GitHub/sigtools_workflow/COSMIC_v3.3_CN_GRCh37.txt')
+  
+  CNVsigs.classfied <- left_join(CNVsigs.class,CNV_sigs)
+  CNVsigs.classfied[is.na(CNVsigs.classfied)] <- 0
+  
+  class_prop <- CNVsigs.classfied$prop
+  names(class_prop) <- CNVsigs.classfied$Type
+  
+
   #count number of LOH segments
   LOH_table <- ascatToHRDLOH(ascat.data=ascat.data,
                              SAMPLE.ID=sample_name,
                              return.loc = T)
   
   #save LOH segments and LOH count to ls   
-  LOH_ls <- list(nrow(LOH_table),as.matrix(LOH_table[,c("Chromosome","Start","End","totalCN")]))
-  names(LOH_ls) <- c("LOHcount","LOHsegments")
+  LOH_ls <- list(nrow(LOH_table),as.matrix(LOH_table[,c("Chromosome","Start","End","totalCN")]),class_prop)
+  names(LOH_ls) <- c("LOHcount","LOHsegments","CNVclassification")
   
   return(LOH_ls)
 }
+
+
 
 summarize_SVs <- function(SV_bedpe){
   
@@ -226,16 +277,18 @@ LOH_seg_location    <-  opt$LOHFile
 #boots               <- 2500 
 #genomeVersion       <- "hg38"
 #varCutoff           <- 10
-#sample_name         <- "OCT_010542" 
-#tissue              <- "Ovary" 
-#snv_vcf_location    <- "cgi/scratch/fbeaudry/sigTools_test/LOD/OCT_010542/SNVvaf10/OCT_010542_Om_M_WG.filter.deduped.realigned.recalibrated.mutect2.filtered.VAF.snv.vcf.gz" 
-#indel_vcf_location  <- "cgi/scratch/fbeaudry/sigTools_test/LOD/OCT_010542/SNVvaf10/OCT_010542_Om_M_WG.filter.deduped.realigned.recalibrated.mutect2.filtered.VAF.indel.vcf.gz" 
-#SV_bedpe_location   <- "cgi/scratch/fbeaudry/sigTools_test/LOD/OCT_010542/SNVvaf10/OCT_010542_Om_M_WG_.somatic_filtered.delly.merged.bedpe"
-#LOH_seg_location    <- "cgi/scratch/fbeaudry/sigTools_test/LOD/OCT_010542/SNVvaf10/OCT_010542_Om_M_WG_segments.cna.txt" 
+sample_name         <- "OCT_010434" 
+tissue              <- "Ovary" 
+snv_vcf_location    <- "cgi/scratch/fbeaudry/sigTools_test/TGL62/OCT_010434/OCT_010434_Ov_P_WG.filter.deduped.realigned.recalibrated.mutect2.filtered.VAF.snv.vcf.gz" 
+indel_vcf_location  <- "cgi/scratch/fbeaudry/sigTools_test/TGL62/OCT_010434/OCT_010434_Ov_P_WG.filter.deduped.realigned.recalibrated.mutect2.filtered.VAF.indel.vcf.gz" 
+SV_bedpe_location   <- "cgi/scratch/fbeaudry/sigTools_test/TGL62/OCT_010434/OCT_010434_Ov_P_WG__somatic.somatic_filtered.delly.merged.bedpe"
+LOH_seg_location    <- "cgi/scratch/fbeaudry/sigTools_test/TGL62/OCT_010434/OCT_010434_Ov_P_WG_segments.cna.txt" 
 
 ####LOH####
 
-LOH_ls <- summarize_LOH(LOH_seg_location,sample_name)
+LOH_ls <- summarize_LOH(LOH_seg_file=LOH_seg_location,
+                        sample_name=sample_name
+                        )
 
 ####Structural Variants####
 
