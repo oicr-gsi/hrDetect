@@ -244,7 +244,8 @@ summarize_SNVs <- function(snv_vcf_location,genomeVersion,sample_name,tissue){
   
   print("fitting rare SNV signatures")
   
-  rare_fit <- FitMS(catalogues = snv_catalogue_reformat,"Pancreas",
+  rare_fit <- FitMS(catalogues = snv_catalogue_reformat,
+                    organ = tissue,
                     useBootstrap = TRUE,
                     nboot = boots)
   
@@ -254,6 +255,10 @@ summarize_SNVs <- function(snv_vcf_location,genomeVersion,sample_name,tissue){
   tissue_fit <- as.data.frame(t(SNV_fit_sigs$exposures[1,]))
   
   rare_fit_df <-  as.data.frame(t(rare_fit$exposures[1,]))
+  
+  if(length(rare_fit_df) == 1){
+    names(rare_fit_df) <- colnames(rare_fit$exposures)
+  }
   
   #make list
   SNV_ls <- list(sum(snv_catalogue$catalogue),classic_fit,tissue_fit,rare_fit_df,snv_catalogue_reformat)
@@ -270,7 +275,8 @@ option_list = list(
   make_option(c("-L", "--LOHFile"), type="character", default=NULL, help="LOH file", metavar="character"),
   make_option(c("-b", "--bootstraps"), type="numeric", default=2500, help="number of bootstraps for signature detection", metavar="numeric"),
   make_option(c("-g", "--genomeVersion"), type="character", default="hg38", help="genome version", metavar="character"),
-  make_option(c("-i", "--varCutoff"), type="numeric", default=10, help="minimum number of variants for analysis", metavar="numeric")
+  make_option(c("-i", "--indelCutoff"), type="numeric", default=10, help="minimum number of indels for analysis", metavar="numeric"),
+  make_option(c("-c", "--snvCutoff"), type="numeric", default=10, help="minimum number of snvs for analysis", metavar="numeric")
 )
 
 opt_parser <- OptionParser(option_list=option_list, add_help_option=FALSE)
@@ -278,7 +284,8 @@ opt <- parse_args(opt_parser)
 
 boots               <-  opt$bootstraps
 genomeVersion       <-  opt$genomeVersion
-varCutoff           <-  opt$varCutoff
+indelCutoff         <-  opt$indelCutoff
+snvCutoff           <-  opt$snvCutoff
 sample_name         <-  opt$sampleName
 tissue              <-  opt$tissue
 snv_vcf_location    <-  opt$snvFile
@@ -290,7 +297,9 @@ LOH_seg_location    <-  opt$LOHFile
 #setwd('/Volumes/')
 #boots               <- 2500 
 #genomeVersion       <- "hg38"
-#varCutoff           <- 10
+
+#indelCutoff         <- 10
+#snvCutoff           <- 10
 #sample_name         <- "OCT_010434" 
 #tissue              <- "Ovary" 
 #snv_vcf_location    <- "cgi/scratch/fbeaudry/sigTools_test/TGL62/OCT_010434/OCT_010434_Ov_P_WG.filter.deduped.realigned.recalibrated.mutect2.filtered.VAF.snv.vcf.gz" 
@@ -304,6 +313,7 @@ tissue.catalog <-  c("Biliary", "Bladder", "Bone_SoftTissue", "Breast",  "CNS", 
 if(tissue %ni% tissue.catalog){
   print("careful: tissue not in tissue-catalog!")
 }
+
 
 ####LOH####
 
@@ -345,7 +355,7 @@ if("try-error" %in% class(indel_vcf) ) {
   indel_ls        <- list(0,NA,NA)
   names(indel_ls) <- c("indelCount","indel_sigtools_catalog","indel_CHORD_catalog")
   
-} else if(nrow(indel_vcf) < varCutoff){
+} else if(nrow(indel_vcf) < indelCutoff){
   
   print("low indels!")
   indel_ls        <- list(nrow(indel_vcf),NA,NA)
@@ -372,7 +382,7 @@ if("try-error" %in% class(snv_vcf)  ) {
   SNV_ls        <- list(0,NA,NA,NA,NA)
   names(SNV_ls) <- c("SNVCount","classic_sigs","tissue_sigs","rare_sigs","SNV_catalog")
   
-} else if( nrow(snv_vcf) < varCutoff){
+} else if( nrow(snv_vcf) < snvCutoff){
   
   print("low SNVs!")
   SNV_ls        <- list(nrow(snv_vcf),NA,NA,NA,NA)
@@ -400,7 +410,9 @@ if("try-error" %in% class(snv_vcf) | "try-error" %in% class(indel_vcf) | "try-er
 
   print("some data missing, no HRD call!")
 
-} else if(nrow(snv_vcf) < varCutoff | nrow(indel_vcf) < varCutoff ){
+  
+} else if(nrow(snv_vcf) < snvCutoff | nrow(indel_vcf) < indelCutoff ){
+
   
   print("some calls too few, no HRD call!")
 
@@ -425,7 +437,7 @@ if("try-error" %in% class(snv_vcf) | "try-error" %in% class(indel_vcf) | "try-er
   SNV_catalog         <-  sigTools_formatter(SNV_ls["SNV_catalog"],sampleName = sample_name)
   
   #call HRDetect
-  HRDetect_res <- HRDetect_pipeline(  SNV_signature_version   = "RefSigv2",
+  HRDetect_res <- HRDetect_pipeline(  SNV_signature_version   = "RefSigv1",
                                       organ                   = tissue,
                                       genome.v                = genomeVersion,
                                       bootstrapHRDetectScores = TRUE,
@@ -433,7 +445,7 @@ if("try-error" %in% class(snv_vcf) | "try-error" %in% class(indel_vcf) | "try-er
                                       data_matrix             = input_matrix,
                                       SV_catalogues           = SV_sigtools_catalog,
                                       SNV_catalogues          = SNV_catalog,
-                                      Indels_vcf_files        = indel_vcf_location,
+                                      Indels_vcf_files        = indel_vcf_location
                                     )
   
   #catalog CHORD
