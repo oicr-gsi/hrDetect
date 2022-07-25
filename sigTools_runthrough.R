@@ -10,6 +10,7 @@ library(BSgenome.Hsapiens.UCSC.hg38)
 library(jsonlite)
 
 ####functions####
+'%ni%' <- function(x,y)!('%in%'(x,y))
 
 sigTools_formatter <- function(input,sampleName){
   cat_list <- list()
@@ -31,6 +32,7 @@ setColNames <- function (object = nm, nm) {
   object
 }
 
+#extend_segments is not currently in use, empirically found it did not help with HRD
 extend_segments <-  function(ascat.data){
   #extend disrupted segments by assuming homozygosity within missing chunk 
   #is same on both sides of missing chunk; increases # of LOH segs
@@ -72,7 +74,7 @@ extend_segments <-  function(ascat.data){
   return(df_total)
 }
 
-summarize_LOH <- function(LOH_seg_file,sample_name){
+summarize_LOH <- function(LOH_seg_file,sample_name,CNVsigs=F){
   print("summarizing LOH")
   ascat.data <- read.table(LOH_seg_file,sep="\t",header=TRUE)
   
@@ -85,10 +87,73 @@ summarize_LOH <- function(LOH_seg_file,sample_name){
   LOH_ls <- list(nrow(LOH_table),as.matrix(LOH_table[,c("Chromosome","Start","End","totalCN")]))
   names(LOH_ls) <- c("LOHcount","LOHsegments")
   
+  if(CNVsigs=T){
+    seg <- ascat.data[,c("Chromosome","chromStart","chromEnd","total.copy.number.inTumour","minor.copy.number.inTumour"),] 
+    seg$length <- (seg$chromEnd - seg$chromStart)/1000
+    seg$Aallele <- seg$total.copy.number.inTumour - seg$minor.copy.number.inTumour
+    
+    ##Class1
+    #"HET" heterozygous segments with copy number of (A > 0, B > 0); 
+    seg$BASEclass[seg$minor.copy.number.inTumour > 0 & seg$Aallele > 0] <- "HET"
+    #"LOH": segments with LOH with copy number of (A > 0, B = 0);
+    seg$BASEclass[seg$minor.copy.number.inTumour == 0 & seg$Aallele > 0] <- "LOH"
+    #"HD": segments with homozygous deletions (A = 0, B = 0) 
+    seg$BASEclass[seg$minor.copy.number.inTumour == 0 & seg$Aallele == 0] <- "HD"
+    
+    #Segments were further subclassified into five classes 
+    #on the basis of the sum of major and minor alleles (TCN) 
+    #TCN = 0 (homozygous deletion); 
+    #TCN = 1 (deletion leading to LOH);
+    #TCN = 2 (wild type, including copy-neutral LOH); 
+    #TCN = 3 or 4 (minor gain); 
+    #TCN = 5–8 (moderate gain); and 
+    #TCN ≥ 9 (high-level amplification)
+    seg$TCNclass[seg$total.copy.number.inTumour == 0] <- "0"
+    seg$TCNclass[seg$total.copy.number.inTumour == 1] <- "1"
+    seg$TCNclass[seg$total.copy.number.inTumour == 2] <- "2"
+    seg$TCNclass[seg$total.copy.number.inTumour == 3 | seg$total.copy.number.inTumour == 4 ] <- "3-4"
+    seg$TCNclass[seg$total.copy.number.inTumour >= 5 & seg$total.copy.number.inTumour <= 8] <- "5-8"
+    seg$TCNclass[seg$total.copy.number.inTumour >= 9] <- "9+"
+    
+    # Each of the heterozygous and LOH TCN states were then subclassified into five classes 
+    #on basis of the size of their segments: 
+    seg$LENGTHclass[seg$length <= 100] <- "0–100kb"
+    seg$LENGTHclass[seg$length > 100 & seg$length <= 1000] <- "100kb–1Mb"
+    seg$LENGTHclass[seg$length > 1000 & seg$length <= 10000] <- "1Mb–10Mb"
+    seg$LENGTHclass[seg$length > 10000 & seg$length <= 40000] <- "10Mb–40Mb"
+    seg$LENGTHclass[seg$length > 40000] <- "40Mb+"
+    seg$LENGTHclass[seg$length > 1000 & seg$BASEclass == "HD"] <- "1Mb+"
+    
+    CNV_sigs <- seg %>% group_by(LENGTHclass,TCNclass,BASEclass) %>% tally()
+    CNV_sigs$prop <- CNV_sigs$n / sum(CNV_sigs$n)
+    
+    CNVsigs.class <- fread('~/Documents/GitHub/sigtools_workflow/CNVsigs.class.txt')
+    CNVsigs.classifications <- fread('~/Documents/GitHub/sigtools_workflow/COSMIC_v3.3_CN_GRCh37.txt')
+    
+    CNVsigs.classfied <- left_join(CNVsigs.class,CNV_sigs)
+    CNVsigs.classfied[is.na(CNVsigs.classfied)] <- 0
+    
+    class_prop <- CNVsigs.classfied$prop
+    names(class_prop) <- CNVsigs.classfied$Type
+  
+    #count number of LOH segments
+    LOH_table <- ascatToHRDLOH(ascat.data=ascat.data,
+                               SAMPLE.ID=sample_name,
+                               return.loc = T)
+    
+    #save LOH segments and LOH count to ls   
+    LOH_ls <- list(nrow(LOH_table),as.matrix(LOH_table[,c("Chromosome","Start","End","totalCN")]),class_prop)
+    names(LOH_ls) <- c("LOHcount","LOHsegments","CNVclassification")
+    
+  }
+
+
   return(LOH_ls)
 }
 
-summarize_SVs <- function(SV_bedpe){
+
+
+summarize_SVs <- function(SV_bedpe,tissue){
   
   #start sigtools SV analysis
   SV_bedpe_sigtools <- SV_bedpe
@@ -146,7 +211,7 @@ summarize_indels <- function(indel_vcf_location,sample_name,genomeVersion){
   return(indel_ls)
 }  
 
-summarize_SNVs <- function(snv_vcf_location,genomeVersion,sample_name){
+summarize_SNVs <- function(snv_vcf_location,genomeVersion,sample_name,tissue){
   #catalog SNVs
   snv_catalogue <- vcfToSNVcatalogue(vcfFilename = snv_vcf_location,
                                      genome.v = genomeVersion)
@@ -232,18 +297,29 @@ LOH_seg_location    <-  opt$LOHFile
 #setwd('/Volumes/')
 #boots               <- 2500 
 #genomeVersion       <- "hg38"
+
 #indelCutoff         <- 10
 #snvCutoff           <- 10
-#sample_name         <- "OCT_010542" 
+#sample_name         <- "OCT_010434" 
 #tissue              <- "Ovary" 
-#snv_vcf_location    <- "cgi/scratch/fbeaudry/sigTools_test/LOD/OCT_010542/snvVAF05/OCT_010542_Om_M_WG.filter.deduped.realigned.recalibrated.mutect2.filtered.VAF.snv.vcf.gz" 
-#indel_vcf_location  <- "cgi/scratch/fbeaudry/sigTools_test/LOD/OCT_010542/snvVAF05/OCT_010542_Om_M_WG.filter.deduped.realigned.recalibrated.mutect2.filtered.VAF.indel.vcf.gz" 
-#SV_bedpe_location   <- "cgi/scratch/fbeaudry/sigTools_test/LOD/OCT_010542/snvVAF05/OCT_010542_Om_M_WG_.somatic_filtered.delly.merged.bedpe"
-#LOH_seg_location    <- "cgi/scratch/fbeaudry/sigTools_test/LOD/OCT_010542/snvVAF05/OCT_010542_Om_M_WG_segments.cna.txt" 
+#snv_vcf_location    <- "cgi/scratch/fbeaudry/sigTools_test/TGL62/OCT_010434/OCT_010434_Ov_P_WG.filter.deduped.realigned.recalibrated.mutect2.filtered.VAF.snv.vcf.gz" 
+#indel_vcf_location  <- "cgi/scratch/fbeaudry/sigTools_test/TGL62/OCT_010434/OCT_010434_Ov_P_WG.filter.deduped.realigned.recalibrated.mutect2.filtered.VAF.indel.vcf.gz" 
+#SV_bedpe_location   <- "cgi/scratch/fbeaudry/sigTools_test/TGL62/OCT_010434/OCT_010434_Ov_P_WG__somatic.somatic_filtered.delly.merged.bedpe"
+#LOH_seg_location    <- "cgi/scratch/fbeaudry/sigTools_test/TGL62/OCT_010434/OCT_010434_Ov_P_WG_segments.cna.txt" 
+
+####tissue test####
+tissue.catalog <-  c("Biliary", "Bladder", "Bone_SoftTissue", "Breast",  "CNS", "Colorectal", "Esophagus", "Head_neck", "Kidney", "Liver", "Lung", "Lymphoid", "Ovary", "Pancreas", "Prostate", "Skin", "Stomach", "Uterus")
+
+if(tissue %ni% tissue.catalog){
+  print("careful: tissue not in tissue-catalog!")
+}
+
 
 ####LOH####
 
-LOH_ls <- summarize_LOH(LOH_seg_location,sample_name)
+LOH_ls <- summarize_LOH(LOH_seg_file=LOH_seg_location,
+                        sample_name=sample_name
+                        )
 
 ####Structural Variants####
 
@@ -255,10 +331,16 @@ if("try-error" %in% class(SV_bedpe)) {
   SV_ls <- list(0,NA,NA,NA)
   names(SV_ls) <- c("SVcount","SV_sigtools_catalog","SV_sigtools_exposures","SV_CHORD_catalog")
   
+} else if(tissue %ni% tissue.catalog){
+  
+  print("tissue not in tissue-catalog, skipping SV sigs")
+  SV_ls <- list(nrow(SV_bedpe),NA,NA,NA)
+  names(SV_ls) <- c("SVcount","SV_sigtools_catalog","SV_sigtools_exposures","SV_CHORD_catalog")
+  
 } else {
   
   print("summarizing SVs")
-  SV_ls <- summarize_SVs(SV_bedpe)
+  SV_ls <- summarize_SVs(SV_bedpe,tissue)
   names(SV_ls) <- c("SVcount","SV_sigtools_catalog","SV_sigtools_exposures","SV_CHORD_catalog")
   
 }
@@ -306,29 +388,39 @@ if("try-error" %in% class(snv_vcf)  ) {
   SNV_ls        <- list(nrow(snv_vcf),NA,NA,NA,NA)
   names(SNV_ls) <- c("SNVCount","classic_sigs","tissue_sigs","rare_sigs","SNV_catalog")
   
-} else {
+} else if(tissue %ni% tissue.catalog){
+  
+  print("tissue not in tissue-catalog, skipping SNV sigs")
+  SNV_ls        <- list(nrow(snv_vcf),NA,NA,NA,NA)
+  names(SNV_ls) <- c("SNVCount","classic_sigs","tissue_sigs","rare_sigs","SNV_catalog")
+  
+}  else {
   
   print("summarizing SNVs")
-  SNV_ls        <- summarize_SNVs(snv_vcf_location,genomeVersion,sample_name)
+  SNV_ls        <- summarize_SNVs(snv_vcf_location,genomeVersion,sample_name,tissue)
   names(SNV_ls) <- c("SNVCount","classic_sigs","tissue_sigs","rare_sigs","SNV_catalog")
   
 }
   
 ####HRD tests####
+HR_calls <- list(NA,NA)
+names(HR_calls) <- c("HRDetect","CHORD")
 
 if("try-error" %in% class(snv_vcf) | "try-error" %in% class(indel_vcf) | "try-error" %in% class(SV_bedpe)) {
 
   print("some data missing, no HRD call!")
-  HR_calls <- list(NA,NA)
-  names(HR_calls) <- c("HRDetect","CHORD")
+
   
 } else if(nrow(snv_vcf) < snvCutoff | nrow(indel_vcf) < indelCutoff ){
+
   
   print("some calls too few, no HRD call!")
-  HR_calls <- list(NA,NA)
-  names(HR_calls) <- c("HRDetect","CHORD")
+
+} else if(tissue %ni% tissue.catalog){
   
-} else {
+  print("tissue not in tissue-catalog, skipping HRD call")
+    
+}  else {
   print("Performing HRD tests")
   
   #make HRDetect input matrix
