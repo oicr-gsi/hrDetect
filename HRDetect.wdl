@@ -15,7 +15,6 @@ workflow HRDetect {
 		smallsVcfFile: "Input VCF file of SNV and indels (small mutations) (eg. from mutect2)"
 		smallsVcfIndex: "Index of input VCF file of SNV and indels"
 		segFile: "File for segmentations, used to estimate number of segments in Loss of heterozygosity (LOH) (eg. from sequenza)"
-		tissue: "Cancerous-tissue of origin"
 		sampleName: "Name of sample matching the tumor sample in .vcf"
 		plotIt: "Create plots of sigtools results"
 	}
@@ -293,7 +292,7 @@ task hrdResults {
 		File snvVcfFiltered
 		File snvVcfIndexFiltered
 		File lohSegFile
-		String tissue
+		String oncotree
 		String sampleName
 		String modules = "hrdetect-scripts/1.3"
 		String sigtoolrScript = "$HRDETECT_SCRIPTS_ROOT/bin/sigTools_runthrough.R"
@@ -312,7 +311,7 @@ task hrdResults {
 		indelVcfIndexFiltered: "filtered INDEL .vcf.tbi (indexed)"
 		snvVcfIndexFiltered: "filtered SNV .vcf.tbi (indexed)"
 		lohSegFile: "reformatted segmentation file"
-		tissue: "Cancerous-tissue of origin"
+		oncotree: "oncotree code of cancer"
 		sigtoolrScript: ".R script containing sigtools"
 		sampleName: "Name of sample matching the tumor sample in .vcf"		
 		modules: "Required environment modules"
@@ -327,7 +326,7 @@ task hrdResults {
 	command <<<
 		set -euo pipefail
 
-		Rscript --vanilla ~{sigtoolrScript} -s ~{sampleName} -t ~{tissue} -S ~{snvVcfFiltered} -I  ~{indelVcfFiltered} -V ~{structuralBedpeFiltered} -L ~{lohSegFile} -b ~{sigtoolsBootstrap} -g ~{genomeVersion} -i ~{indelCutoff}
+		Rscript --vanilla ~{sigtoolrScript} -s ~{sampleName} -o ~{oncotree} -S ~{snvVcfFiltered} -I  ~{indelVcfFiltered} -V ~{structuralBedpeFiltered} -L ~{lohSegFile} -b ~{sigtoolsBootstrap} -g ~{genomeVersion} -i ~{indelCutoff}
 
 	>>> 
 

@@ -35,7 +35,7 @@ Parameter|Value|Description
 `filterSNVs.genome`|String|Path to loaded genome .fa
 `filterSNVs.VAF`|Float|minimum variant allele frequency to retain variant
 `filterSNVs.QUALfilter`|String|filter for filter calls to remove, eg. FILTER~'weak_evidence' | FILTER~'strand_bias' 
-`hrdResults.tissue`|String|Cancerous-tissue of origin
+`hrdResults.oncotree`|String|oncotree code of cancer
 
 #### Optional task parameters:
 Parameter|Value|Default|Description
@@ -156,7 +156,7 @@ Output | Type | Description
  	>>>
   ### Run the HRDetect and CHORD package in R
  
- 		Rscript --vanilla ~{sigtoolrScript} -s ~{sampleName} -t ~{tissue} -S ~{snvVcfFiltered} -I  ~{indelVcfFiltered} -V ~{structuralBedpeFiltered} -L ~{lohSegFile} -b ~{sigtoolsBootstrap} -g ~{genomeVersion} -i ~{indelCutoff}
+ 		Rscript --vanilla ~{sigtoolrScript} -s ~{sampleName} -o ~{oncotree} -S ~{snvVcfFiltered} -I  ~{indelVcfFiltered} -V ~{structuralBedpeFiltered} -L ~{lohSegFile} -b ~{sigtoolsBootstrap} -g ~{genomeVersion} -i ~{indelCutoff}
  
   ### Run plotting in R (optional)
  

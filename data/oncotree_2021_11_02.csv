@@ -1,0 +1,885 @@
+oncotree_version,oncotree_code,tissue,sigtools
+oncotree_2021_11_02,PHC,Adrenal Gland,None
+oncotree_2021_11_02,ADRENAL_GLAND,Adrenal Gland,None
+oncotree_2021_11_02,ACA,Adrenal Gland,None
+oncotree_2021_11_02,ACC,Adrenal Gland,None
+oncotree_2021_11_02,IAMPCA,Ampulla of Vater,None
+oncotree_2021_11_02,MAMPCA,Ampulla of Vater,None
+oncotree_2021_11_02,AMPULLA_OF_VATER,Ampulla of Vater,None
+oncotree_2021_11_02,PAMPCA,Ampulla of Vater,None
+oncotree_2021_11_02,AMPCA,Ampulla of Vater,None
+oncotree_2021_11_02,SCGBC,Biliary Tract,Biliary
+oncotree_2021_11_02,PHCH,Biliary Tract,Biliary
+oncotree_2021_11_02,IPN,Biliary Tract,Biliary
+oncotree_2021_11_02,ICPN,Biliary Tract,Biliary
+oncotree_2021_11_02,IHCH,Biliary Tract,Biliary
+oncotree_2021_11_02,EHCH,Biliary Tract,Biliary
+oncotree_2021_11_02,GBC,Biliary Tract,Biliary
+oncotree_2021_11_02,BILIARY_TRACT,Biliary Tract,Biliary
+oncotree_2021_11_02,GBAD,Biliary Tract,Biliary
+oncotree_2021_11_02,GBASC,Biliary Tract,Biliary
+oncotree_2021_11_02,CHOL,Biliary Tract,Biliary
+oncotree_2021_11_02,SRCBC,Bladder/Urinary Tract,Bladder
+oncotree_2021_11_02,UPA,Bladder/Urinary Tract,Bladder
+oncotree_2021_11_02,UA,Bladder/Urinary Tract,Bladder
+oncotree_2021_11_02,SCBC,Bladder/Urinary Tract,Bladder
+oncotree_2021_11_02,IMTB,Bladder/Urinary Tract,Bladder
+oncotree_2021_11_02,IUP,Bladder/Urinary Tract,Bladder
+oncotree_2021_11_02,URCA,Bladder/Urinary Tract,Bladder
+oncotree_2021_11_02,URMM,Bladder/Urinary Tract,Bladder
+oncotree_2021_11_02,UAD,Bladder/Urinary Tract,Bladder
+oncotree_2021_11_02,BLCA,Bladder/Urinary Tract,Bladder
+oncotree_2021_11_02,USCC,Bladder/Urinary Tract,Bladder
+oncotree_2021_11_02,BLSC,Bladder/Urinary Tract,Bladder
+oncotree_2021_11_02,UTUC,Bladder/Urinary Tract,Bladder
+oncotree_2021_11_02,SCB,Bladder/Urinary Tract,Bladder
+oncotree_2021_11_02,UCA,Bladder/Urinary Tract,Bladder
+oncotree_2021_11_02,BLAD,Bladder/Urinary Tract,Bladder
+oncotree_2021_11_02,BLADDER,Bladder/Urinary Tract,Bladder
+oncotree_2021_11_02,UCU,Bladder/Urinary Tract,Bladder
+oncotree_2021_11_02,PAOS,Bone,Bone_SoftTissue
+oncotree_2021_11_02,FIOS,Bone,Bone_SoftTissue
+oncotree_2021_11_02,BONE,Bone,Bone_SoftTissue
+oncotree_2021_11_02,MCHS,Bone,Bone_SoftTissue
+oncotree_2021_11_02,CCHDM,Bone,Bone_SoftTissue
+oncotree_2021_11_02,DDCHDM,Bone,Bone_SoftTissue
+oncotree_2021_11_02,CHOS,Bone,Bone_SoftTissue
+oncotree_2021_11_02,HGSOS,Bone,Bone_SoftTissue
+oncotree_2021_11_02,OSOS,Bone,Bone_SoftTissue
+oncotree_2021_11_02,SECOS,Bone,Bone_SoftTissue
+oncotree_2021_11_02,CHDM,Bone,Bone_SoftTissue
+oncotree_2021_11_02,EMCHS,Bone,Bone_SoftTissue
+oncotree_2021_11_02,DDCHS,Bone,Bone_SoftTissue
+oncotree_2021_11_02,CHBL,Bone,Bone_SoftTissue
+oncotree_2021_11_02,ES,Bone,Bone_SoftTissue
+oncotree_2021_11_02,LGCOS,Bone,Bone_SoftTissue
+oncotree_2021_11_02,OS,Bone,Bone_SoftTissue
+oncotree_2021_11_02,GCTB,Bone,Bone_SoftTissue
+oncotree_2021_11_02,SCOS,Bone,Bone_SoftTissue
+oncotree_2021_11_02,CHS,Bone,Bone_SoftTissue
+oncotree_2021_11_02,TEOS,Bone,Bone_SoftTissue
+oncotree_2021_11_02,ADMA,Bone,Bone_SoftTissue
+oncotree_2021_11_02,MYCHS,Bone,Bone_SoftTissue
+oncotree_2021_11_02,PEOS,Bone,Bone_SoftTissue
+oncotree_2021_11_02,AWDNET,Bowel,Colorectal
+oncotree_2021_11_02,SRAP,Bowel,Colorectal
+oncotree_2021_11_02,SIC,Bowel,Colorectal
+oncotree_2021_11_02,TAC,Bowel,Colorectal
+oncotree_2021_11_02,AGA,Bowel,Colorectal
+oncotree_2021_11_02,CTAAP,Bowel,Colorectal
+oncotree_2021_11_02,SRCCR,Bowel,Colorectal
+oncotree_2021_11_02,HGNEC,Bowel,Colorectal
+oncotree_2021_11_02,COAD,Bowel,Colorectal
+oncotree_2021_11_02,READ,Bowel,Colorectal
+oncotree_2021_11_02,COADREAD,Bowel,Colorectal
+oncotree_2021_11_02,GINET,Bowel,Colorectal
+oncotree_2021_11_02,MACR,Bowel,Colorectal
+oncotree_2021_11_02,BOWEL,Bowel,Colorectal
+oncotree_2021_11_02,CMC,Bowel,Colorectal
+oncotree_2021_11_02,ARMM,Bowel,Colorectal
+oncotree_2021_11_02,RWDNET,Bowel,Colorectal
+oncotree_2021_11_02,MAAP,Bowel,Colorectal
+oncotree_2021_11_02,APAD,Bowel,Colorectal
+oncotree_2021_11_02,ANSC,Bowel,Colorectal
+oncotree_2021_11_02,GCCAP,Bowel,Colorectal
+oncotree_2021_11_02,LAMN,Bowel,Colorectal
+oncotree_2021_11_02,SBWDNET,Bowel,Colorectal
+oncotree_2021_11_02,SBC,Bowel,Colorectal
+oncotree_2021_11_02,CAIS,Bowel,Colorectal
+oncotree_2021_11_02,DA,Bowel,Colorectal
+oncotree_2021_11_02,MBC,Breast,Breast
+oncotree_2021_11_02,ACBC,Breast,Breast
+oncotree_2021_11_02,COM,Breast,Breast
+oncotree_2021_11_02,SPC,Breast,Breast
+oncotree_2021_11_02,MDLC,Breast,Breast
+oncotree_2021_11_02,BRSRCC,Breast,Breast
+oncotree_2021_11_02,CCHM,Breast,Breast
+oncotree_2021_11_02,BRAME,Breast,Breast
+oncotree_2021_11_02,DCIS,Breast,Breast
+oncotree_2021_11_02,BRCA,Breast,Breast
+oncotree_2021_11_02,BNNOS,Breast,Breast
+oncotree_2021_11_02,IBC,Breast,Breast
+oncotree_2021_11_02,PT,Breast,Breast
+oncotree_2021_11_02,BLPT,Breast,Breast
+oncotree_2021_11_02,MASCC,Breast,Breast
+oncotree_2021_11_02,PD,Breast,Breast
+oncotree_2021_11_02,IDC,Breast,Breast
+oncotree_2021_11_02,CSNOS,Breast,Breast
+oncotree_2021_11_02,PBS,Breast,Breast
+oncotree_2021_11_02,BA,Breast,Breast
+oncotree_2021_11_02,MASC,Breast,Breast
+oncotree_2021_11_02,BPT,Breast,Breast
+oncotree_2021_11_02,LCIS,Breast,Breast
+oncotree_2021_11_02,MPT,Breast,Breast
+oncotree_2021_11_02,BRCNOS,Breast,Breast
+oncotree_2021_11_02,BFN,Breast,Breast
+oncotree_2021_11_02,FA,Breast,Breast
+oncotree_2021_11_02,MSCC,Breast,Breast
+oncotree_2021_11_02,ILC,Breast,Breast
+oncotree_2021_11_02,BREAST,Breast,Breast
+oncotree_2021_11_02,MMBC,Breast,Breast
+oncotree_2021_11_02,IMMC,Breast,Breast
+oncotree_2021_11_02,JSCB,Breast,Breast
+oncotree_2021_11_02,MCS,Breast,Breast
+oncotree_2021_11_02,EMBC,Breast,Breast
+oncotree_2021_11_02,BRCANOS,Breast,Breast
+oncotree_2021_11_02,CABC,Cervix,None
+oncotree_2021_11_02,CERMS,Cervix,None
+oncotree_2021_11_02,GCEMU,Cervix,None
+oncotree_2021_11_02,CEVG,Cervix,None
+oncotree_2021_11_02,CERVIX,Cervix,None
+oncotree_2021_11_02,CEAD,Cervix,None
+oncotree_2021_11_02,CECC,Cervix,None
+oncotree_2021_11_02,CESE,Cervix,None
+oncotree_2021_11_02,VGCE,Cervix,None
+oncotree_2021_11_02,CESC,Cervix,None
+oncotree_2021_11_02,SCCE,Cervix,None
+oncotree_2021_11_02,CEAIS,Cervix,None
+oncotree_2021_11_02,CELI,Cervix,None
+oncotree_2021_11_02,ICEMU,Cervix,None
+oncotree_2021_11_02,ECAD,Cervix,None
+oncotree_2021_11_02,MCCE,Cervix,None
+oncotree_2021_11_02,CEMN,Cervix,None
+oncotree_2021_11_02,SCEMU,Cervix,None
+oncotree_2021_11_02,CEAS,Cervix,None
+oncotree_2021_11_02,CACC,Cervix,None
+oncotree_2021_11_02,CEEN,Cervix,None
+oncotree_2021_11_02,CENE,Cervix,None
+oncotree_2021_11_02,CEGCC,Cervix,None
+oncotree_2021_11_02,CEMU,Cervix,None
+oncotree_2021_11_02,MMB,CNS/Brain,CNS
+oncotree_2021_11_02,PCGP,CNS/Brain,CNS
+oncotree_2021_11_02,GBM,CNS/Brain,CNS
+oncotree_2021_11_02,SELT,CNS/Brain,CNS
+oncotree_2021_11_02,PXA,CNS/Brain,CNS
+oncotree_2021_11_02,RHM,CNS/Brain,CNS
+oncotree_2021_11_02,ENCG,CNS/Brain,CNS
+oncotree_2021_11_02,SUBE,CNS/Brain,CNS
+oncotree_2021_11_02,BCCA,CNS/Brain,CNS
+oncotree_2021_11_02,BMGCT,CNS/Brain,CNS
+oncotree_2021_11_02,GMN,CNS/Brain,CNS
+oncotree_2021_11_02,PCNSMT,CNS/Brain,CNS
+oncotree_2021_11_02,MBLWNT,CNS/Brain,CNS
+oncotree_2021_11_02,MMBL,CNS/Brain,CNS
+oncotree_2021_11_02,EVN,CNS/Brain,CNS
+oncotree_2021_11_02,BYST,CNS/Brain,CNS
+oncotree_2021_11_02,DMBLSHH,CNS/Brain,CNS
+oncotree_2021_11_02,MBENSHH,CNS/Brain,CNS
+oncotree_2021_11_02,DIG,CNS/Brain,CNS
+oncotree_2021_11_02,DMBL,CNS/Brain,CNS
+oncotree_2021_11_02,MELC,CNS/Brain,CNS
+oncotree_2021_11_02,APXA,CNS/Brain,CNS
+oncotree_2021_11_02,PINC,CNS/Brain,CNS
+oncotree_2021_11_02,MT,CNS/Brain,CNS
+oncotree_2021_11_02,BMGT,CNS/Brain,CNS
+oncotree_2021_11_02,CCM,CNS/Brain,CNS
+oncotree_2021_11_02,ANM,CNS/Brain,CNS
+oncotree_2021_11_02,SFTCNS,CNS/Brain,CNS
+oncotree_2021_11_02,ASTR,CNS/Brain,CNS
+oncotree_2021_11_02,GNC,CNS/Brain,CNS
+oncotree_2021_11_02,APE,CNS/Brain,CNS
+oncotree_2021_11_02,BRAIN,CNS/Brain,CNS
+oncotree_2021_11_02,GSARC,CNS/Brain,CNS
+oncotree_2021_11_02,BGCT,CNS/Brain,CNS
+oncotree_2021_11_02,ANGL,CNS/Brain,CNS
+oncotree_2021_11_02,BMT,CNS/Brain,CNS
+oncotree_2021_11_02,LGGNOS,CNS/Brain,CNS
+oncotree_2021_11_02,MLYM,CNS/Brain,CNS
+oncotree_2021_11_02,PINT,CNS/Brain,CNS
+oncotree_2021_11_02,DMBLNOS,CNS/Brain,CNS
+oncotree_2021_11_02,MBLSHH,CNS/Brain,CNS
+oncotree_2021_11_02,AODG,CNS/Brain,CNS
+oncotree_2021_11_02,LDD,CNS/Brain,CNS
+oncotree_2021_11_02,PTAD,CNS/Brain,CNS
+oncotree_2021_11_02,MNG,CNS/Brain,CNS
+oncotree_2021_11_02,OAST,CNS/Brain,CNS
+oncotree_2021_11_02,EMBT,CNS/Brain,CNS
+oncotree_2021_11_02,CNC,CNS/Brain,CNS
+oncotree_2021_11_02,AMBLNWSG3,CNS/Brain,CNS
+oncotree_2021_11_02,MPE,CNS/Brain,CNS
+oncotree_2021_11_02,CLNC,CNS/Brain,CNS
+oncotree_2021_11_02,EPM,CNS/Brain,CNS
+oncotree_2021_11_02,HMBL,CNS/Brain,CNS
+oncotree_2021_11_02,PNET,CNS/Brain,CNS
+oncotree_2021_11_02,PAST,CNS/Brain,CNS
+oncotree_2021_11_02,PTCY,CNS/Brain,CNS
+oncotree_2021_11_02,MBLNOS,CNS/Brain,CNS
+oncotree_2021_11_02,MBLG4,CNS/Brain,CNS
+oncotree_2021_11_02,MNET,CNS/Brain,CNS
+oncotree_2021_11_02,AASTR,CNS/Brain,CNS
+oncotree_2021_11_02,MDEP,CNS/Brain,CNS
+oncotree_2021_11_02,ACPG,CNS/Brain,CNS
+oncotree_2021_11_02,ACPP,CNS/Brain,CNS
+oncotree_2021_11_02,APTAD,CNS/Brain,CNS
+oncotree_2021_11_02,ATM,CNS/Brain,CNS
+oncotree_2021_11_02,CHOM,CNS/Brain,CNS
+oncotree_2021_11_02,PMA,CNS/Brain,CNS
+oncotree_2021_11_02,AMBLNWSG4,CNS/Brain,CNS
+oncotree_2021_11_02,PCNSM,CNS/Brain,CNS
+oncotree_2021_11_02,ONBL,CNS/Brain,CNS
+oncotree_2021_11_02,ASTB,CNS/Brain,CNS
+oncotree_2021_11_02,PRNET,CNS/Brain,CNS
+oncotree_2021_11_02,HGNET,CNS/Brain,CNS
+oncotree_2021_11_02,MBLG3,CNS/Brain,CNS
+oncotree_2021_11_02,MBL,CNS/Brain,CNS
+oncotree_2021_11_02,DIA,CNS/Brain,CNS
+oncotree_2021_11_02,PBL,CNS/Brain,CNS
+oncotree_2021_11_02,PTCA,CNS/Brain,CNS
+oncotree_2021_11_02,AOAST,CNS/Brain,CNS
+oncotree_2021_11_02,BIMT,CNS/Brain,CNS
+oncotree_2021_11_02,MBT,CNS/Brain,CNS
+oncotree_2021_11_02,SCOAH,CNS/Brain,CNS
+oncotree_2021_11_02,MCHSCNS,CNS/Brain,CNS
+oncotree_2021_11_02,ETANTR,CNS/Brain,CNS
+oncotree_2021_11_02,RGNT,CNS/Brain,CNS
+oncotree_2021_11_02,DIFG,CNS/Brain,CNS
+oncotree_2021_11_02,ODG,CNS/Brain,CNS
+oncotree_2021_11_02,ATRT,CNS/Brain,CNS
+oncotree_2021_11_02,GB,CNS/Brain,CNS
+oncotree_2021_11_02,GNG,CNS/Brain,CNS
+oncotree_2021_11_02,MBLNWS,CNS/Brain,CNS
+oncotree_2021_11_02,AMBLSHH,CNS/Brain,CNS
+oncotree_2021_11_02,AGNG,CNS/Brain,CNS
+oncotree_2021_11_02,CPC,CNS/Brain,CNS
+oncotree_2021_11_02,PPTID,CNS/Brain,CNS
+oncotree_2021_11_02,GNOS,CNS/Brain,CNS
+oncotree_2021_11_02,CPP,CNS/Brain,CNS
+oncotree_2021_11_02,PBT,CNS/Brain,CNS
+oncotree_2021_11_02,DNT,CNS/Brain,CNS
+oncotree_2021_11_02,BEC,CNS/Brain,CNS
+oncotree_2021_11_02,HGGNOS,CNS/Brain,CNS
+oncotree_2021_11_02,CPT,CNS/Brain,CNS
+oncotree_2021_11_02,MNGT,CNS/Brain,CNS
+oncotree_2021_11_02,MBENNOS,CNS/Brain,CNS
+oncotree_2021_11_02,DIPG,CNS/Brain,CNS
+oncotree_2021_11_02,MBEN,CNS/Brain,CNS
+oncotree_2021_11_02,SCGBM,CNS/Brain,CNS
+oncotree_2021_11_02,PGNT,CNS/Brain,CNS
+oncotree_2021_11_02,AMBLNOS,CNS/Brain,CNS
+oncotree_2021_11_02,HPCCNS,CNS/Brain,CNS
+oncotree_2021_11_02,LGNET,CNS/Brain,CNS
+oncotree_2021_11_02,PTPR,CNS/Brain,CNS
+oncotree_2021_11_02,AMBLNWS,CNS/Brain,CNS
+oncotree_2021_11_02,EPMT,CNS/Brain,CNS
+oncotree_2021_11_02,GCT,CNS/Brain,CNS
+oncotree_2021_11_02,CCE,CNS/Brain,CNS
+oncotree_2021_11_02,AMBL,CNS/Brain,CNS
+oncotree_2021_11_02,CHGL,CNS/Brain,CNS
+oncotree_2021_11_02,DASTR,CNS/Brain,CNS
+oncotree_2021_11_02,PPM,CNS/Brain,CNS
+oncotree_2021_11_02,SWDNET,Esophagus/Stomach,Esophagus
+oncotree_2021_11_02,USTAD,Esophagus/Stomach,Esophagus
+oncotree_2021_11_02,ESMM,Esophagus/Stomach,Esophagus
+oncotree_2021_11_02,ESCA,Esophagus/Stomach,Esophagus
+oncotree_2021_11_02,SPDAC,Esophagus/Stomach,Esophagus
+oncotree_2021_11_02,GINETES,Esophagus/Stomach,Esophagus
+oncotree_2021_11_02,STAS,Esophagus/Stomach,Esophagus
+oncotree_2021_11_02,EGC,Esophagus/Stomach,Esophagus
+oncotree_2021_11_02,SMN,Esophagus/Stomach,Esophagus
+oncotree_2021_11_02,DSTAD,Esophagus/Stomach,Esophagus
+oncotree_2021_11_02,PSTAD,Esophagus/Stomach,Esophagus
+oncotree_2021_11_02,HGNEE,Esophagus/Stomach,Esophagus
+oncotree_2021_11_02,TSTAD,Esophagus/Stomach,Esophagus
+oncotree_2021_11_02,STOMACH,Esophagus/Stomach,Esophagus
+oncotree_2021_11_02,ISTAD,Esophagus/Stomach,Esophagus
+oncotree_2021_11_02,STSC,Esophagus/Stomach,Esophagus
+oncotree_2021_11_02,STAD,Esophagus/Stomach,Esophagus
+oncotree_2021_11_02,GEJ,Esophagus/Stomach,Esophagus
+oncotree_2021_11_02,GRC,Esophagus/Stomach,Esophagus
+oncotree_2021_11_02,EPDCA,Esophagus/Stomach,Esophagus
+oncotree_2021_11_02,ESCC,Esophagus/Stomach,Esophagus
+oncotree_2021_11_02,HGNES,Esophagus/Stomach,Esophagus
+oncotree_2021_11_02,SSRCC,Esophagus/Stomach,Esophagus
+oncotree_2021_11_02,MSTAD,Esophagus/Stomach,Esophagus
+oncotree_2021_11_02,LGT,Eye,None
+oncotree_2021_11_02,OM,Eye,None
+oncotree_2021_11_02,RBL,Eye,None
+oncotree_2021_11_02,UM,Eye,None
+oncotree_2021_11_02,CM,Eye,None
+oncotree_2021_11_02,EYE,Eye,None
+oncotree_2021_11_02,SCLG,Eye,None
+oncotree_2021_11_02,ACLG,Eye,None
+oncotree_2021_11_02,OHNCA,Head and Neck,Head_neck
+oncotree_2021_11_02,SBL,Head and Neck,Head_neck
+oncotree_2021_11_02,LXSC,Head and Neck,Head_neck
+oncotree_2021_11_02,HNSC,Head and Neck,Head_neck
+oncotree_2021_11_02,OPHSC,Head and Neck,Head_neck
+oncotree_2021_11_02,BCAC,Head and Neck,Head_neck
+oncotree_2021_11_02,HEAD_NECK,Head and Neck,Head_neck
+oncotree_2021_11_02,MUCC,Head and Neck,Head_neck
+oncotree_2021_11_02,SGO,Head and Neck,Head_neck
+oncotree_2021_11_02,HNNE,Head and Neck,Head_neck
+oncotree_2021_11_02,NPC,Head and Neck,Head_neck
+oncotree_2021_11_02,SDCA,Head and Neck,Head_neck
+oncotree_2021_11_02,PTH,Head and Neck,Head_neck
+oncotree_2021_11_02,NMCHN,Head and Neck,Head_neck
+oncotree_2021_11_02,SNSC,Head and Neck,Head_neck
+oncotree_2021_11_02,ODGC,Head and Neck,Head_neck
+oncotree_2021_11_02,SNUC,Head and Neck,Head_neck
+oncotree_2021_11_02,OSACA,Head and Neck,Head_neck
+oncotree_2021_11_02,ASCT,Head and Neck,Head_neck
+oncotree_2021_11_02,HNSCUP,Head and Neck,Head_neck
+oncotree_2021_11_02,SACA,Head and Neck,Head_neck
+oncotree_2021_11_02,PADA,Head and Neck,Head_neck
+oncotree_2021_11_02,HNMUCM,Head and Neck,Head_neck
+oncotree_2021_11_02,CCOC,Head and Neck,Head_neck
+oncotree_2021_11_02,SNA,Head and Neck,Head_neck
+oncotree_2021_11_02,EMYOCA,Head and Neck,Head_neck
+oncotree_2021_11_02,HNMASC,Head and Neck,Head_neck
+oncotree_2021_11_02,SAAD,Head and Neck,Head_neck
+oncotree_2021_11_02,PAC,Head and Neck,Head_neck
+oncotree_2021_11_02,CAEXPA,Head and Neck,Head_neck
+oncotree_2021_11_02,PTHC,Head and Neck,Head_neck
+oncotree_2021_11_02,OCSC,Head and Neck,Head_neck
+oncotree_2021_11_02,ACYC,Head and Neck,Head_neck
+oncotree_2021_11_02,HPHSC,Head and Neck,Head_neck
+oncotree_2021_11_02,ACCC,Head and Neck,Head_neck
+oncotree_2021_11_02,MYEC,Head and Neck,Head_neck
+oncotree_2021_11_02,ROCY,Kidney,Kidney
+oncotree_2021_11_02,CCPRC,Kidney,Kidney
+oncotree_2021_11_02,RSCC,Kidney,Kidney
+oncotree_2021_11_02,MRC,Kidney,Kidney
+oncotree_2021_11_02,KIDNEY,Kidney,Kidney
+oncotree_2021_11_02,MRT,Kidney,Kidney
+oncotree_2021_11_02,CHRCC,Kidney,Kidney
+oncotree_2021_11_02,CCRCC,Kidney,Kidney
+oncotree_2021_11_02,SRCC,Kidney,Kidney
+oncotree_2021_11_02,WT,Kidney,Kidney
+oncotree_2021_11_02,URCC,Kidney,Kidney
+oncotree_2021_11_02,MTSCC,Kidney,Kidney
+oncotree_2021_11_02,NCCRCC,Kidney,Kidney
+oncotree_2021_11_02,PRCC,Kidney,Kidney
+oncotree_2021_11_02,FHRCC,Kidney,Kidney
+oncotree_2021_11_02,CDRCC,Kidney,Kidney
+oncotree_2021_11_02,SCCRCC,Kidney,Kidney
+oncotree_2021_11_02,TRCC,Kidney,Kidney
+oncotree_2021_11_02,RAML,Kidney,Kidney
+oncotree_2021_11_02,RNET,Kidney,Kidney
+oncotree_2021_11_02,CCSK,Kidney,Kidney
+oncotree_2021_11_02,RCC,Kidney,Kidney
+oncotree_2021_11_02,LIVER,Liver,Liver
+oncotree_2021_11_02,LIMNET,Liver,Liver
+oncotree_2021_11_02,HCC,Liver,Liver
+oncotree_2021_11_02,MRTL,Liver,Liver
+oncotree_2021_11_02,FLC,Liver,Liver
+oncotree_2021_11_02,UESL,Liver,Liver
+oncotree_2021_11_02,LIHB,Liver,Liver
+oncotree_2021_11_02,LIAS,Liver,Liver
+oncotree_2021_11_02,HCCIHCH,Liver,Liver
+oncotree_2021_11_02,LIAD,Liver,Liver
+oncotree_2021_11_02,LAM,Lung,Lung
+oncotree_2021_11_02,SCLC,Lung,Lung
+oncotree_2021_11_02,LUNE,Lung,Lung
+oncotree_2021_11_02,NSCLC,Lung,Lung
+oncotree_2021_11_02,CMPT,Lung,Lung
+oncotree_2021_11_02,ALUCA,Lung,Lung
+oncotree_2021_11_02,LUMEC,Lung,Lung
+oncotree_2021_11_02,LECLC,Lung,Lung
+oncotree_2021_11_02,LAIS,Lung,Lung
+oncotree_2021_11_02,SPCC,Lung,Lung
+oncotree_2021_11_02,SGTTL,Lung,Lung
+oncotree_2021_11_02,LUNG,Lung,Lung
+oncotree_2021_11_02,NUTCL,Lung,Lung
+oncotree_2021_11_02,LCLC,Lung,Lung
+oncotree_2021_11_02,CCLC,Lung,Lung
+oncotree_2021_11_02,LUAD,Lung,Lung
+oncotree_2021_11_02,RLCLC,Lung,Lung
+oncotree_2021_11_02,LUPC,Lung,Lung
+oncotree_2021_11_02,GCLC,Lung,Lung
+oncotree_2021_11_02,LUSC,Lung,Lung
+oncotree_2021_11_02,NSCLCPD,Lung,Lung
+oncotree_2021_11_02,IMTL,Lung,Lung
+oncotree_2021_11_02,LNET,Lung,Lung
+oncotree_2021_11_02,LUACC,Lung,Lung
+oncotree_2021_11_02,LUAS,Lung,Lung
+oncotree_2021_11_02,BLCLC,Lung,Lung
+oncotree_2021_11_02,SARCL,Lung,Lung
+oncotree_2021_11_02,PPB,Lung,Lung
+oncotree_2021_11_02,CSCLC,Lung,Lung
+oncotree_2021_11_02,LUCA,Lung,Lung
+oncotree_2021_11_02,GCB,Lymphoid,Lymphoid
+oncotree_2021_11_02,SBLU,Lymphoid,Lymphoid
+oncotree_2021_11_02,ITLPDGI,Lymphoid,Lymphoid
+oncotree_2021_11_02,BL,Lymphoid,Lymphoid
+oncotree_2021_11_02,LNM,Lymphoid,Lymphoid
+oncotree_2021_11_02,PMBL,Lymphoid,Lymphoid
+oncotree_2021_11_02,BIALCL,Lymphoid,Lymphoid
+oncotree_2021_11_02,WM,Lymphoid,Lymphoid
+oncotree_2021_11_02,BLLRGA,Lymphoid,Lymphoid
+oncotree_2021_11_02,PTLD,Lymphoid,Lymphoid
+oncotree_2021_11_02,MGUSIGG,Lymphoid,Lymphoid
+oncotree_2021_11_02,PEL,Lymphoid,Lymphoid
+oncotree_2021_11_02,NSCHL,Lymphoid,Lymphoid
+oncotree_2021_11_02,BPLL,Lymphoid,Lymphoid
+oncotree_2021_11_02,BLL,Lymphoid,Lymphoid
+oncotree_2021_11_02,PHPTLD,Lymphoid,Lymphoid
+oncotree_2021_11_02,MCBCL,Lymphoid,Lymphoid
+oncotree_2021_11_02,ALKLBCL,Lymphoid,Lymphoid
+oncotree_2021_11_02,EATL,Lymphoid,Lymphoid
+oncotree_2021_11_02,SPTCL,Lymphoid,Lymphoid
+oncotree_2021_11_02,MIDDA,Lymphoid,Lymphoid
+oncotree_2021_11_02,AHCD,Lymphoid,Lymphoid
+oncotree_2021_11_02,BLLHYPER,Lymphoid,Lymphoid
+oncotree_2021_11_02,EBVDLBCLNOS,Lymphoid,Lymphoid
+oncotree_2021_11_02,BLLIAMP21,Lymphoid,Lymphoid
+oncotree_2021_11_02,HCL-V,Lymphoid,Lymphoid
+oncotree_2021_11_02,TPLL,Lymphoid,Lymphoid
+oncotree_2021_11_02,ALCLALKN,Lymphoid,Lymphoid
+oncotree_2021_11_02,ISMCL,Lymphoid,Lymphoid
+oncotree_2021_11_02,PTFL,Lymphoid,Lymphoid
+oncotree_2021_11_02,BLLETV6RUNX1,Lymphoid,Lymphoid
+oncotree_2021_11_02,LDCHL,Lymphoid,Lymphoid
+oncotree_2021_11_02,SPB,Lymphoid,Lymphoid
+oncotree_2021_11_02,BCLU,Lymphoid,Lymphoid
+oncotree_2021_11_02,BLLHYPO,Lymphoid,Lymphoid
+oncotree_2021_11_02,PLBL,Lymphoid,Lymphoid
+oncotree_2021_11_02,ENKL,Lymphoid,Lymphoid
+oncotree_2021_11_02,MIDDO,Lymphoid,Lymphoid
+oncotree_2021_11_02,PTCL,Lymphoid,Lymphoid
+oncotree_2021_11_02,MTNN,Lymphoid,Lymphoid
+oncotree_2021_11_02,LATL,Lymphoid,Lymphoid
+oncotree_2021_11_02,AITL,Lymphoid,Lymphoid
+oncotree_2021_11_02,CHLPTLD,Lymphoid,Lymphoid
+oncotree_2021_11_02,HCL,Lymphoid,Lymphoid
+oncotree_2021_11_02,FL,Lymphoid,Lymphoid
+oncotree_2021_11_02,TLL,Lymphoid,Lymphoid
+oncotree_2021_11_02,SS,Lymphoid,Lymphoid
+oncotree_2021_11_02,ATLL,Lymphoid,Lymphoid
+oncotree_2021_11_02,THRLBCL,Lymphoid,Lymphoid
+oncotree_2021_11_02,LBLIRF4,Lymphoid,Lymphoid
+oncotree_2021_11_02,PCSMTPLD,Lymphoid,Lymphoid
+oncotree_2021_11_02,LYG,Lymphoid,Lymphoid
+oncotree_2021_11_02,ALCLALKP,Lymphoid,Lymphoid
+oncotree_2021_11_02,EBVMCU,Lymphoid,Lymphoid
+oncotree_2021_11_02,BLLBCRABL1,Lymphoid,Lymphoid
+oncotree_2021_11_02,FHPTLD,Lymphoid,Lymphoid
+oncotree_2021_11_02,BLL11Q,Lymphoid,Lymphoid
+oncotree_2021_11_02,FTCL,Lymphoid,Lymphoid
+oncotree_2021_11_02,LBGN,Lymphoid,Lymphoid
+oncotree_2021_11_02,EMALT,Lymphoid,Lymphoid
+oncotree_2021_11_02,MGUS,Lymphoid,Lymphoid
+oncotree_2021_11_02,MEITL,Lymphoid,Lymphoid
+oncotree_2021_11_02,NKCLL,Lymphoid,Lymphoid
+oncotree_2021_11_02,MGUSIGA,Lymphoid,Lymphoid
+oncotree_2021_11_02,NMZL,Lymphoid,Lymphoid
+oncotree_2021_11_02,NPTLTFH,Lymphoid,Lymphoid
+oncotree_2021_11_02,MYCF,Lymphoid,Lymphoid
+oncotree_2021_11_02,LYMPH,Lymphoid,Lymphoid
+oncotree_2021_11_02,TLGL,Lymphoid,Lymphoid
+oncotree_2021_11_02,DLBCLNOS,Lymphoid,Lymphoid
+oncotree_2021_11_02,PCLPD,Lymphoid,Lymphoid
+oncotree_2021_11_02,CHL,Lymphoid,Lymphoid
+oncotree_2021_11_02,PPTLD,Lymphoid,Lymphoid
+oncotree_2021_11_02,HHV8DLBCL,Lymphoid,Lymphoid
+oncotree_2021_11_02,BLLIL3IGH,Lymphoid,Lymphoid
+oncotree_2021_11_02,MBN,Lymphoid,Lymphoid
+oncotree_2021_11_02,HGBCLMYCBCL2,Lymphoid,Lymphoid
+oncotree_2021_11_02,CLLSLL,Lymphoid,Lymphoid
+oncotree_2021_11_02,LPL,Lymphoid,Lymphoid
+oncotree_2021_11_02,ABC,Lymphoid,Lymphoid
+oncotree_2021_11_02,MPTLD,Lymphoid,Lymphoid
+oncotree_2021_11_02,NHL,Lymphoid,Lymphoid
+oncotree_2021_11_02,SMZL,Lymphoid,Lymphoid
+oncotree_2021_11_02,GHCD,Lymphoid,Lymphoid
+oncotree_2021_11_02,MCL,Lymphoid,Lymphoid
+oncotree_2021_11_02,PCLBCLLT,Lymphoid,Lymphoid
+oncotree_2021_11_02,SEBVTLC,Lymphoid,Lymphoid
+oncotree_2021_11_02,HSTCL,Lymphoid,Lymphoid
+oncotree_2021_11_02,PCALCL,Lymphoid,Lymphoid
+oncotree_2021_11_02,EP,Lymphoid,Lymphoid
+oncotree_2021_11_02,MZL,Lymphoid,Lymphoid
+oncotree_2021_11_02,PCM,Lymphoid,Lymphoid
+oncotree_2021_11_02,ANKL,Lymphoid,Lymphoid
+oncotree_2021_11_02,LRCHL,Lymphoid,Lymphoid
+oncotree_2021_11_02,CLPDNK,Lymphoid,Lymphoid
+oncotree_2021_11_02,DFL,Lymphoid,Lymphoid
+oncotree_2021_11_02,MHCD,Lymphoid,Lymphoid
+oncotree_2021_11_02,LYP,Lymphoid,Lymphoid
+oncotree_2021_11_02,BLLBCRABL1L,Lymphoid,Lymphoid
+oncotree_2021_11_02,PCGDTCL,Lymphoid,Lymphoid
+oncotree_2021_11_02,HGBCL,Lymphoid,Lymphoid
+oncotree_2021_11_02,HVLL,Lymphoid,Lymphoid
+oncotree_2021_11_02,SDRPL,Lymphoid,Lymphoid
+oncotree_2021_11_02,IVBCL,Lymphoid,Lymphoid
+oncotree_2021_11_02,NLPHL,Lymphoid,Lymphoid
+oncotree_2021_11_02,PCNSL,Lymphoid,Lymphoid
+oncotree_2021_11_02,HL,Lymphoid,Lymphoid
+oncotree_2021_11_02,ALCL,Lymphoid,Lymphoid
+oncotree_2021_11_02,MCCHL,Lymphoid,Lymphoid
+oncotree_2021_11_02,BLLTCF3PBX1,Lymphoid,Lymphoid
+oncotree_2021_11_02,IMPTLD,Lymphoid,Lymphoid
+oncotree_2021_11_02,DLBCLCI,Lymphoid,Lymphoid
+oncotree_2021_11_02,BLLNOS,Lymphoid,Lymphoid
+oncotree_2021_11_02,BLLKMT2A,Lymphoid,Lymphoid
+oncotree_2021_11_02,PCAECTCL,Lymphoid,Lymphoid
+oncotree_2021_11_02,PCATCL,Lymphoid,Lymphoid
+oncotree_2021_11_02,PCFCL,Lymphoid,Lymphoid
+oncotree_2021_11_02,MIDD,Lymphoid,Lymphoid
+oncotree_2021_11_02,ISFN,Lymphoid,Lymphoid
+oncotree_2021_11_02,MGUSIGM,Lymphoid,Lymphoid
+oncotree_2021_11_02,ETPLL,Lymphoid,Lymphoid
+oncotree_2021_11_02,TMDS,Myeloid,None
+oncotree_2021_11_02,AMLCBFBMYH11,Myeloid,None
+oncotree_2021_11_02,AWM,Myeloid,None
+oncotree_2021_11_02,AMLMRC,Myeloid,None
+oncotree_2021_11_02,AMOL,Myeloid,None
+oncotree_2021_11_02,PERL,Myeloid,None
+oncotree_2021_11_02,AMLCEBPA,Myeloid,None
+oncotree_2021_11_02,CNL,Myeloid,None
+oncotree_2021_11_02,PVMF,Myeloid,None
+oncotree_2021_11_02,MLNFGFR1,Myeloid,None
+oncotree_2021_11_02,MDSID5Q,Myeloid,None
+oncotree_2021_11_02,MPALBCRABL1,Myeloid,None
+oncotree_2021_11_02,MBGN,Myeloid,None
+oncotree_2021_11_02,APMF,Myeloid,None
+oncotree_2021_11_02,CMCD,Myeloid,None
+oncotree_2021_11_02,MDSMPNU,Myeloid,None
+oncotree_2021_11_02,MNM,Myeloid,None
+oncotree_2021_11_02,AMLBCRABL1,Myeloid,None
+oncotree_2021_11_02,MPN,Myeloid,None
+oncotree_2021_11_02,AMLRGA,Myeloid,None
+oncotree_2021_11_02,MCSL,Myeloid,None
+oncotree_2021_11_02,SM,Myeloid,None
+oncotree_2021_11_02,CMML,Myeloid,None
+oncotree_2021_11_02,MDSMD,Myeloid,None
+oncotree_2021_11_02,AMLRARA,Myeloid,None
+oncotree_2021_11_02,AMLMLLT3KMT2A,Myeloid,None
+oncotree_2021_11_02,TAM,Myeloid,None
+oncotree_2021_11_02,MLADS,Myeloid,None
+oncotree_2021_11_02,APLPMLRARA,Myeloid,None
+oncotree_2021_11_02,MDSRS,Myeloid,None
+oncotree_2021_11_02,HS,Myeloid,None
+oncotree_2021_11_02,MPALKMT2A,Myeloid,None
+oncotree_2021_11_02,ASM,Myeloid,None
+oncotree_2021_11_02,MDS/MPN,Myeloid,None
+oncotree_2021_11_02,MLNPDGFRA,Myeloid,None
+oncotree_2021_11_02,AMML,Myeloid,None
+oncotree_2021_11_02,MCD,Myeloid,None
+oncotree_2021_11_02,ETMF,Myeloid,None
+oncotree_2021_11_02,MDSRSSLD,Myeloid,None
+oncotree_2021_11_02,HDCN,Myeloid,None
+oncotree_2021_11_02,MDS,Myeloid,None
+oncotree_2021_11_02,MDSEB,Myeloid,None
+oncotree_2021_11_02,RDD,Myeloid,None
+oncotree_2021_11_02,IDCT,Myeloid,None
+oncotree_2021_11_02,MDSEB2,Myeloid,None
+oncotree_2021_11_02,AMLRBM15MKL1,Myeloid,None
+oncotree_2021_11_02,TMN,Myeloid,None
+oncotree_2021_11_02,AMLDEKNUP214,Myeloid,None
+oncotree_2021_11_02,SSM,Myeloid,None
+oncotree_2021_11_02,CMML2,Myeloid,None
+oncotree_2021_11_02,BPDCN,Myeloid,None
+oncotree_2021_11_02,TAML,Myeloid,None
+oncotree_2021_11_02,FRCT,Myeloid,None
+oncotree_2021_11_02,AUL,Myeloid,None
+oncotree_2021_11_02,PMFOFS,Myeloid,None
+oncotree_2021_11_02,SMMCL,Myeloid,None
+oncotree_2021_11_02,AML,Myeloid,None
+oncotree_2021_11_02,AMKL,Myeloid,None
+oncotree_2021_11_02,CELNOS,Myeloid,None
+oncotree_2021_11_02,JXG,Myeloid,None
+oncotree_2021_11_02,CML,Myeloid,None
+oncotree_2021_11_02,MNGLP,Myeloid,None
+oncotree_2021_11_02,CMML0,Myeloid,None
+oncotree_2021_11_02,AMLGATA2MECOM,Myeloid,None
+oncotree_2021_11_02,CMLBCRABL1,Myeloid,None
+oncotree_2021_11_02,AMLNOS,Myeloid,None
+oncotree_2021_11_02,MDSSLD,Myeloid,None
+oncotree_2021_11_02,FDCS,Myeloid,None
+oncotree_2021_11_02,ECD,Myeloid,None
+oncotree_2021_11_02,PMF,Myeloid,None
+oncotree_2021_11_02,MPALTNOS,Myeloid,None
+oncotree_2021_11_02,MYELOID,Myeloid,None
+oncotree_2021_11_02,MLNPDGFRB,Myeloid,None
+oncotree_2021_11_02,LCS,Myeloid,None
+oncotree_2021_11_02,SMAHN,Myeloid,None
+oncotree_2021_11_02,AMLMD,Myeloid,None
+oncotree_2021_11_02,MPALBNOS,Myeloid,None
+oncotree_2021_11_02,RCYC,Myeloid,None
+oncotree_2021_11_02,MLNPCM1JAK2,Myeloid,None
+oncotree_2021_11_02,JMML,Myeloid,None
+oncotree_2021_11_02,MLNER,Myeloid,None
+oncotree_2021_11_02,ET,Myeloid,None
+oncotree_2021_11_02,MDSU,Myeloid,None
+oncotree_2021_11_02,ALAL,Myeloid,None
+oncotree_2021_11_02,PMFPES,Myeloid,None
+oncotree_2021_11_02,MDSEB1,Myeloid,None
+oncotree_2021_11_02,MS,Myeloid,None
+oncotree_2021_11_02,AMLNPM1,Myeloid,None
+oncotree_2021_11_02,AMLRUNX1RUNX1T1,Myeloid,None
+oncotree_2021_11_02,IDCS,Myeloid,None
+oncotree_2021_11_02,MDSMPNRST,Myeloid,None
+oncotree_2021_11_02,AMLRUNX1,Myeloid,None
+oncotree_2021_11_02,PV,Myeloid,None
+oncotree_2021_11_02,ISM,Myeloid,None
+oncotree_2021_11_02,MATPL,Myeloid,None
+oncotree_2021_11_02,CMML1,Myeloid,None
+oncotree_2021_11_02,ABL,Myeloid,None
+oncotree_2021_11_02,MPNU,Myeloid,None
+oncotree_2021_11_02,ACML,Myeloid,None
+oncotree_2021_11_02,MDSRSMD,Myeloid,None
+oncotree_2021_11_02,MPRDS,Myeloid,None
+oncotree_2021_11_02,LCH,Myeloid,None
+oncotree_2021_11_02,AM,Myeloid,None
+oncotree_2021_11_02,NETNOS,Other,None
+oncotree_2021_11_02,NECNOS,Other,None
+oncotree_2021_11_02,CUPNOS,Other,None
+oncotree_2021_11_02,EGCT,Other,None
+oncotree_2021_11_02,SCUP,Other,None
+oncotree_2021_11_02,OTHER,Other,None
+oncotree_2021_11_02,UDMN,Other,None
+oncotree_2021_11_02,ACN,Other,None
+oncotree_2021_11_02,AIS,Other,None
+oncotree_2021_11_02,MIXED,Other,None
+oncotree_2021_11_02,ADNOS,Other,None
+oncotree_2021_11_02,SCCNOS,Other,None
+oncotree_2021_11_02,CUP,Other,None
+oncotree_2021_11_02,PDC,Other,None
+oncotree_2021_11_02,SCST,Ovary/Fallopian Tube,Ovary
+oncotree_2021_11_02,SCCO,Ovary/Fallopian Tube,Ovary
+oncotree_2021_11_02,OEC,Ovary/Fallopian Tube,Ovary
+oncotree_2021_11_02,HGSOC,Ovary/Fallopian Tube,Ovary
+oncotree_2021_11_02,OGBL,Ovary/Fallopian Tube,Ovary
+oncotree_2021_11_02,BTBEOV,Ovary/Fallopian Tube,Ovary
+oncotree_2021_11_02,OGCT,Ovary/Fallopian Tube,Ovary
+oncotree_2021_11_02,OSMBT,Ovary/Fallopian Tube,Ovary
+oncotree_2021_11_02,OCS,Ovary/Fallopian Tube,Ovary
+oncotree_2021_11_02,EBOV,Ovary/Fallopian Tube,Ovary
+oncotree_2021_11_02,SBOV,Ovary/Fallopian Tube,Ovary
+oncotree_2021_11_02,LGSOC,Ovary/Fallopian Tube,Ovary
+oncotree_2021_11_02,OMGCT,Ovary/Fallopian Tube,Ovary
+oncotree_2021_11_02,OPE,Ovary/Fallopian Tube,Ovary
+oncotree_2021_11_02,OVT,Ovary/Fallopian Tube,Ovary
+oncotree_2021_11_02,OYST,Ovary/Fallopian Tube,Ovary
+oncotree_2021_11_02,OCNOS,Ovary/Fallopian Tube,Ovary
+oncotree_2021_11_02,MOV,Ovary/Fallopian Tube,Ovary
+oncotree_2021_11_02,BTBOV,Ovary/Fallopian Tube,Ovary
+oncotree_2021_11_02,OIMT,Ovary/Fallopian Tube,Ovary
+oncotree_2021_11_02,HGSFT,Ovary/Fallopian Tube,Ovary
+oncotree_2021_11_02,OMT,Ovary/Fallopian Tube,Ovary
+oncotree_2021_11_02,SCT,Ovary/Fallopian Tube,Ovary
+oncotree_2021_11_02,SLCT,Ovary/Fallopian Tube,Ovary
+oncotree_2021_11_02,BTMOV,Ovary/Fallopian Tube,Ovary
+oncotree_2021_11_02,MBOV,Ovary/Fallopian Tube,Ovary
+oncotree_2021_11_02,OVARY,Ovary/Fallopian Tube,Ovary
+oncotree_2021_11_02,ODYS,Ovary/Fallopian Tube,Ovary
+oncotree_2021_11_02,OSMAD,Ovary/Fallopian Tube,Ovary
+oncotree_2021_11_02,HGONEC,Ovary/Fallopian Tube,Ovary
+oncotree_2021_11_02,SOC,Ovary/Fallopian Tube,Ovary
+oncotree_2021_11_02,BTOV,Ovary/Fallopian Tube,Ovary
+oncotree_2021_11_02,OSMCA,Ovary/Fallopian Tube,Ovary
+oncotree_2021_11_02,FT,Ovary/Fallopian Tube,Ovary
+oncotree_2021_11_02,EOV,Ovary/Fallopian Tube,Ovary
+oncotree_2021_11_02,CCOV,Ovary/Fallopian Tube,Ovary
+oncotree_2021_11_02,GRCT,Ovary/Fallopian Tube,Ovary
+oncotree_2021_11_02,CCBOV,Ovary/Fallopian Tube,Ovary
+oncotree_2021_11_02,SBMOV,Ovary/Fallopian Tube,Ovary
+oncotree_2021_11_02,MXOV,Ovary/Fallopian Tube,Ovary
+oncotree_2021_11_02,OOVC,Ovary/Fallopian Tube,Ovary
+oncotree_2021_11_02,PSC,Pancreas,Pancreas
+oncotree_2021_11_02,IOPN,Pancreas,Pancreas
+oncotree_2021_11_02,OSGCT,Pancreas,Pancreas
+oncotree_2021_11_02,SPN,Pancreas,Pancreas
+oncotree_2021_11_02,PAAD,Pancreas,Pancreas
+oncotree_2021_11_02,PAAC,Pancreas,Pancreas
+oncotree_2021_11_02,PAASC,Pancreas,Pancreas
+oncotree_2021_11_02,IPMN,Pancreas,Pancreas
+oncotree_2021_11_02,PANET,Pancreas,Pancreas
+oncotree_2021_11_02,PACT,Pancreas,Pancreas
+oncotree_2021_11_02,PANCREAS,Pancreas,Pancreas
+oncotree_2021_11_02,UCP,Pancreas,Pancreas
+oncotree_2021_11_02,PANEC,Pancreas,Pancreas
+oncotree_2021_11_02,PB,Pancreas,Pancreas
+oncotree_2021_11_02,ITPN,Pancreas,Pancreas
+oncotree_2021_11_02,MCN,Pancreas,Pancreas
+oncotree_2021_11_02,PENIS,Penis,None
+oncotree_2021_11_02,BPSCC,Penis,None
+oncotree_2021_11_02,PSCC,Penis,None
+oncotree_2021_11_02,WPSCC,Penis,None
+oncotree_2021_11_02,VPSCC,Penis,None
+oncotree_2021_11_02,SCHW,Peripheral Nervous System,None
+oncotree_2021_11_02,CSCHW,Peripheral Nervous System,None
+oncotree_2021_11_02,GNBL,Peripheral Nervous System,None
+oncotree_2021_11_02,NST,Peripheral Nervous System,None
+oncotree_2021_11_02,NBL,Peripheral Nervous System,None
+oncotree_2021_11_02,MSCHW,Peripheral Nervous System,None
+oncotree_2021_11_02,PNS,Peripheral Nervous System,None
+oncotree_2021_11_02,NFIB,Peripheral Nervous System,None
+oncotree_2021_11_02,GN,Peripheral Nervous System,None
+oncotree_2021_11_02,MPNST,Peripheral Nervous System,None
+oncotree_2021_11_02,PEMESO,Peritoneum,None
+oncotree_2021_11_02,PERITONEUM,Peritoneum,None
+oncotree_2021_11_02,PSEC,Peritoneum,None
+oncotree_2021_11_02,PLSMESO,Pleura,None
+oncotree_2021_11_02,PLMESO,Pleura,None
+oncotree_2021_11_02,PLEURA,Pleura,None
+oncotree_2021_11_02,PLEMESO,Pleura,None
+oncotree_2021_11_02,PLBMESO,Pleura,None
+oncotree_2021_11_02,BCCP,Prostate,Prostate
+oncotree_2021_11_02,PRSC,Prostate,Prostate
+oncotree_2021_11_02,PRAD,Prostate,Prostate
+oncotree_2021_11_02,PRSCC,Prostate,Prostate
+oncotree_2021_11_02,PROSTATE,Prostate,Prostate
+oncotree_2021_11_02,PRNE,Prostate,Prostate
+oncotree_2021_11_02,AN,Skin,Skin
+oncotree_2021_11_02,DESM,Skin,Skin
+oncotree_2021_11_02,EMPSGC,Skin,Skin
+oncotree_2021_11_02,MAC,Skin,Skin
+oncotree_2021_11_02,CSCC,Skin,Skin
+oncotree_2021_11_02,ADPA,Skin,Skin
+oncotree_2021_11_02,SEBA,Skin,Skin
+oncotree_2021_11_02,PPCT,Skin,Skin
+oncotree_2021_11_02,SGAD,Skin,Skin
+oncotree_2021_11_02,PORO,Skin,Skin
+oncotree_2021_11_02,ACRM,Skin,Skin
+oncotree_2021_11_02,MCC,Skin,Skin
+oncotree_2021_11_02,AECA,Skin,Skin
+oncotree_2021_11_02,DF,Skin,Skin
+oncotree_2021_11_02,EMPD,Skin,Skin
+oncotree_2021_11_02,DFSP,Skin,Skin
+oncotree_2021_11_02,SKLMM,Skin,Skin
+oncotree_2021_11_02,SKIN,Skin,Skin
+oncotree_2021_11_02,MEL,Skin,Skin
+oncotree_2021_11_02,AFX,Skin,Skin
+oncotree_2021_11_02,SPZM,Skin,Skin
+oncotree_2021_11_02,DTE,Skin,Skin
+oncotree_2021_11_02,POCA,Skin,Skin
+oncotree_2021_11_02,SPIR,Skin,Skin
+oncotree_2021_11_02,SKCM,Skin,Skin
+oncotree_2021_11_02,SKCN,Skin,Skin
+oncotree_2021_11_02,MUP,Skin,Skin
+oncotree_2021_11_02,SKAC,Skin,Skin
+oncotree_2021_11_02,BCC,Skin,Skin
+oncotree_2021_11_02,ARMS,Soft Tissue,Bone_SoftTissue
+oncotree_2021_11_02,MFS,Soft Tissue,Bone_SoftTissue
+oncotree_2021_11_02,WDLS,Soft Tissue,Bone_SoftTissue
+oncotree_2021_11_02,CCS,Soft Tissue,Bone_SoftTissue
+oncotree_2021_11_02,MFH,Soft Tissue,Bone_SoftTissue
+oncotree_2021_11_02,FIBS,Soft Tissue,Bone_SoftTissue
+oncotree_2021_11_02,SOFT_TISSUE,Soft Tissue,Bone_SoftTissue
+oncotree_2021_11_02,ASPS,Soft Tissue,Bone_SoftTissue
+oncotree_2021_11_02,DSRCT,Soft Tissue,Bone_SoftTissue
+oncotree_2021_11_02,HEMA,Soft Tissue,Bone_SoftTissue
+oncotree_2021_11_02,PLLS,Soft Tissue,Bone_SoftTissue
+oncotree_2021_11_02,DDLS,Soft Tissue,Bone_SoftTissue
+oncotree_2021_11_02,LMS,Soft Tissue,Bone_SoftTissue
+oncotree_2021_11_02,IFS,Soft Tissue,Bone_SoftTissue
+oncotree_2021_11_02,RMS,Soft Tissue,Bone_SoftTissue
+oncotree_2021_11_02,AFH,Soft Tissue,Bone_SoftTissue
+oncotree_2021_11_02,SYNS,Soft Tissue,Bone_SoftTissue
+oncotree_2021_11_02,ERMS,Soft Tissue,Bone_SoftTissue
+oncotree_2021_11_02,ESST,Soft Tissue,Bone_SoftTissue
+oncotree_2021_11_02,LIPO,Soft Tissue,Bone_SoftTissue
+oncotree_2021_11_02,SEF,Soft Tissue,Bone_SoftTissue
+oncotree_2021_11_02,DES,Soft Tissue,Bone_SoftTissue
+oncotree_2021_11_02,EHAE,Soft Tissue,Bone_SoftTissue
+oncotree_2021_11_02,MYXO,Soft Tissue,Bone_SoftTissue
+oncotree_2021_11_02,INTS,Soft Tissue,Bone_SoftTissue
+oncotree_2021_11_02,PGNG,Soft Tissue,Bone_SoftTissue
+oncotree_2021_11_02,SFT,Soft Tissue,Bone_SoftTissue
+oncotree_2021_11_02,TGCT,Soft Tissue,Bone_SoftTissue
+oncotree_2021_11_02,IMS,Soft Tissue,Bone_SoftTissue
+oncotree_2021_11_02,MGST,Soft Tissue,Bone_SoftTissue
+oncotree_2021_11_02,OFMT,Soft Tissue,Bone_SoftTissue
+oncotree_2021_11_02,ALT,Soft Tissue,Bone_SoftTissue
+oncotree_2021_11_02,MPC,Soft Tissue,Bone_SoftTissue
+oncotree_2021_11_02,PLRMS,Soft Tissue,Bone_SoftTissue
+oncotree_2021_11_02,PMHE,Soft Tissue,Bone_SoftTissue
+oncotree_2021_11_02,HDCS,Soft Tissue,Bone_SoftTissue
+oncotree_2021_11_02,RCSNOS,Soft Tissue,Bone_SoftTissue
+oncotree_2021_11_02,EPIS,Soft Tissue,Bone_SoftTissue
+oncotree_2021_11_02,LGFMS,Soft Tissue,Bone_SoftTissue
+oncotree_2021_11_02,MRLS,Soft Tissue,Bone_SoftTissue
+oncotree_2021_11_02,GS,Soft Tissue,Bone_SoftTissue
+oncotree_2021_11_02,GIST,Soft Tissue,Bone_SoftTissue
+oncotree_2021_11_02,AA,Soft Tissue,Bone_SoftTissue
+oncotree_2021_11_02,LM,Soft Tissue,Bone_SoftTissue
+oncotree_2021_11_02,SARCNOS,Soft Tissue,Bone_SoftTissue
+oncotree_2021_11_02,STMYEC,Soft Tissue,Bone_SoftTissue
+oncotree_2021_11_02,SCSRMS,Soft Tissue,Bone_SoftTissue
+oncotree_2021_11_02,ANGS,Soft Tissue,Bone_SoftTissue
+oncotree_2021_11_02,PECOMA,Soft Tissue,Bone_SoftTissue
+oncotree_2021_11_02,RAS,Soft Tissue,Bone_SoftTissue
+oncotree_2021_11_02,MF,Soft Tissue,Bone_SoftTissue
+oncotree_2021_11_02,IMT,Soft Tissue,Bone_SoftTissue
+oncotree_2021_11_02,DCS,Soft Tissue,Bone_SoftTissue
+oncotree_2021_11_02,SCRMS,Soft Tissue,Bone_SoftTissue
+oncotree_2021_11_02,PTES,Soft Tissue,Bone_SoftTissue
+oncotree_2021_11_02,GCTSTM,Testis,None
+oncotree_2021_11_02,TCCA,Testis,None
+oncotree_2021_11_02,EMBCA,Testis,None
+oncotree_2021_11_02,NSGCT,Testis,None
+oncotree_2021_11_02,TYST,Testis,None
+oncotree_2021_11_02,MGCT,Testis,None
+oncotree_2021_11_02,TT,Testis,None
+oncotree_2021_11_02,TLYM,Testis,None
+oncotree_2021_11_02,TMESO,Testis,None
+oncotree_2021_11_02,TSCST,Testis,None
+oncotree_2021_11_02,TESTIS,Testis,None
+oncotree_2021_11_02,SEM,Testis,None
+oncotree_2021_11_02,TNET,Thymus,None
+oncotree_2021_11_02,TET,Thymus,None
+oncotree_2021_11_02,THYMUS,Thymus,None
+oncotree_2021_11_02,THYC,Thymus,None
+oncotree_2021_11_02,THYM,Thymus,None
+oncotree_2021_11_02,THHC,Thyroid,None
+oncotree_2021_11_02,THPD,Thyroid,None
+oncotree_2021_11_02,WDTC,Thyroid,None
+oncotree_2021_11_02,THPA,Thyroid,None
+oncotree_2021_11_02,HTAT,Thyroid,None
+oncotree_2021_11_02,THAP,Thyroid,None
+oncotree_2021_11_02,THME,Thyroid,None
+oncotree_2021_11_02,THYROID,Thyroid,None
+oncotree_2021_11_02,OAT,Thyroid,None
+oncotree_2021_11_02,THFO,Thyroid,None
+oncotree_2021_11_02,UASC,Uterus,Uterus
+oncotree_2021_11_02,UPDC,Uterus,Uterus
+oncotree_2021_11_02,USTUMP,Uterus,Uterus
+oncotree_2021_11_02,USARC,Uterus,Uterus
+oncotree_2021_11_02,USC,Uterus,Uterus
+oncotree_2021_11_02,HGESS,Uterus,Uterus
+oncotree_2021_11_02,LGESS,Uterus,Uterus
+oncotree_2021_11_02,UMNC,Uterus,Uterus
+oncotree_2021_11_02,UEC,Uterus,Uterus
+oncotree_2021_11_02,UUC,Uterus,Uterus
+oncotree_2021_11_02,UCCA,Uterus,Uterus
+oncotree_2021_11_02,UELMS,Uterus,Uterus
+oncotree_2021_11_02,UMLMS,Uterus,Uterus
+oncotree_2021_11_02,UCS,Uterus,Uterus
+oncotree_2021_11_02,MP,Uterus,Uterus
+oncotree_2021_11_02,UTERUS,Uterus,Uterus
+oncotree_2021_11_02,GTD,Uterus,Uterus
+oncotree_2021_11_02,UNEC,Uterus,Uterus
+oncotree_2021_11_02,UMC,Uterus,Uterus
+oncotree_2021_11_02,UDDC,Uterus,Uterus
+oncotree_2021_11_02,CHM,Uterus,Uterus
+oncotree_2021_11_02,UMEC,Uterus,Uterus
+oncotree_2021_11_02,UAS,Uterus,Uterus
+oncotree_2021_11_02,ESS,Uterus,Uterus
+oncotree_2021_11_02,PSTT,Uterus,Uterus
+oncotree_2021_11_02,UCEC,Uterus,Uterus
+oncotree_2021_11_02,PHM,Uterus,Uterus
+oncotree_2021_11_02,IHM,Uterus,Uterus
+oncotree_2021_11_02,ULM,Uterus,Uterus
+oncotree_2021_11_02,USMT,Uterus,Uterus
+oncotree_2021_11_02,ULMS,Uterus,Uterus
+oncotree_2021_11_02,OUSARC,Uterus,Uterus
+oncotree_2021_11_02,UUS,Uterus,Uterus
+oncotree_2021_11_02,UCCC,Uterus,Uterus
+oncotree_2021_11_02,OUTT,Uterus,Uterus
+oncotree_2021_11_02,ETT,Uterus,Uterus
+oncotree_2021_11_02,UPECOMA,Uterus,Uterus
+oncotree_2021_11_02,VDYS,Vulva/Vagina,None
+oncotree_2021_11_02,VULVA,Vulva/Vagina,None
+oncotree_2021_11_02,VMA,Vulva/Vagina,None
+oncotree_2021_11_02,VA,Vulva/Vagina,None
+oncotree_2021_11_02,VPE,Vulva/Vagina,None
+oncotree_2021_11_02,VGCT,Vulva/Vagina,None
+oncotree_2021_11_02,VIMT,Vulva/Vagina,None
+oncotree_2021_11_02,VMM,Vulva/Vagina,None
+oncotree_2021_11_02,VMGCT,Vulva/Vagina,None
+oncotree_2021_11_02,VPDC,Vulva/Vagina,None
+oncotree_2021_11_02,VMT,Vulva/Vagina,None
+oncotree_2021_11_02,VOEC,Vulva/Vagina,None
+oncotree_2021_11_02,VYST,Vulva/Vagina,None
+oncotree_2021_11_02,VSC,Vulva/Vagina,None
