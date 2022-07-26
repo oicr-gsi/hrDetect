@@ -1,4 +1,12 @@
 # CHANGELOG
+## 1.4 - 2022-07-26
+- Fixed bugs
+	- removed rare fit set to Pancreas
+- Split INDEL and SNV cutoffs
+- Protects from crash on tissue not in catalog
+- Protects from crash on low SNV/INDEL counts
+- New function to extend LOH (default: OFF)
+- Added CNV signatures (default: OFF)
 
 ## 1.3 - 2022-06-22
 - Fixed SV reformatting for bug on end2 (was printing end1)
