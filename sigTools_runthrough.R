@@ -127,9 +127,8 @@ summarize_LOH <- function(LOH_seg_file,sample_name,CNVsigs=F){
     CNV_sigs <- seg %>% group_by(LENGTHclass,TCNclass,BASEclass) %>% tally()
     CNV_sigs$prop <- CNV_sigs$n / sum(CNV_sigs$n)
     
-    CNVsigs.class <- fread('~/Documents/GitHub/sigtools_workflow/CNVsigs.class.txt')
-    CNVsigs.classifications <- fread('~/Documents/GitHub/sigtools_workflow/COSMIC_v3.3_CN_GRCh37.txt')
-    
+    CNVsigs.class <- read.table('~/data/CNVsigs.class.txt')
+
     CNVsigs.classfied <- left_join(CNVsigs.class,CNV_sigs)
     CNVsigs.classfied[is.na(CNVsigs.classfied)] <- 0
     
@@ -268,7 +267,7 @@ summarize_SNVs <- function(snv_vcf_location,genomeVersion,sample_name,tissue){
 ####arguments####
 option_list = list(
   make_option(c("-s", "--sampleName"), type="character", default=NULL, help="sample name", metavar="character"),
-  make_option(c("-t", "--tissue"), type="character", default=NULL, help="tissue/organ for HRDetect signatures", metavar="character"),
+  make_option(c("-o", "--oncotree"), type="character", default=NULL, help="oncotree code", metavar="character"),
   make_option(c("-S", "--snvFile"), type="character", default=NULL, help="SNV vcf file", metavar="character"),
   make_option(c("-I", "--indelFile"), type="character", default=NULL, help="indel vcf file", metavar="character"),
   make_option(c("-V", "--SVFile"), type="character", default=NULL, help="Structural variant bed file", metavar="character"),
@@ -287,7 +286,7 @@ genomeVersion       <-  opt$genomeVersion
 indelCutoff         <-  opt$indelCutoff
 snvCutoff           <-  opt$snvCutoff
 sample_name         <-  opt$sampleName
-tissue              <-  opt$tissue
+oncotree            <-  opt$oncotree
 snv_vcf_location    <-  opt$snvFile
 indel_vcf_location  <-  opt$indelFile
 SV_bedpe_location   <-  opt$SVFile
@@ -301,13 +300,18 @@ LOH_seg_location    <-  opt$LOHFile
 #indelCutoff         <- 10
 #snvCutoff           <- 10
 #sample_name         <- "OCT_010434" 
-#tissue              <- "Ovary" 
+#oncotree            <- "HGSOC" 
 #snv_vcf_location    <- "cgi/scratch/fbeaudry/sigTools_test/TGL62/OCT_010434/OCT_010434_Ov_P_WG.filter.deduped.realigned.recalibrated.mutect2.filtered.VAF.snv.vcf.gz" 
 #indel_vcf_location  <- "cgi/scratch/fbeaudry/sigTools_test/TGL62/OCT_010434/OCT_010434_Ov_P_WG.filter.deduped.realigned.recalibrated.mutect2.filtered.VAF.indel.vcf.gz" 
 #SV_bedpe_location   <- "cgi/scratch/fbeaudry/sigTools_test/TGL62/OCT_010434/OCT_010434_Ov_P_WG__somatic.somatic_filtered.delly.merged.bedpe"
 #LOH_seg_location    <- "cgi/scratch/fbeaudry/sigTools_test/TGL62/OCT_010434/OCT_010434_Ov_P_WG_segments.cna.txt" 
 
 ####tissue test####
+
+oncotree_data <- read.table("data/oncotree_2021_11_02.csv",sep=",",header = T)
+
+tissue <- oncotree_data$sigtools[oncotree_data$oncotree_code == oncotree]
+  
 tissue.catalog <-  c("Biliary", "Bladder", "Bone_SoftTissue", "Breast",  "CNS", "Colorectal", "Esophagus", "Head_neck", "Kidney", "Liver", "Lung", "Lymphoid", "Ovary", "Pancreas", "Prostate", "Skin", "Stomach", "Uterus")
 
 if(tissue %ni% tissue.catalog){
