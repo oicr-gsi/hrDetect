@@ -150,8 +150,6 @@ summarize_LOH <- function(LOH_seg_file,sample_name,CNVsigs=F){
   return(LOH_ls)
 }
 
-
-
 summarize_SVs <- function(SV_bedpe,tissue){
   
   #start sigtools SV analysis
