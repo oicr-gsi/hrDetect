@@ -7,7 +7,6 @@ workflow HRDetect {
 		File smallsVcfIndex
 		File segFile
 		String sampleName
-		Boolean plotIt
 	}
 
 	parameter_meta {
@@ -16,7 +15,6 @@ workflow HRDetect {
 		smallsVcfIndex: "Index of input VCF file of SNV and indels"
 		segFile: "File for segmentations, used to estimate number of segments in Loss of heterozygosity (LOH) (eg. from sequenza)"
 		sampleName: "Name of sample matching the tumor sample in .vcf"
-		plotIt: "Create plots of sigtools results"
 	}
 
 	call filterStructural {
@@ -57,14 +55,6 @@ workflow HRDetect {
 			sampleName = sampleName
 	}
 
-	if(plotIt == true){
-		call plotResults {
-			input:
-				JSONin = hrdResults.JSONout,
-				sampleName = sampleName
-		}
-	}
-
 	meta {
 		author: "Felix Beaudry"
 		email: "fbeaudry@oicr.on.ca"
@@ -82,16 +72,10 @@ workflow HRDetect {
 			{
 				name: "sigtools/0.0.0.9000",
 				url: "https://github.com/Nik-Zainal-Group/signature.tools.lib"
-			},
-			{
-				name: "ggplot2/3.3.6",
-				url: "https://ggplot2.tidyverse.org/"
 			}
 		]
 		output_meta: {
 			JSONout : "sigtools and CHORD results in JSON",
-			sigTools_sigs_plot_Output: "plot of signature breakdown from sigtools",
-			sigTools_hrd_plot_Output: "plot of point estimate and bootstraped confidence intervals for HRD from sigtools",
 			indelFilteringReport: "counts of INDELs pre and post filtering",
 			snvFilteringReport: "counts of SNVs pre and post filtering",
 			structuralFilteringReport: "counts of structural variants pre and post filtering"
@@ -102,8 +86,6 @@ workflow HRDetect {
 		File snvFilteringReport = "~{sampleName}.SNP.filteringReport.txt"
 		File structuralFilteringReport = "~{sampleName}.structural.filteringReport.txt"
 		File JSONout = "~{sampleName}.signatures.json"
-		File? sigTools_sigs_plot_Output = "~{sampleName}.sigtools.sigs.png"
-		File? sigTools_hrd_plot_Output = "~{sampleName}.sigtools.hrd.png"
 	}
 }
 
@@ -209,11 +191,9 @@ task filterSMALLs {
 		$BCFTOOLS_ROOT/bin/bcftools filter -i "(FORMAT/AD[0:1])/(FORMAT/AD[0:0]+FORMAT/AD[0:1]) >= ~{VAF}" >~{basename}.VAF.vcf
 
 		bgzip ~{basename}.VAF.vcf
-		
 		tabix -p vcf ~{basename}.VAF.vcf.gz
 
 		zcat ~{smallsVcfFile} | awk '$1 !~ "#" {print}'  | wc -l >~{sampleName}.filteringReport.txt
-				
 		zcat ~{basename}.VAF.vcf.gz | awk '$1 !~ "#" {print}'  | wc -l >>~{sampleName}.filteringReport.txt
 
 	>>> 
@@ -296,6 +276,7 @@ task hrdResults {
 		String sampleName
 		String modules = "hrdetect-scripts/1.3"
 		String sigtoolrScript = "$HRDETECT_SCRIPTS_ROOT/bin/sigTools_runthrough.R"
+		String SVrefSigs = "$SIGTOOLS_ROOT/lib/R/library/signature.tools.lib/data/RefSigv1_Rearr.tsv"
 		String genomeVersion = "hg38"
 		Int sigtoolsBootstrap = 2500
 		Int indelCutoff = 10
@@ -306,6 +287,7 @@ task hrdResults {
 
 	parameter_meta {
 		structuralBedpeFiltered: "filtered structural variant .bedpe"
+		SVrefSigs: "reference signatures for SVs"
 		indelVcfFiltered: "filtered INDEL .vcf"
 		snvVcfFiltered: "filtered SNV .vcf"
 		indelVcfIndexFiltered: "filtered INDEL .vcf.tbi (indexed)"
@@ -326,7 +308,11 @@ task hrdResults {
 	command <<<
 		set -euo pipefail
 
-		Rscript --vanilla ~{sigtoolrScript} -s ~{sampleName} -o ~{oncotree} -S ~{snvVcfFiltered} -I  ~{indelVcfFiltered} -V ~{structuralBedpeFiltered} -L ~{lohSegFile} -b ~{sigtoolsBootstrap} -g ~{genomeVersion} -i ~{indelCutoff}
+		Rscript ~{sigtoolrScript} -s ~{sampleName} \
+			-S ~{snvVcfFiltered} -I  ~{indelVcfFiltered} \
+			-V ~{structuralBedpeFiltered} -L ~{lohSegFile} \
+			-b ~{sigtoolsBootstrap} -g ~{genomeVersion} -i ~{indelCutoff} \
+			-r ~{SVrefSigs}
 
 	>>> 
 
@@ -344,54 +330,6 @@ task hrdResults {
 	meta {
 		output_meta: {
 			JSONout : "JSON file of sigtools and CHORD signatures"
-		}
-	}
-}
-
-task plotResults {
-	input {
-		File JSONin 
-		String sampleName
-		String modules = "hrdetect-scripts/1.3"
-		String plotrScript = "$HRDETECT_SCRIPTS_ROOT/bin/sigTools_plotter.R"
-		Int jobMemory = 20
-		Int threads = 1
-		Int timeout = 2
-	}
-
-	parameter_meta {
-		plotrScript: ".R plotting script"
-		sampleName: "Name of sample matching the tumor sample in .vcf"
-		JSONin: "JSON file of sigtools and CHORD signatures"		
-		modules: "Required environment modules"
-		jobMemory: "Memory allocated for this job (GB)"
-		threads: "Requested CPU threads"
-		timeout: "Hours before task timeout"
-	}
-
-	command <<<
-		set -euo pipefail
-
-		Rscript --vanilla ~{plotrScript} ~{JSONin}
-
-	>>> 
-
-	runtime {
-		modules: "~{modules}"
-		memory:  "~{jobMemory} GB"
-		cpu:     "~{threads}"
-		timeout: "~{timeout}"
-	}
-
-	output {
-		File sigTools_sigs_plot_Output = "~{sampleName}.sigtools.sigs.png"
-		File sigTools_hrd_plot_Output = "~{sampleName}.sigtools.hrd.png"
-	}
-
-	meta {
-		output_meta: {
-			sigTools_sigs_plot_Output: "plot of signature breakdown from sigtools",
-			sigTools_hrd_plot_Output: "plot of point estimate and bootstraped confidence intervals for HRD from sigtools"
 		}
 	}
 }
