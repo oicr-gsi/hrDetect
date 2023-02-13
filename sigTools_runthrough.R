@@ -65,14 +65,6 @@ summarize_SVs <- function(SV_bedpe,SVrefSigs){
   SV_catalogue <- bedpeToRearrCatalogue(SV_bedpe_sigtools)
   SV_catalogue_reformat <-  sigTools_formatter(SV_catalogue,sampleName = sample_name)
   
-  #get organ signature
- # SV_sigs <- getOrganSignatures(organ = "Breast", 
- #                               version = "1", 
- #                               typemut = "rearr", 
- #                              verbose = FALSE)
-  
-  #signature.tools.lib::all_organ_sigs_rearr
-
   SV_sigs <- read.table(SVrefSigs,sep = "\t", header = TRUE)
   
   #fit organ signature
@@ -126,8 +118,8 @@ summarize_SNVs <- function(snv_vcf_location,genomeVersion,sample_name){
   subs_COSMICV2_res <- Fit(catalogues = snv_catalogue_reformat,
                            signatures = COSMIC30_subs_signatures,
                            useBootstrap = TRUE, 
-                            giniThresholdScaling=2 ,
-                             threshold_percent=1,
+                           giniThresholdScaling=2 ,
+                           threshold_percent=1,
                            nboot = boots)
   
   #reformat for JSON
@@ -167,19 +159,19 @@ SV_bedpe_location   <-  opt$SVFile
 LOH_seg_location    <-  opt$LOHFile
 
 ##test
-setwd('/Volumes/')
-boots               <- 2500 
-genomeVersion       <- "hg38"
+#setwd('/Volumes/')
+#boots               <- 2500 
+#genomeVersion       <- "hg38"
 
-indelCutoff         <- 10
-snvCutoff           <- 10
-sample_name         <- "OCT_010434" 
+#indelCutoff         <- 10
+#snvCutoff           <- 10
+#sample_name         <- "OCT_010434" 
 
-snv_vcf_location    <- "cgi/scratch/fbeaudry/sigTools_test/TGL62/OCT_010434/OCT_010434_Ov_P_WG.filter.deduped.realigned.recalibrated.mutect2.filtered.VAF.snv.vcf.gz" 
-indel_vcf_location  <- "cgi/scratch/fbeaudry/sigTools_test/TGL62/OCT_010434/OCT_010434_Ov_P_WG.filter.deduped.realigned.recalibrated.mutect2.filtered.VAF.indel.vcf.gz" 
-SV_bedpe_location   <- "cgi/scratch/fbeaudry/sigTools_test/TGL62/OCT_010434/OCT_010434_Ov_P_WG__somatic.somatic_filtered.delly.merged.bedpe"
-LOH_seg_location    <- "cgi/scratch/fbeaudry/sigTools_test/TGL62/OCT_010434/OCT_010434_Ov_P_WG_segments.cna.txt" 
-SVrefSigs           <- "cgi/scratch/fbeaudry/sigTools_test/RefSigv1_Rearr.tsv"
+#snv_vcf_location    <- "cgi/scratch/fbeaudry/sigTools_test/TGL62/OCT_010434/OCT_010434_Ov_P_WG.filter.deduped.realigned.recalibrated.mutect2.filtered.VAF.snv.vcf.gz" 
+#indel_vcf_location  <- "cgi/scratch/fbeaudry/sigTools_test/TGL62/OCT_010434/OCT_010434_Ov_P_WG.filter.deduped.realigned.recalibrated.mutect2.filtered.VAF.indel.vcf.gz" 
+#SV_bedpe_location   <- "cgi/scratch/fbeaudry/sigTools_test/TGL62/OCT_010434/OCT_010434_Ov_P_WG__somatic.somatic_filtered.delly.merged.bedpe"
+#LOH_seg_location    <- "cgi/scratch/fbeaudry/sigTools_test/TGL62/OCT_010434/OCT_010434_Ov_P_WG_segments.cna.txt" 
+#SVrefSigs           <- "cgi/scratch/fbeaudry/sigTools_test/RefSigv1_Rearr.tsv"
 
 ####LOH####
 
