@@ -151,16 +151,16 @@ task filterStructural {
 
 task filterSMALLs {
 	input {
+		String sampleName
+		String smallType
 		File smallsVcfFile
 		File smallsVcfIndex
 		String basename = basename("~{smallsVcfFile}", ".vcf.gz")
-		String modules = "tabix/1.9 bcftools/1.9"
-		String sampleName
-		String genome 
-		String? difficultRegions
-		Float VAF
-		String smallType
-		String QUALfilter 
+		String modules = "tabix/1.9 bcftools/1.9 hg38/p12 hg38-dac-exclusion/1.0"
+		String genome = "$HG38_ROOT/hg38_random.fa"
+		String? difficultRegions = "--regions-file $HG38_DAC_EXCLUSION_ROOT/hg38-dac-exclusion.v2.bed"
+		Float VAF = 0.01
+		String QUALfilter = "FILTER~'haplotype' | FILTER~'clustered_events' | FILTER~'multiallelic' | FILTER~'slippage' |FILTER~'weak_evidence' | FILTER~'strand_bias' | FILTER~'position' | FILTER~'normal_artifact' |  FILTER~'map_qual' | FILTER~'germline' | FILTER~'fragment' | FILTER~'contamination' | FILTER~'base_qual'"
 		Int jobMemory = 10
 		Int threads = 1
 		Int timeout = 2
@@ -280,9 +280,9 @@ task hrdResults {
 		String genomeVersion = "hg38"
 		Int sigtoolsBootstrap = 2500
 		Int indelCutoff = 10
-		Int jobMemory = 20
+		Int jobMemory = 30
 		Int threads = 1
-		Int timeout = 2
+		Int timeout = 5
 	}
 
 	parameter_meta {
