@@ -35,12 +35,6 @@ workflow HRDetect {
 			smallType = "snp"
 	}
 
-	call convertSegFile {
-		input: 
-			outputFileNamePrefix = outputFileNamePrefix,
-			segFile = segFile
-	}
-
 	call hrdResults {
 		input:
 			outputFileNamePrefix = outputFileNamePrefix,
@@ -49,7 +43,7 @@ workflow HRDetect {
 			indelVcfIndexFiltered = filterINDELs.smallsVcfIndexOutput,
 			snvVcfFiltered = filterSNVs.smallsVcfOutput,
 			snvVcfIndexFiltered = filterSNVs.smallsVcfIndexOutput,
-			lohSegFile = convertSegFile.segmentsOutput
+			lohSegFile = segFile
 	}
 
 	meta {
@@ -161,7 +155,6 @@ task filterSMALLs {
 
 	parameter_meta {
 		smallsVcfFile: "Vcf input file"
-		basename: "Base name"
 		modules: "Required environment modules"
 		outputFileNamePrefix: "Name of sample matching the tumor sample in .vcf"
 		genome: "Path to loaded genome .fa"
@@ -212,50 +205,6 @@ task filterSMALLs {
 	}
 }
 
-task convertSegFile {
-	input {
-		String outputFileNamePrefix
-		File segFile 
-		Int jobMemory = 5
-		Int threads = 1
-		Int timeout = 1
-	}
-
-	parameter_meta {
-		segFile: "segment input file from sequenza"
-		outputFileNamePrefix: "Base name"
-		jobMemory: "Memory allocated for this job (GB)"
-		threads: "Requested CPU threads"
-		timeout: "Hours before task timeout"
-	}
-
-	command <<<
-
-		set -euo pipefail
-
-		echo  -e "seg_no\tChromosome\tchromStart\tchromEnd\ttotal.copy.number.inNormal\tminor.copy.number.inNormal\ttotal.copy.number.inTumour\tminor.copy.number.inTumour" >~{outputFileNamePrefix}_segments.cna.txt
-
-		tail -n +2 ~{segFile} | \
-		awk 'split($1,a,"\"") split(a[2],b,"chr") {print NR"\t"b[2]"\t"$2"\t"$3"\t"2"\t"1"\t"$10"\t"$12}' >>~{outputFileNamePrefix}_segments.cna.txt
-	>>> 
-
-	runtime {
-		memory:  "~{jobMemory} GB"
-		cpu:     "~{threads}"
-		timeout: "~{timeout}"
-	}
-
-	output {
-		File segmentsOutput = "~{outputFileNamePrefix}_segments.cna.txt"
-	}
-
-	meta {
-		output_meta: {
-			segmentsOutput: "reformatted segmentation file"
-		}
-	}
-}
-
 task hrdResults {
 	input {
 		String outputFileNamePrefix
@@ -284,7 +233,6 @@ task hrdResults {
 		indelVcfIndexFiltered: "filtered INDEL .vcf.tbi (indexed)"
 		snvVcfIndexFiltered: "filtered SNV .vcf.tbi (indexed)"
 		lohSegFile: "reformatted segmentation file"
-		oncotree: "oncotree code of cancer"
 		sigtoolrScript: ".R script containing sigtools"
 		outputFileNamePrefix: "Name of sample matching the tumor sample in .vcf"		
 		modules: "Required environment modules"
