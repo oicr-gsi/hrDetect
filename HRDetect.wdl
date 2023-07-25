@@ -5,6 +5,7 @@ workflow HRDetect {
 		String outputFileNamePrefix
 		File structuralVcfFile
 		File smallsVcfFile
+		File smallsVcfIndex
 		File segFile
 	}
 
@@ -25,6 +26,7 @@ workflow HRDetect {
 		input: 
 			outputFileNamePrefix = outputFileNamePrefix,
 			smallsVcfFile = smallsVcfFile,
+			smallsVcfIndex = smallsVcfIndex,
 			smallType = "indel"
 	}
 
@@ -32,6 +34,7 @@ workflow HRDetect {
 		input: 
 			outputFileNamePrefix = outputFileNamePrefix,
 			smallsVcfFile = smallsVcfFile,
+			smallsVcfIndex = smallsVcfIndex,
 			smallType = "snp"
 	}
 
@@ -106,10 +109,12 @@ task filterStructural {
 	command <<<
 		set -euo pipefail
 
+
+		$BCFTOOLS_ROOT/bin/bcftools view -f '~{structuralQUALfilter}' ~{structuralVcfFile} > ~{outputFileNamePrefix}.PASS.vcf
+		
 		echo  -e "chrom1\tstart1\tend1\tchrom2\tstart2\tend2\tsample\tsvclass"  >~{outputFileNamePrefix}.bedpe
 
-		$BCFTOOLS_ROOT/bin/bcftools view -f '~{structuralQUALfilter}' ~{structuralVcfFile} |\
-		$BCFTOOLS_ROOT/bin/bcftools filter -e 'INFO/SVTYPE = "~{structuralTYPEfilter}"' |\
+		$BCFTOOLS_ROOT/bin/bcftools filter -e 'INFO/SVTYPE = "~{structuralTYPEfilter}"' ~{outputFileNamePrefix}.PASS.vcf |\
 		$BCFTOOLS_ROOT/bin/bcftools query -f "%CHROM\t%POS\t%INFO/END\t%FILTER\t%INFO/SVTYPE\t%INFO/CIPOS\t%INFO/CIEND\n" |\
 		awk -v outputFileNamePrefix=~{outputFileNamePrefix} 'split($6,a,",") split($7,b,",") {print $1"\t"$2+a[1]-1"\t"$2+a[2]"\t"$1"\t"$3+b[1]-1"\t"$3+b[2]"\t"outputFileNamePrefix"\t"$5}' >>~{outputFileNamePrefix}.bedpe
 
@@ -126,12 +131,14 @@ task filterStructural {
 	}
 
 	output {
+		File structuralpass_vcf = "~{outputFileNamePrefix}.PASS.vcf"
 		File structuralbedpe = "~{outputFileNamePrefix}.bedpe"
 		File structuralFilteringReport = "~{outputFileNamePrefix}.structural.filteringReport.txt"
 	}
 
 	meta {
 		output_meta: {
+			structuralpass_vcf: "filtered structural .vcf"
 			structuralbedpe: "filtered structural .bedpe",
 			structuralFilteringReport: "counts of variants pre and post filtering"
 		}
@@ -141,6 +148,7 @@ task filterStructural {
 task filterSMALLs {
 	input {
 		String outputFileNamePrefix
+		File smallsVcfIndex
 		String smallType
 		File smallsVcfFile
 		String modules = "tabix/1.9 bcftools/1.9 hg38/p12 hg38-dac-exclusion/1.0"
@@ -170,16 +178,16 @@ task filterSMALLs {
 	command <<<
 		set -euo pipefail
 
-		$BCFTOOLS_ROOT/bin/bcftools norm --multiallelics - --fasta-ref ~{genome} ~{difficultRegions} ~{smallsVcfFile} |\
-		$BCFTOOLS_ROOT/bin/bcftools filter -i "TYPE='~{smallType}'" |\
-		$BCFTOOLS_ROOT/bin/bcftools filter -e "~{QUALfilter}" |\
-		$BCFTOOLS_ROOT/bin/bcftools filter -i "(FORMAT/AD[0:1])/(FORMAT/AD[0:0]+FORMAT/AD[0:1]) >= ~{VAF}" >~{outputFileNamePrefix}.VAF.vcf
+		$BCFTOOLS_ROOT/bin/bcftools norm --multiallelics - --fasta-ref ~{genome} ~{difficultRegions} ~{smallsVcfFile} | \
+		$BCFTOOLS_ROOT/bin/bcftools filter -i "TYPE='~{smallType}'" | \
+		$BCFTOOLS_ROOT/bin/bcftools filter -e "~{QUALfilter}" | \
+		$BCFTOOLS_ROOT/bin/bcftools filter -i "(FORMAT/AD[0:1])/(FORMAT/AD[0:0]+FORMAT/AD[0:1]) >= ~{VAF}" >~{outputFileNamePrefix}.~{smallType}.VAF.vcf
 
-		bgzip ~{outputFileNamePrefix}.VAF.vcf
-		tabix -p vcf ~{outputFileNamePrefix}.VAF.vcf.gz
+		bgzip ~{outputFileNamePrefix}.~{smallType}.VAF.vcf
+		tabix -p vcf ~{outputFileNamePrefix}.~{smallType}.VAF.vcf.gz
 
-		zcat ~{smallsVcfFile} | awk '$1 !~ "#" {print}'  | wc -l >~{outputFileNamePrefix}.filteringReport.txt
-		zcat ~{outputFileNamePrefix}.VAF.vcf.gz | awk '$1 !~ "#" {print}'  | wc -l >>~{outputFileNamePrefix}.filteringReport.txt
+		zcat ~{smallsVcfFile} | awk '$1 !~ "#" {print}'  | wc -l >~{outputFileNamePrefix}.~{smallType}.filteringReport.txt
+		zcat ~{outputFileNamePrefix}.~{smallType}.VAF.vcf.gz | awk '$1 !~ "#" {print}'  | wc -l >>~{outputFileNamePrefix}.~{smallType}.filteringReport.txt
 
 	>>> 
 
@@ -191,9 +199,9 @@ task filterSMALLs {
 	}
 
 	output {
-		File smallsVcfOutput = "~{outputFileNamePrefix}.VAF.vcf.gz"
-		File smallsVcfIndexOutput = "~{outputFileNamePrefix}.VAF.vcf.gz.tbi"
-		File smallsFilteringReport = "~{outputFileNamePrefix}.filteringReport.txt"
+		File smallsVcfOutput = "~{outputFileNamePrefix}.~{smallType}.VAF.vcf.gz"
+		File smallsVcfIndexOutput = "~{outputFileNamePrefix}.~{smallType}.VAF.vcf.gz.tbi"
+		File smallsFilteringReport = "~{outputFileNamePrefix}.~{smallType}.filteringReport.txt"
 	}
 
 	meta {
@@ -214,15 +222,16 @@ task hrdResults {
 		File snvVcfFiltered
 		File snvVcfIndexFiltered
 		File lohSegFile
-		String modules = "hrdetect-scripts/1.3"
-		String sigtoolrScript = "$HRDETECT_SCRIPTS_ROOT/bin/sigTools_runthrough.R"
+		String modules = "hrdetect-scripts/1.4"
+		String sigtoolrScript = "/.mounts/labs/CGI/scratch/fbeaudry/wdl/sigtools_workflow/sigTools_runthrough.R"
 		String SVrefSigs = "$SIGTOOLS_ROOT/lib/R/library/signature.tools.lib/data/RefSigv1_Rearr.tsv"
+		String SNVrefSigs = "/.mounts/labs/CGI/scratch/fbeaudry/validation/sigTools_test/COSMIC_v2_SBS_GRCh38.txt"
 		String genomeVersion = "hg38"
-		Int sigtoolsBootstrap = 2500
+		Int sigtoolsBootstrap = 200
 		Int indelCutoff = 10
 		Int jobMemory = 30
 		Int threads = 1
-		Int timeout = 5
+		Int timeout = 15
 	}
 
 	parameter_meta {
@@ -251,7 +260,7 @@ task hrdResults {
 			-S ~{snvVcfFiltered} -I  ~{indelVcfFiltered} \
 			-V ~{structuralBedpeFiltered} -L ~{lohSegFile} \
 			-b ~{sigtoolsBootstrap} -g ~{genomeVersion} -i ~{indelCutoff} \
-			-r ~{SVrefSigs}
+			-r ~{SVrefSigs} -R ~{SNVrefSigs}
 
 	>>> 
 
