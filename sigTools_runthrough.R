@@ -6,10 +6,10 @@ library(optparse)
 option_list = list(
   make_option(c("-s", "--sampleName"), type="character", default=NULL, help="sample name", metavar="character"),
   make_option(c("-r", "--SVrefSigs"), type="character", default=NULL, help="structural variant reference signatures", metavar="character"),
-  make_option(c("-R", "--SNVrefSigs"), type="character", default=NULL, help="single nucleotide polymorphism reference signatures", metavar="character"),
+ # make_option(c("-R", "--SNVrefSigs"), type="character", default=NULL, help="single nucleotide polymorphism reference signatures", metavar="character"),
   make_option(c("-S", "--snvFile"), type="character", default=NULL, help="SNV vcf file", metavar="character"),
   make_option(c("-I", "--indelFile"), type="character", default=NULL, help="indel vcf file", metavar="character"),
-  make_option(c("-V", "--SVFile"), type="character", default=NULL, help="Structural variant bed file", metavar="character"),
+  make_option(c("-V", "--SVFile"), type="character", default=NULL, help="Structural variant file", metavar="character"),
   make_option(c("-L", "--LOHFile"), type="character", default=NULL, help="LOH file", metavar="character"),
   make_option(c("-b", "--bootstraps"), type="numeric", default=2500, help="number of bootstraps for signature detection", metavar="numeric"),
   make_option(c("-g", "--genomeVersion"), type="character", default="hg38", help="genome version", metavar="character"),
@@ -26,18 +26,17 @@ indelCutoff         <-  opt$indelCutoff
 snvCutoff           <-  opt$snvCutoff
 sample_name         <-  opt$sampleName
 SVrefSigs           <-  opt$SVrefSigs
-SNVrefSigs          <-  opt$SNVrefSigs
+#SNVrefSigs         <-  opt$SNVrefSigs
 snv_vcf_location    <-  opt$snvFile
 indel_vcf_location  <-  opt$indelFile
-SV_bedpe_location   <-  opt$SVFile
+SV_vcf_location     <-  opt$SVFile
 LOH_seg_file        <-  opt$LOHFile
 
-
-SV_bedpe <- try(read.table(SV_bedpe_location,sep = "\t", header = TRUE))
+SV_vcf <- try(read.table(SV_vcf_location,sep = "\t", header = TRUE))
 indel_vcf <- try(read.table(indel_vcf_location,sep = "\t", header = TRUE))
 snv_vcf <- try(read.table(snv_vcf_location,sep = "\t", header = TRUE))
 
-if("try-error" %in% class(snv_vcf) | "try-error" %in% class(indel_vcf) | "try-error" %in% class(SV_bedpe)) {
+if("try-error" %in% class(snv_vcf) | "try-error" %in% class(indel_vcf) | "try-error" %in% class(SV_vcf)) {
   
   print("some data missing, no HRD call!")
   
@@ -48,14 +47,13 @@ if("try-error" %in% class(snv_vcf) | "try-error" %in% class(indel_vcf) | "try-er
 } else {
     
   call_hrdetect(boots               ,
-                            genomeVersion       ,
-                            sample_name         ,
-                            SVrefSigs           ,
-                            SNVrefSigs          ,
-                            snv_vcf_location    ,
-                            indel_vcf_location  ,
-                            SV_bedpe_location   ,
-                            LOH_seg_file    
+                genomeVersion       ,
+                sample_name         ,
+                SVrefSigs           ,
+                snv_vcf_location    ,
+                indel_vcf_location  ,
+                SV_vcf_location     ,
+                LOH_seg_file    
   )
   
 }

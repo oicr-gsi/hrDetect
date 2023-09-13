@@ -41,7 +41,7 @@ workflow HRDetect {
 	call hrdResults {
 		input:
 			outputFileNamePrefix = outputFileNamePrefix,
-			structuralBedpeFiltered = filterStructural.structuralbedpe,
+			structuralBedpeFiltered = filterStructural.structuralpass_vcf,
 			indelVcfFiltered = filterINDELs.smallsVcfOutput,
 			indelVcfIndexFiltered = filterINDELs.smallsVcfIndexOutput,
 			snvVcfFiltered = filterSNVs.smallsVcfOutput,
@@ -79,7 +79,7 @@ workflow HRDetect {
 		File indelFilteringReport = "~{outputFileNamePrefix}.INDEL.filteringReport.txt"
 		File snvFilteringReport = "~{outputFileNamePrefix}.SNP.filteringReport.txt"
 		File structuralFilteringReport = "~{outputFileNamePrefix}.structural.filteringReport.txt"
-		File JSONout = "~{outputFileNamePrefix}.signatures.json"
+		File? JSONout = "~{outputFileNamePrefix}.signatures.json"
 	}
 }
 
@@ -109,7 +109,6 @@ task filterStructural {
 	command <<<
 		set -euo pipefail
 
-
 		$BCFTOOLS_ROOT/bin/bcftools view -f '~{structuralQUALfilter}' ~{structuralVcfFile} > ~{outputFileNamePrefix}.PASS.vcf
 		
 		echo  -e "chrom1\tstart1\tend1\tchrom2\tstart2\tend2\tsample\tsvclass"  >~{outputFileNamePrefix}.bedpe
@@ -138,7 +137,7 @@ task filterStructural {
 
 	meta {
 		output_meta: {
-			structuralpass_vcf: "filtered structural .vcf"
+			structuralpass_vcf: "filtered structural .vcf",
 			structuralbedpe: "filtered structural .bedpe",
 			structuralFilteringReport: "counts of variants pre and post filtering"
 		}
@@ -222,10 +221,9 @@ task hrdResults {
 		File snvVcfFiltered
 		File snvVcfIndexFiltered
 		File lohSegFile
-		String modules = "hrdetect-scripts/1.4"
+		String modules = "sigtools/2.4.1"
 		String sigtoolrScript = "/.mounts/labs/CGI/scratch/fbeaudry/wdl/sigtools_workflow/sigTools_runthrough.R"
 		String SVrefSigs = "$SIGTOOLS_ROOT/lib/R/library/signature.tools.lib/data/RefSigv1_Rearr.tsv"
-		String SNVrefSigs = "/.mounts/labs/CGI/scratch/fbeaudry/validation/sigTools_test/COSMIC_v2_SBS_GRCh38.txt"
 		String genomeVersion = "hg38"
 		Int sigtoolsBootstrap = 200
 		Int indelCutoff = 10
@@ -256,11 +254,16 @@ task hrdResults {
 	command <<<
 		set -euo pipefail
 
-		Rscript ~{sigtoolrScript} -s ~{outputFileNamePrefix} \
-			-S ~{snvVcfFiltered} -I  ~{indelVcfFiltered} \
-			-V ~{structuralBedpeFiltered} -L ~{lohSegFile} \
-			-b ~{sigtoolsBootstrap} -g ~{genomeVersion} -i ~{indelCutoff} \
-			-r ~{SVrefSigs} -R ~{SNVrefSigs}
+		Rscript ~{sigtoolrScript} \
+			--sampleName ~{outputFileNamePrefix} \
+			--snvFile ~{snvVcfFiltered} \
+			--indelFile  ~{indelVcfFiltered} \
+			--SVFile ~{structuralBedpeFiltered} \
+			--LOHFile ~{lohSegFile} \
+			--bootstraps ~{sigtoolsBootstrap} \
+			--genomeVersion ~{genomeVersion} \
+			--indelCutoff ~{indelCutoff} \
+			--SVrefSigs ~{SVrefSigs} 
 
 	>>> 
 
@@ -272,7 +275,7 @@ task hrdResults {
 	}
 
 	output {
-		File JSONout = "~{outputFileNamePrefix}.signatures.json"
+		File? JSONout = "~{outputFileNamePrefix}.signatures.json"
 	}
 
 	meta {
