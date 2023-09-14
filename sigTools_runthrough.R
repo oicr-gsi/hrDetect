@@ -1,6 +1,9 @@
 #! /usr/bin/env Rscript
 
+#basedir <- paste(Sys.getenv(c("HRDETECT_ROOT")), sep='/')
+#source(paste0(basedir, "/call_hrdetect.R"))
 source("/.mounts/labs/CGI/scratch/fbeaudry/wdl/sigtools_workflow/call_hrdetect.R")
+
 library(optparse)
 
 option_list = list(

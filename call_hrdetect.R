@@ -188,7 +188,7 @@ summarize_SNVs_dcSigs <- function(snv_df, sample_name){
   
   # calculate a sample
   sample_sigs <- whichSignatures(tumor.ref=sigs_input,
-                                 signatures.ref=signatures.nature2013,
+                                 signatures.ref=signatures.nature2013, #alt: signatures.genome.cosmic.v3.may2019 ??
                                  sample.id=sample_name,
                                  contexts.needed=TRUE,
                                  tri.counts.method='exome')

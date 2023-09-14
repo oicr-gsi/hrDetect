@@ -16,12 +16,6 @@ workflow HRDetect {
 		outputFileNamePrefix: "Name of sample matching the tumor sample in .vcf"
 	}
 
-	call filterStructural {
-		input: 
-			outputFileNamePrefix = outputFileNamePrefix,
-			structuralVcfFile = structuralVcfFile,
-	}
-
 	call filterSMALLs as filterINDELs {
 		input: 
 			outputFileNamePrefix = outputFileNamePrefix,
@@ -41,7 +35,7 @@ workflow HRDetect {
 	call hrdResults {
 		input:
 			outputFileNamePrefix = outputFileNamePrefix,
-			structuralBedpeFiltered = filterStructural.structuralpass_vcf,
+			SV_vcf_location = structuralVcfFile,
 			indelVcfFiltered = filterINDELs.smallsVcfOutput,
 			indelVcfIndexFiltered = filterINDELs.smallsVcfIndexOutput,
 			snvVcfFiltered = filterSNVs.smallsVcfOutput,
@@ -80,67 +74,6 @@ workflow HRDetect {
 		File snvFilteringReport = "~{outputFileNamePrefix}.SNP.filteringReport.txt"
 		File structuralFilteringReport = "~{outputFileNamePrefix}.structural.filteringReport.txt"
 		File? JSONout = "~{outputFileNamePrefix}.signatures.json"
-	}
-}
-
-task filterStructural {
-	input {
-		String outputFileNamePrefix
-		File structuralVcfFile 
-		String modules = "bcftools/1.9"
-		String structuralQUALfilter = "PASS"
-		String structuralTYPEfilter = "BND"
-		Int jobMemory = 5
-		Int threads = 1
-		Int timeout = 1
-	}
-
-	parameter_meta {
-		structuralVcfFile: "Vcf input file"
-		modules: "Required environment modules"
-		outputFileNamePrefix: "Name of sample matching the tumor sample in .vcf"
-		structuralQUALfilter: "filter for filter calls to keep, eg. PASS"
-		structuralTYPEfilter: "filter for tye of structural calls to remove, eg. BND"
-		jobMemory: "Memory allocated for this job (GB)"
-		threads: "Requested CPU threads"
-		timeout: "Hours before task timeout"
-	}
-
-	command <<<
-		set -euo pipefail
-
-		$BCFTOOLS_ROOT/bin/bcftools view -f '~{structuralQUALfilter}' ~{structuralVcfFile} > ~{outputFileNamePrefix}.PASS.vcf
-		
-		echo  -e "chrom1\tstart1\tend1\tchrom2\tstart2\tend2\tsample\tsvclass"  >~{outputFileNamePrefix}.bedpe
-
-		$BCFTOOLS_ROOT/bin/bcftools filter -e 'INFO/SVTYPE = "~{structuralTYPEfilter}"' ~{outputFileNamePrefix}.PASS.vcf |\
-		$BCFTOOLS_ROOT/bin/bcftools query -f "%CHROM\t%POS\t%INFO/END\t%FILTER\t%INFO/SVTYPE\t%INFO/CIPOS\t%INFO/CIEND\n" |\
-		awk -v outputFileNamePrefix=~{outputFileNamePrefix} 'split($6,a,",") split($7,b,",") {print $1"\t"$2+a[1]-1"\t"$2+a[2]"\t"$1"\t"$3+b[1]-1"\t"$3+b[2]"\t"outputFileNamePrefix"\t"$5}' >>~{outputFileNamePrefix}.bedpe
-
-		awk '$1 !~ "#" {print}' ~{structuralVcfFile} | wc -l >~{outputFileNamePrefix}.structural.filteringReport.txt
-		awk '$1 !~ "#" {print}' ~{outputFileNamePrefix}.bedpe | wc -l >>~{outputFileNamePrefix}.structural.filteringReport.txt
-
-	>>>
-
-	runtime {
-		modules: "~{modules}"
-		memory:  "~{jobMemory} GB"
-		cpu:     "~{threads}"
-		timeout: "~{timeout}"
-	}
-
-	output {
-		File structuralpass_vcf = "~{outputFileNamePrefix}.PASS.vcf"
-		File structuralbedpe = "~{outputFileNamePrefix}.bedpe"
-		File structuralFilteringReport = "~{outputFileNamePrefix}.structural.filteringReport.txt"
-	}
-
-	meta {
-		output_meta: {
-			structuralpass_vcf: "filtered structural .vcf",
-			structuralbedpe: "filtered structural .bedpe",
-			structuralFilteringReport: "counts of variants pre and post filtering"
-		}
 	}
 }
 
@@ -215,7 +148,7 @@ task filterSMALLs {
 task hrdResults {
 	input {
 		String outputFileNamePrefix
-		File structuralBedpeFiltered
+		File SV_vcf_location
 		File indelVcfFiltered
 		File indelVcfIndexFiltered
 		File snvVcfFiltered
@@ -233,7 +166,7 @@ task hrdResults {
 	}
 
 	parameter_meta {
-		structuralBedpeFiltered: "filtered structural variant .bedpe"
+		SV_vcf_location: "structural variant vcf"
 		SVrefSigs: "reference signatures for SVs"
 		indelVcfFiltered: "filtered INDEL .vcf"
 		snvVcfFiltered: "filtered SNV .vcf"
@@ -258,7 +191,7 @@ task hrdResults {
 			--sampleName ~{outputFileNamePrefix} \
 			--snvFile ~{snvVcfFiltered} \
 			--indelFile  ~{indelVcfFiltered} \
-			--SVFile ~{structuralBedpeFiltered} \
+			--SVFile ~{SV_vcf_location} \
 			--LOHFile ~{lohSegFile} \
 			--bootstraps ~{sigtoolsBootstrap} \
 			--genomeVersion ~{genomeVersion} \
