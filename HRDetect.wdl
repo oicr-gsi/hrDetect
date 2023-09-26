@@ -16,6 +16,12 @@ workflow HRDetect {
 		outputFileNamePrefix: "Name of sample matching the tumor sample in .vcf"
 	}
 
+	call filterStructural {
+		input: 
+			outputFileNamePrefix = outputFileNamePrefix,
+			structuralVcfFile = structuralVcfFile
+	}
+
 	call filterSMALLs as filterINDELs {
 		input: 
 			outputFileNamePrefix = outputFileNamePrefix,
@@ -35,7 +41,7 @@ workflow HRDetect {
 	call hrdResults {
 		input:
 			outputFileNamePrefix = outputFileNamePrefix,
-			SV_vcf_location = structuralVcfFile,
+			SV_vcf_location = filterStructural.SV_vcf_location,
 			indelVcfFiltered = filterINDELs.smallsVcfOutput,
 			indelVcfIndexFiltered = filterINDELs.smallsVcfIndexOutput,
 			snvVcfFiltered = filterSNVs.smallsVcfOutput,
@@ -63,19 +69,84 @@ workflow HRDetect {
 			}
 		]
 		output_meta: {
-			JSONout : "sigtools and CHORD results in JSON",
 			indelFilteringReport: "counts of INDELs pre and post filtering",
 			snvFilteringReport: "counts of SNVs pre and post filtering",
-			structuralFilteringReport: "counts of structural variants pre and post filtering"
+			structuralFilteringReport: "counts of structural variants pre and post filtering",
+			hrd_signatures : "JSON file of hrdetect signatures",
+			SBS_exposures: "JSON of single basepair substitution signatures",
+			SV_exposures: "JSON of structural variant signatures",
+			SV_catalog: "JSON cataloguing structural variants",
+			ID_catalog: "JSON cataloguing indels",
+			SBS_catalog: "JSON cataloguing  single basepair substitutions"
+
 		}
 	}
 	output {
 		File indelFilteringReport = "~{outputFileNamePrefix}.INDEL.filteringReport.txt"
 		File snvFilteringReport = "~{outputFileNamePrefix}.SNP.filteringReport.txt"
 		File structuralFilteringReport = "~{outputFileNamePrefix}.structural.filteringReport.txt"
-		File? JSONout = "~{outputFileNamePrefix}.signatures.json"
+		File? hrd_signatures = "~{outputFileNamePrefix}.signatures.json"
+		File? SBS_exposures = "~{outputFileNamePrefix}.exposures.SBS.json"
+		File? SV_exposures = "~{outputFileNamePrefix}.exposures.SV.json"
+		File? SV_catalog = "~{outputFileNamePrefix}.catalog.SV.json"
+		File? ID_catalog = "~{outputFileNamePrefix}.catalog.ID.json"
+		File? SBS_catalog = "~{outputFileNamePrefix}.catalog.SBS.json"
+
 	}
 }
+
+task filterStructural {
+	input {
+		String outputFileNamePrefix
+		File structuralVcfFile 
+		String modules = "bcftools/1.9"
+		String structuralQUALfilter = "PASS"
+		Int jobMemory = 5
+		Int threads = 1
+		Int timeout = 1
+	}
+
+	parameter_meta {
+		structuralVcfFile: "Vcf input file"
+		modules: "Required environment modules"
+		outputFileNamePrefix: "Name of sample matching the tumor sample in .vcf"
+		structuralQUALfilter: "filter for filter calls to keep, eg. PASS"
+		jobMemory: "Memory allocated for this job (GB)"
+		threads: "Requested CPU threads"
+		timeout: "Hours before task timeout"
+	}
+
+	command <<<
+		set -euo pipefail
+
+
+		$BCFTOOLS_ROOT/bin/bcftools view -f '~{structuralQUALfilter}' ~{structuralVcfFile} >> ~{outputFileNamePrefix}.structural.PASS.vcf
+
+		awk '$1 !~ "#" {print}' ~{structuralVcfFile} | wc -l >~{outputFileNamePrefix}.structural.filteringReport.txt
+		awk '$1 !~ "#" {print}' ~{outputFileNamePrefix}.structural.PASS.vcf | wc -l >>~{outputFileNamePrefix}.structural.filteringReport.txt
+
+	>>>
+
+	runtime {
+		modules: "~{modules}"
+		memory:  "~{jobMemory} GB"
+		cpu:     "~{threads}"
+		timeout: "~{timeout}"
+	}
+
+	output {
+		File SV_vcf_location = "~{outputFileNamePrefix}.structural.PASS.vcf"
+		File structuralFilteringReport = "~{outputFileNamePrefix}.structural.filteringReport.txt"
+	}
+
+	meta {
+		output_meta: {
+			SV_vcf_location: "filtered structural .vcf",
+			structuralFilteringReport: "counts of variants pre and post filtering"
+		}
+	}
+}
+
 
 task filterSMALLs {
 	input {
@@ -156,11 +227,12 @@ task hrdResults {
 		File lohSegFile
 		String modules = "sigtools/2.4.1"
 		String sigtoolrScript = "/.mounts/labs/CGI/scratch/fbeaudry/wdl/sigtools_workflow/sigTools_runthrough.R"
-		String SVrefSigs = "$SIGTOOLS_ROOT/lib/R/library/signature.tools.lib/data/RefSigv1_Rearr.tsv"
+		String SVrefSigs = "/.mounts/labs/CGI/scratch/fbeaudry/wdl/sigtools_workflow/data/RefSigv0_Rearr.tsv"
+		String SNVrefSigs = "/.mounts/labs/CGI/scratch/fbeaudry/wdl/sigtools_workflow/data/COSMIC_v1_SBS_GRCh38.txt"
 		String genomeVersion = "hg38"
 		Int sigtoolsBootstrap = 200
 		Int indelCutoff = 10
-		Int jobMemory = 30
+		Int jobMemory = 50
 		Int threads = 1
 		Int timeout = 15
 	}
@@ -168,6 +240,7 @@ task hrdResults {
 	parameter_meta {
 		SV_vcf_location: "structural variant vcf"
 		SVrefSigs: "reference signatures for SVs"
+		SNVrefSigs: "reference signatures for SNVs"
 		indelVcfFiltered: "filtered INDEL .vcf"
 		snvVcfFiltered: "filtered SNV .vcf"
 		indelVcfIndexFiltered: "filtered INDEL .vcf.tbi (indexed)"
@@ -196,7 +269,8 @@ task hrdResults {
 			--bootstraps ~{sigtoolsBootstrap} \
 			--genomeVersion ~{genomeVersion} \
 			--indelCutoff ~{indelCutoff} \
-			--SVrefSigs ~{SVrefSigs} 
+			--SVrefSigs ~{SVrefSigs} \
+			--SNVrefSigs ~{SNVrefSigs}
 
 	>>> 
 
@@ -208,12 +282,22 @@ task hrdResults {
 	}
 
 	output {
-		File? JSONout = "~{outputFileNamePrefix}.signatures.json"
+		File? hrd_signatures = "~{outputFileNamePrefix}.signatures.json"
+		File? SBS_exposures = "~{outputFileNamePrefix}.exposures.SBS.json"
+		File? SV_exposures = "~{outputFileNamePrefix}.exposures.SV.json"
+		File? SV_catalog = "~{outputFileNamePrefix}.catalog.SV.json"
+		File? ID_catalog = "~{outputFileNamePrefix}.catalog.ID.json"
+		File? SBS_catalog = "~{outputFileNamePrefix}.catalog.SBS.json"
 	}
 
 	meta {
 		output_meta: {
-			JSONout : "JSON file of sigtools and CHORD signatures"
+			hrd_signatures : "JSON file of hrdetect signatures",
+			SBS_exposures: "JSON of single basepair substitution signatures",
+			SV_exposures: "JSON of structural variant signatures",
+			SV_catalog: "JSON cataloguing structural variants",
+			ID_catalog: "JSON cataloguing indels",
+			SBS_catalog: "JSON cataloguing  single basepair substitutions"
 		}
 	}
 }

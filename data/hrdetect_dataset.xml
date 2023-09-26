@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<hrdetect_dataset>
+    <hrdetect_data category="SBS_signatures">
+        <file_name>COSMIC_v1_SBS_GRCh38.txt</file_name>
+        <source>https://cancer.sanger.ac.uk/signatures/documents/415/COSMIC_v1_SBS_GRCh38.txt</source>
+        <download_date>29/06/23</download_date>
+        <last_edit_date>15/09/23</last_edit_date>
+        <notes_on_edits>changed "signature" to "SBS" in header</notes_on_edits>
+    </hrdetect_data>
+    <hrdetect_data category="SBS_signatures">
+        <file_name>COSMIC_v2_SBS_GRCh38.txt</file_name>
+        <source>https://cancer.sanger.ac.uk/signatures/documents/420/COSMIC_v2_SBS_GRCh38.txt</source>
+        <download_date>29/06/23</download_date>
+        <last_edit_date>NA</last_edit_date>
+    </hrdetect_data>
+    <hrdetect_data category="SBS_signatures">
+        <file_name>COSMIC_v3_SBS_GRCh38.txt</file_name>
+        <source>https://cancer.sanger.ac.uk/signatures/documents/431/COSMIC_v3_SBS_GRCh38.txt</source>
+        <download_date>29/06/23</download_date>
+        <last_edit_date>NA</last_edit_date>
+    </hrdetect_data>
+    <hrdetect_data category="SV_signatures">
+        <file_name>RefSigv1_Rearr.tsv</file_name>
+        <source>https://github.com/Nik-Zainal-Group/signature.tools.lib/blob/master/data/RefSigv1_Rearr.tsv</source>
+        <download_date>09/02/23</download_date>
+        <last_edit_date>NA</last_edit_date>
+    </hrdetect_data>
+    <hrdetect_data category="SV_signatures">
+        <file_name>RefSigv0_Rearr.tsv</file_name>
+        <source>https://static-content.springer.com/esm/art%3A10.1038%2Fnature17676/MediaObjects/41586_2016_BFnature17676_MOESM47_ESM.zip</source>
+        <download_date>15/09/23</download_date>
+        <last_edit_date>15/09/23</last_edit_date>
+        <notes_on_edits>changed header and column names to match signatures.tools expected format</notes_on_edits>
+        <original_file_name>Supplementary.Table.21.Signatures.v3.xlsx</original_file_name>
+    </hrdetect_data>
+
+</hrdetect_dataset>
