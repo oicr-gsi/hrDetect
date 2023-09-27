@@ -2,67 +2,51 @@ version 1.0
 
 workflow HRDetect {
 	input {
+		String outputFileNamePrefix
 		File structuralVcfFile
 		File smallsVcfFile
 		File smallsVcfIndex
 		File segFile
-		String sampleName
-		Boolean plotIt
 	}
 
 	parameter_meta {
 		structuralVcfFile: "Input VCF file of structural variants (eg. from delly)"
 		smallsVcfFile: "Input VCF file of SNV and indels (small mutations) (eg. from mutect2)"
-		smallsVcfIndex: "Index of input VCF file of SNV and indels"
 		segFile: "File for segmentations, used to estimate number of segments in Loss of heterozygosity (LOH) (eg. from sequenza)"
-		sampleName: "Name of sample matching the tumor sample in .vcf"
-		plotIt: "Create plots of sigtools results"
+		outputFileNamePrefix: "Name of sample matching the tumor sample in .vcf"
 	}
 
 	call filterStructural {
 		input: 
-			structuralVcfFile = structuralVcfFile,
-			sampleName = sampleName
+			outputFileNamePrefix = outputFileNamePrefix,
+			structuralVcfFile = structuralVcfFile
 	}
 
 	call filterSMALLs as filterINDELs {
 		input: 
+			outputFileNamePrefix = outputFileNamePrefix,
 			smallsVcfFile = smallsVcfFile,
 			smallsVcfIndex = smallsVcfIndex,
-			sampleName = sampleName,
 			smallType = "indel"
 	}
 
 	call filterSMALLs as filterSNVs {
 		input: 
+			outputFileNamePrefix = outputFileNamePrefix,
 			smallsVcfFile = smallsVcfFile,
 			smallsVcfIndex = smallsVcfIndex,
-			sampleName = sampleName,
 			smallType = "snp"
-	}
-
-	call convertSegFile {
-		input: 
-			segFile = segFile
 	}
 
 	call hrdResults {
 		input:
-			structuralBedpeFiltered = filterStructural.structuralbedpe,
+			outputFileNamePrefix = outputFileNamePrefix,
+			SV_vcf_location = filterStructural.SV_vcf_location,
 			indelVcfFiltered = filterINDELs.smallsVcfOutput,
 			indelVcfIndexFiltered = filterINDELs.smallsVcfIndexOutput,
 			snvVcfFiltered = filterSNVs.smallsVcfOutput,
 			snvVcfIndexFiltered = filterSNVs.smallsVcfIndexOutput,
-			lohSegFile = convertSegFile.segmentsOutput,
-			sampleName = sampleName
-	}
-
-	if(plotIt == true){
-		call plotResults {
-			input:
-				JSONin = hrdResults.JSONout,
-				sampleName = sampleName
-		}
+			lohSegFile = segFile
 	}
 
 	meta {
@@ -82,39 +66,41 @@ workflow HRDetect {
 			{
 				name: "sigtools/0.0.0.9000",
 				url: "https://github.com/Nik-Zainal-Group/signature.tools.lib"
-			},
-			{
-				name: "ggplot2/3.3.6",
-				url: "https://ggplot2.tidyverse.org/"
 			}
 		]
 		output_meta: {
-			JSONout : "sigtools and CHORD results in JSON",
-			sigTools_sigs_plot_Output: "plot of signature breakdown from sigtools",
-			sigTools_hrd_plot_Output: "plot of point estimate and bootstraped confidence intervals for HRD from sigtools",
 			indelFilteringReport: "counts of INDELs pre and post filtering",
 			snvFilteringReport: "counts of SNVs pre and post filtering",
-			structuralFilteringReport: "counts of structural variants pre and post filtering"
+			structuralFilteringReport: "counts of structural variants pre and post filtering",
+			hrd_signatures : "JSON file of hrdetect signatures",
+			SBS_exposures: "JSON of single basepair substitution signatures",
+			SV_exposures: "JSON of structural variant signatures",
+			SV_catalog: "JSON cataloguing structural variants",
+			ID_catalog: "JSON cataloguing indels",
+			SBS_catalog: "JSON cataloguing  single basepair substitutions"
+
 		}
 	}
 	output {
-		File indelFilteringReport = "~{sampleName}.INDEL.filteringReport.txt"
-		File snvFilteringReport = "~{sampleName}.SNP.filteringReport.txt"
-		File structuralFilteringReport = "~{sampleName}.structural.filteringReport.txt"
-		File JSONout = "~{sampleName}.signatures.json"
-		File? sigTools_sigs_plot_Output = "~{sampleName}.sigtools.sigs.png"
-		File? sigTools_hrd_plot_Output = "~{sampleName}.sigtools.hrd.png"
+		File indelFilteringReport = "~{outputFileNamePrefix}.INDEL.filteringReport.txt"
+		File snvFilteringReport = "~{outputFileNamePrefix}.SNP.filteringReport.txt"
+		File structuralFilteringReport = "~{outputFileNamePrefix}.structural.filteringReport.txt"
+		File? hrd_signatures = "~{outputFileNamePrefix}.signatures.json"
+		File? SBS_exposures = "~{outputFileNamePrefix}.exposures.SBS.json"
+		File? SV_exposures = "~{outputFileNamePrefix}.exposures.SV.json"
+		File? SV_catalog = "~{outputFileNamePrefix}.catalog.SV.json"
+		File? ID_catalog = "~{outputFileNamePrefix}.catalog.ID.json"
+		File? SBS_catalog = "~{outputFileNamePrefix}.catalog.SBS.json"
+
 	}
 }
 
 task filterStructural {
 	input {
+		String outputFileNamePrefix
 		File structuralVcfFile 
-		String basename = basename("~{structuralVcfFile}", ".vcf.gz")
 		String modules = "bcftools/1.9"
-		String sampleName
 		String structuralQUALfilter = "PASS"
-		String structuralTYPEfilter = "BND"
 		Int jobMemory = 5
 		Int threads = 1
 		Int timeout = 1
@@ -122,11 +108,9 @@ task filterStructural {
 
 	parameter_meta {
 		structuralVcfFile: "Vcf input file"
-		basename: "Base name"
 		modules: "Required environment modules"
-		sampleName: "Name of sample matching the tumor sample in .vcf"
+		outputFileNamePrefix: "Name of sample matching the tumor sample in .vcf"
 		structuralQUALfilter: "filter for filter calls to keep, eg. PASS"
-		structuralTYPEfilter: "filter for tye of structural calls to remove, eg. BND"
 		jobMemory: "Memory allocated for this job (GB)"
 		threads: "Requested CPU threads"
 		timeout: "Hours before task timeout"
@@ -135,15 +119,11 @@ task filterStructural {
 	command <<<
 		set -euo pipefail
 
-		echo  -e "chrom1\tstart1\tend1\tchrom2\tstart2\tend2\tsample\tsvclass"  >~{basename}.bedpe
 
-		$BCFTOOLS_ROOT/bin/bcftools view -f '~{structuralQUALfilter}' ~{structuralVcfFile} |\
-		$BCFTOOLS_ROOT/bin/bcftools filter -e 'INFO/SVTYPE = "~{structuralTYPEfilter}"' |\
-		$BCFTOOLS_ROOT/bin/bcftools query -f "%CHROM\t%POS\t%INFO/END\t%FILTER\t%INFO/SVTYPE\t%INFO/CIPOS\t%INFO/CIEND\n" |\
-		awk -v sampleName=~{sampleName} 'split($6,a,",") split($7,b,",") {print $1"\t"$2+a[1]-1"\t"$2+a[2]"\t"$1"\t"$3+b[1]-1"\t"$3+b[2]"\t"sampleName"\t"$5}' >>~{basename}.bedpe
+		$BCFTOOLS_ROOT/bin/bcftools view -f '~{structuralQUALfilter}' ~{structuralVcfFile} >> ~{outputFileNamePrefix}.structural.PASS.vcf
 
-		awk '$1 !~ "#" {print}' ~{structuralVcfFile} | wc -l >~{sampleName}.structural.filteringReport.txt
-		awk '$1 !~ "#" {print}' ~{basename}.bedpe | wc -l >>~{sampleName}.structural.filteringReport.txt
+		awk '$1 !~ "#" {print}' ~{structuralVcfFile} | wc -l >~{outputFileNamePrefix}.structural.filteringReport.txt
+		awk '$1 !~ "#" {print}' ~{outputFileNamePrefix}.structural.PASS.vcf | wc -l >>~{outputFileNamePrefix}.structural.filteringReport.txt
 
 	>>>
 
@@ -155,30 +135,30 @@ task filterStructural {
 	}
 
 	output {
-		File structuralbedpe = "~{basename}.bedpe"
-		File structuralFilteringReport = "~{sampleName}.structural.filteringReport.txt"
+		File SV_vcf_location = "~{outputFileNamePrefix}.structural.PASS.vcf"
+		File structuralFilteringReport = "~{outputFileNamePrefix}.structural.filteringReport.txt"
 	}
 
 	meta {
 		output_meta: {
-			structuralbedpe: "filtered structural .bedpe",
+			SV_vcf_location: "filtered structural .vcf",
 			structuralFilteringReport: "counts of variants pre and post filtering"
 		}
 	}
 }
 
+
 task filterSMALLs {
 	input {
-		File smallsVcfFile
+		String outputFileNamePrefix
 		File smallsVcfIndex
-		String basename = basename("~{smallsVcfFile}", ".vcf.gz")
-		String modules = "tabix/1.9 bcftools/1.9"
-		String sampleName
-		String genome 
-		String? difficultRegions
-		Float VAF
 		String smallType
-		String QUALfilter 
+		File smallsVcfFile
+		String modules = "tabix/1.9 bcftools/1.9 hg38/p12 hg38-dac-exclusion/1.0"
+		String genome = "$HG38_ROOT/hg38_random.fa"
+		String? difficultRegions = "--regions-file $HG38_DAC_EXCLUSION_ROOT/hg38-dac-exclusion.v2.bed"
+		Float VAF = 0.01
+		String QUALfilter = "FILTER~'haplotype' | FILTER~'clustered_events' | FILTER~'multiallelic' | FILTER~'slippage' |FILTER~'weak_evidence' | FILTER~'strand_bias' | FILTER~'position' | FILTER~'normal_artifact' |  FILTER~'map_qual' | FILTER~'germline' | FILTER~'fragment' | FILTER~'contamination' | FILTER~'base_qual'"
 		Int jobMemory = 10
 		Int threads = 1
 		Int timeout = 2
@@ -186,10 +166,8 @@ task filterSMALLs {
 
 	parameter_meta {
 		smallsVcfFile: "Vcf input file"
-		smallsVcfIndex: "Vcf input index file"
-		basename: "Base name"
 		modules: "Required environment modules"
-		sampleName: "Name of sample matching the tumor sample in .vcf"
+		outputFileNamePrefix: "Name of sample matching the tumor sample in .vcf"
 		genome: "Path to loaded genome .fa"
 		difficultRegions: "Path to .bed excluding difficult regions, string must include the flag --regions-file "
 		VAF: "minimum variant allele frequency to retain variant"
@@ -203,18 +181,16 @@ task filterSMALLs {
 	command <<<
 		set -euo pipefail
 
-		$BCFTOOLS_ROOT/bin/bcftools norm --multiallelics - --fasta-ref ~{genome} ~{difficultRegions} ~{smallsVcfFile} |\
-		$BCFTOOLS_ROOT/bin/bcftools filter -i "TYPE='~{smallType}'" |\
-		$BCFTOOLS_ROOT/bin/bcftools filter -e "~{QUALfilter}" |\
-		$BCFTOOLS_ROOT/bin/bcftools filter -i "(FORMAT/AD[0:1])/(FORMAT/AD[0:0]+FORMAT/AD[0:1]) >= ~{VAF}" >~{basename}.VAF.vcf
+		$BCFTOOLS_ROOT/bin/bcftools norm --multiallelics - --fasta-ref ~{genome} ~{difficultRegions} ~{smallsVcfFile} | \
+		$BCFTOOLS_ROOT/bin/bcftools filter -i "TYPE='~{smallType}'" | \
+		$BCFTOOLS_ROOT/bin/bcftools filter -e "~{QUALfilter}" | \
+		$BCFTOOLS_ROOT/bin/bcftools filter -i "(FORMAT/AD[0:1])/(FORMAT/AD[0:0]+FORMAT/AD[0:1]) >= ~{VAF}" >~{outputFileNamePrefix}.~{smallType}.VAF.vcf
 
-		bgzip ~{basename}.VAF.vcf
-		
-		tabix -p vcf ~{basename}.VAF.vcf.gz
+		bgzip ~{outputFileNamePrefix}.~{smallType}.VAF.vcf
+		tabix -p vcf ~{outputFileNamePrefix}.~{smallType}.VAF.vcf.gz
 
-		zcat ~{smallsVcfFile} | awk '$1 !~ "#" {print}'  | wc -l >~{sampleName}.filteringReport.txt
-				
-		zcat ~{basename}.VAF.vcf.gz | awk '$1 !~ "#" {print}'  | wc -l >>~{sampleName}.filteringReport.txt
+		zcat ~{smallsVcfFile} | awk '$1 !~ "#" {print}'  | wc -l >~{outputFileNamePrefix}.~{smallType}.filteringReport.txt
+		zcat ~{outputFileNamePrefix}.~{smallType}.VAF.vcf.gz | awk '$1 !~ "#" {print}'  | wc -l >>~{outputFileNamePrefix}.~{smallType}.filteringReport.txt
 
 	>>> 
 
@@ -226,9 +202,9 @@ task filterSMALLs {
 	}
 
 	output {
-		File smallsVcfOutput = "~{basename}.VAF.vcf.gz"
-		File smallsVcfIndexOutput = "~{basename}.VAF.vcf.gz.tbi"
-		File smallsFilteringReport = "~{sampleName}.filteringReport.txt"
+		File smallsVcfOutput = "~{outputFileNamePrefix}.~{smallType}.VAF.vcf.gz"
+		File smallsVcfIndexOutput = "~{outputFileNamePrefix}.~{smallType}.VAF.vcf.gz.tbi"
+		File smallsFilteringReport = "~{outputFileNamePrefix}.~{smallType}.filteringReport.txt"
 	}
 
 	meta {
@@ -240,80 +216,38 @@ task filterSMALLs {
 	}
 }
 
-task convertSegFile {
-	input {
-		File segFile 
-		String basename = basename("~{segFile}", "_segments.txt")
-		Int jobMemory = 5
-		Int threads = 1
-		Int timeout = 1
-	}
-
-	parameter_meta {
-		segFile: "segment input file from sequenza"
-		basename: "Base name"
-		jobMemory: "Memory allocated for this job (GB)"
-		threads: "Requested CPU threads"
-		timeout: "Hours before task timeout"
-	}
-
-	command <<<
-
-		set -euo pipefail
-
-		echo  -e "seg_no\tChromosome\tchromStart\tchromEnd\ttotal.copy.number.inNormal\tminor.copy.number.inNormal\ttotal.copy.number.inTumour\tminor.copy.number.inTumour" >~{basename}_segments.cna.txt
-
-		tail -n +2 ~{segFile} | \
-		awk 'split($1,a,"\"") split(a[2],b,"chr") {print NR"\t"b[2]"\t"$2"\t"$3"\t"2"\t"1"\t"$10"\t"$12}' >>~{basename}_segments.cna.txt
-	>>> 
-
-	runtime {
-		memory:  "~{jobMemory} GB"
-		cpu:     "~{threads}"
-		timeout: "~{timeout}"
-	}
-
-	output {
-		File segmentsOutput = "~{basename}_segments.cna.txt"
-	}
-
-	meta {
-		output_meta: {
-			segmentsOutput: "reformatted segmentation file"
-		}
-	}
-}
-
 task hrdResults {
 	input {
-		File structuralBedpeFiltered
+		String outputFileNamePrefix
+		File SV_vcf_location
 		File indelVcfFiltered
 		File indelVcfIndexFiltered
 		File snvVcfFiltered
 		File snvVcfIndexFiltered
 		File lohSegFile
-		String oncotree
-		String sampleName
-		String modules = "hrdetect-scripts/1.3"
-		String sigtoolrScript = "$HRDETECT_SCRIPTS_ROOT/bin/sigTools_runthrough.R"
+		String modules = "sigtools/2.4.1"
+		String sigtoolrScript = "/.mounts/labs/CGI/scratch/fbeaudry/wdl/sigtools_workflow/sigTools_runthrough.R"
+		String SVrefSigs = "/.mounts/labs/CGI/scratch/fbeaudry/wdl/sigtools_workflow/data/RefSigv0_Rearr.tsv"
+		String SNVrefSigs = "/.mounts/labs/CGI/scratch/fbeaudry/wdl/sigtools_workflow/data/COSMIC_v1_SBS_GRCh38.txt"
 		String genomeVersion = "hg38"
-		Int sigtoolsBootstrap = 2500
+		Int sigtoolsBootstrap = 200
 		Int indelCutoff = 10
-		Int jobMemory = 20
+		Int jobMemory = 50
 		Int threads = 1
-		Int timeout = 2
+		Int timeout = 15
 	}
 
 	parameter_meta {
-		structuralBedpeFiltered: "filtered structural variant .bedpe"
+		SV_vcf_location: "structural variant vcf"
+		SVrefSigs: "reference signatures for SVs"
+		SNVrefSigs: "reference signatures for SNVs"
 		indelVcfFiltered: "filtered INDEL .vcf"
 		snvVcfFiltered: "filtered SNV .vcf"
 		indelVcfIndexFiltered: "filtered INDEL .vcf.tbi (indexed)"
 		snvVcfIndexFiltered: "filtered SNV .vcf.tbi (indexed)"
 		lohSegFile: "reformatted segmentation file"
-		oncotree: "oncotree code of cancer"
 		sigtoolrScript: ".R script containing sigtools"
-		sampleName: "Name of sample matching the tumor sample in .vcf"		
+		outputFileNamePrefix: "Name of sample matching the tumor sample in .vcf"		
 		modules: "Required environment modules"
 		genomeVersion: "version of genome, eg hg38"
 		sigtoolsBootstrap: "Number of bootstraps for sigtools"
@@ -326,7 +260,17 @@ task hrdResults {
 	command <<<
 		set -euo pipefail
 
-		Rscript --vanilla ~{sigtoolrScript} -s ~{sampleName} -o ~{oncotree} -S ~{snvVcfFiltered} -I  ~{indelVcfFiltered} -V ~{structuralBedpeFiltered} -L ~{lohSegFile} -b ~{sigtoolsBootstrap} -g ~{genomeVersion} -i ~{indelCutoff}
+		Rscript ~{sigtoolrScript} \
+			--sampleName ~{outputFileNamePrefix} \
+			--snvFile ~{snvVcfFiltered} \
+			--indelFile  ~{indelVcfFiltered} \
+			--SVFile ~{SV_vcf_location} \
+			--LOHFile ~{lohSegFile} \
+			--bootstraps ~{sigtoolsBootstrap} \
+			--genomeVersion ~{genomeVersion} \
+			--indelCutoff ~{indelCutoff} \
+			--SVrefSigs ~{SVrefSigs} \
+			--SNVrefSigs ~{SNVrefSigs}
 
 	>>> 
 
@@ -338,60 +282,22 @@ task hrdResults {
 	}
 
 	output {
-		File JSONout = "~{sampleName}.signatures.json"
+		File? hrd_signatures = "~{outputFileNamePrefix}.signatures.json"
+		File? SBS_exposures = "~{outputFileNamePrefix}.exposures.SBS.json"
+		File? SV_exposures = "~{outputFileNamePrefix}.exposures.SV.json"
+		File? SV_catalog = "~{outputFileNamePrefix}.catalog.SV.json"
+		File? ID_catalog = "~{outputFileNamePrefix}.catalog.ID.json"
+		File? SBS_catalog = "~{outputFileNamePrefix}.catalog.SBS.json"
 	}
 
 	meta {
 		output_meta: {
-			JSONout : "JSON file of sigtools and CHORD signatures"
-		}
-	}
-}
-
-task plotResults {
-	input {
-		File JSONin 
-		String sampleName
-		String modules = "hrdetect-scripts/1.3"
-		String plotrScript = "$HRDETECT_SCRIPTS_ROOT/bin/sigTools_plotter.R"
-		Int jobMemory = 20
-		Int threads = 1
-		Int timeout = 2
-	}
-
-	parameter_meta {
-		plotrScript: ".R plotting script"
-		sampleName: "Name of sample matching the tumor sample in .vcf"
-		JSONin: "JSON file of sigtools and CHORD signatures"		
-		modules: "Required environment modules"
-		jobMemory: "Memory allocated for this job (GB)"
-		threads: "Requested CPU threads"
-		timeout: "Hours before task timeout"
-	}
-
-	command <<<
-		set -euo pipefail
-
-		Rscript --vanilla ~{plotrScript} ~{JSONin}
-
-	>>> 
-
-	runtime {
-		modules: "~{modules}"
-		memory:  "~{jobMemory} GB"
-		cpu:     "~{threads}"
-		timeout: "~{timeout}"
-	}
-
-	output {
-		File sigTools_sigs_plot_Output = "~{sampleName}.sigtools.sigs.png"
-		File sigTools_hrd_plot_Output = "~{sampleName}.sigtools.hrd.png"
-	}
-
-	meta {
-		output_meta: {
-			sigTools_sigs_plot_Output: "plot of signature breakdown from sigtools",
-			sigTools_hrd_plot_Output: "plot of point estimate and bootstraped confidence intervals for HRD from sigtools"
+			hrd_signatures : "JSON file of hrdetect signatures",
+			SBS_exposures: "JSON of single basepair substitution signatures",
+			SV_exposures: "JSON of structural variant signatures",
+			SV_catalog: "JSON cataloguing structural variants",
+			ID_catalog: "JSON cataloguing indels",
+			SBS_catalog: "JSON cataloguing  single basepair substitutions"
 		}
 	}
 }
