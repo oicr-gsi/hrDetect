@@ -65,8 +65,10 @@
             "HRDetect.hrdResults.modules": null,
             "HRDetect.hrdResults.sigtoolrScript": null,
             "HRDetect.hrdResults.SVrefSigs": null,
+            "HRDetect.hrdResults.SNVrefSigs":null,
             "HRDetect.hrdResults.sigtoolsBootstrap": null,
             "HRDetect.hrdResults.indelCutoff": null,
+            "HRDetect.hrdResults.threads": null,
             "HRDetect.filterINDELs.genome": "$HG38_ROOT/hg38_random.fa",
             "HRDetect.filterINDELs.modules": "tabix/1.9 bcftools/1.9 hg38/p12 hg38-dac-exclusion/1.0",
             "HRDetect.filterSNVs.modules": "tabix/1.9 bcftools/1.9 hg38/p12 hg38-dac-exclusion/1.0",
@@ -121,7 +123,7 @@
                 ],
                 "type": "ALL"
             },
-            "HRDetect.hrd_SBS_exposures": {
+            "HRDetect.SBS_exposures": {
                 "contents": [
                     {
                         "outputDirectory": "@SCRATCH@/@DATE@_Workflow_HRDetect_PANX_1309Test_@JENKINSID@"
@@ -153,7 +155,7 @@
                 ],
                 "type": "ALL"
             },
-            "HRDetect.catalog": {
+            "HRDetect.SBS_catalog": {
                 "contents": [
                     {
                         "outputDirectory": "@SCRATCH@/@DATE@_Workflow_HRDetect_PANX_1309Test_@JENKINSID@"
