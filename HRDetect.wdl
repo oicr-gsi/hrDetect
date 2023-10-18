@@ -93,28 +93,17 @@ workflow HRDetect {
 			}
 		]
 		output_meta: {
-			indelFilteringReport: "counts of INDELs pre and post filtering",
-			snvFilteringReport: "counts of SNVs pre and post filtering",
-			structuralFilteringReport: "counts of structural variants pre and post filtering",
 			hrd_signatures : "JSON file of hrdetect signatures",
-			SBS_exposures: "JSON of single basepair substitution signatures",
 			SV_exposures: "JSON of structural variant signatures",
 			SV_catalog: "JSON cataloguing structural variants",
-			ID_catalog: "JSON cataloguing indels",
-			SBS_catalog: "JSON cataloguing  single basepair substitutions"
+			ID_catalog: "JSON cataloguing indels"
 		}
 	}
 	output {
-		File indelFilteringReport = "~{outputFileNamePrefix}.INDEL.filteringReport.txt"
-		File snvFilteringReport = "~{outputFileNamePrefix}.SNP.filteringReport.txt"
-		File structuralFilteringReport = "~{outputFileNamePrefix}.structural.filteringReport.txt"
-		File? hrd_signatures = "~{outputFileNamePrefix}.signatures.json"
-		File? SBS_exposures = "~{outputFileNamePrefix}.exposures.SBS.json"
-		File? SV_exposures = "~{outputFileNamePrefix}.exposures.SV.json"
-		File? SV_catalog = "~{outputFileNamePrefix}.catalog.SV.json"
-		File? ID_catalog = "~{outputFileNamePrefix}.catalog.ID.json"
-		File? SBS_catalog = "~{outputFileNamePrefix}.catalog.SBS.json"
-
+		File hrd_signatures = hrdResults.hrd_signatures
+		File SBS_exposures = hrdResults.SBS_exposures
+		File SV_exposures = hrdResults.SV_exposures
+		File ID_catalog = hrdResults.ID_catalog
 	}
 }
 
@@ -305,12 +294,10 @@ task hrdResults {
 	}
 
 	output {
-		File? hrd_signatures = "~{outputFileNamePrefix}.signatures.json"
-		File? SBS_exposures = "~{outputFileNamePrefix}.exposures.SBS.json"
-		File? SV_exposures = "~{outputFileNamePrefix}.exposures.SV.json"
-		File? SV_catalog = "~{outputFileNamePrefix}.catalog.SV.json"
-		File? ID_catalog = "~{outputFileNamePrefix}.catalog.ID.json"
-		File? SBS_catalog = "~{outputFileNamePrefix}.catalog.SBS.json"
+		File hrd_signatures = "~{outputFileNamePrefix}.signatures.json"
+		File SBS_exposures = "~{outputFileNamePrefix}.exposures.SBS.json"
+		File SV_exposures = "~{outputFileNamePrefix}.exposures.SV.json"
+		File ID_catalog = "~{outputFileNamePrefix}.catalog.ID.json"
 	}
 
 	meta {
@@ -318,9 +305,7 @@ task hrdResults {
 			hrd_signatures : "JSON file of hrdetect signatures",
 			SBS_exposures: "JSON of single basepair substitution signatures",
 			SV_exposures: "JSON of structural variant signatures",
-			SV_catalog: "JSON cataloguing structural variants",
-			ID_catalog: "JSON cataloguing indels",
-			SBS_catalog: "JSON cataloguing  single basepair substitutions"
+			ID_catalog: "JSON cataloguing indels"
 		}
 	}
 }

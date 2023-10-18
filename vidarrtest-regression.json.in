@@ -91,30 +91,6 @@
         },
         "id": "PANX_1309Test",
         "metadata": {
-            "HRDetect.indelFilteringReport": {
-                "contents": [
-                    {
-                        "outputDirectory": "@SCRATCH@/@DATE@_Workflow_HRDetect_PANX_1309Test_@JENKINSID@"
-                    }
-                ],
-                "type": "ALL"
-            },
-            "HRDetect.snvFilteringReport": {
-                "contents": [
-                    {
-                        "outputDirectory": "@SCRATCH@/@DATE@_Workflow_HRDetect_PANX_1309Test_@JENKINSID@"
-                    }
-                ],
-                "type": "ALL"
-            },
-            "HRDetect.structuralFilteringReport": {
-                "contents": [
-                    {
-                        "outputDirectory": "@SCRATCH@/@DATE@_Workflow_HRDetect_PANX_1309Test_@JENKINSID@"
-                    }
-                ],
-                "type": "ALL"
-            },
             "HRDetect.hrd_signatures": {
                 "contents": [
                     {
@@ -139,23 +115,7 @@
                 ],
                 "type": "ALL"
             },
-            "HRDetect.SV_catalog": {
-                "contents": [
-                    {
-                        "outputDirectory": "@SCRATCH@/@DATE@_Workflow_HRDetect_PANX_1309Test_@JENKINSID@"
-                    }
-                ],
-                "type": "ALL"
-            },
             "HRDetect.ID_catalog": {
-                "contents": [
-                    {
-                        "outputDirectory": "@SCRATCH@/@DATE@_Workflow_HRDetect_PANX_1309Test_@JENKINSID@"
-                    }
-                ],
-                "type": "ALL"
-            },
-            "HRDetect.SBS_catalog": {
                 "contents": [
                     {
                         "outputDirectory": "@SCRATCH@/@DATE@_Workflow_HRDetect_PANX_1309Test_@JENKINSID@"

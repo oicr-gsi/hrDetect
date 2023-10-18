@@ -69,63 +69,56 @@ Parameter|Value|Default|Description
 
 Output | Type | Description
 ---|---|---
-`indelFilteringReport`|File|counts of INDELs pre and post filtering
-`snvFilteringReport`|File|counts of SNVs pre and post filtering
-`structuralFilteringReport`|File|counts of structural variants pre and post filtering
-`hrd_signatures`|File?|JSON file of hrdetect signatures
-`SBS_exposures`|File?|JSON of single basepair substitution signatures
-`SV_exposures`|File?|JSON of structural variant signatures
-`SV_catalog`|File?|JSON cataloguing structural variants
-`ID_catalog`|File?|JSON cataloguing indels
-`SBS_catalog`|File?|JSON cataloguing  single basepair substitutions
+`hrd_signatures`|File|JSON file of hrdetect signatures
+`SBS_exposures`|File|JSON of single basepair substitution signatures
+`SV_exposures`|File|JSON of structural variant signatures
+`ID_catalog`|File|JSON cataloguing indels
 
 
-## Commands
- This section lists command(s) run by WORKFLOW workflow
- 
- * Running WORKFLOW
- 
- ```
- 		set -euo pipefail
- 
- 
- 		$BCFTOOLS_ROOT/bin/bcftools view -f '~{structuralQUALfilter}' ~{structuralVcfFile} >> ~{outputFileNamePrefix}.structural.PASS.vcf
- 
- 		awk '$1 !~ "#" {print}' ~{structuralVcfFile} | wc -l >~{outputFileNamePrefix}.structural.filteringReport.txt
- 		awk '$1 !~ "#" {print}' ~{outputFileNamePrefix}.structural.PASS.vcf | wc -l >>~{outputFileNamePrefix}.structural.filteringReport.txt
- 
- ```
- ```
- 		set -euo pipefail
- 
- 		$BCFTOOLS_ROOT/bin/bcftools norm --multiallelics - --fasta-ref ~{genome} ~{difficultRegions} ~{smallsVcfFile} | \
- 		$BCFTOOLS_ROOT/bin/bcftools filter -i "TYPE='~{smallType}'" | \
- 		$BCFTOOLS_ROOT/bin/bcftools filter -e "~{QUALfilter}" | \
- 		$BCFTOOLS_ROOT/bin/bcftools filter -i "(FORMAT/AD[0:1])/(FORMAT/AD[0:0]+FORMAT/AD[0:1]) >= ~{VAF}" >~{outputFileNamePrefix}.~{smallType}.VAF.vcf
- 
- 		bgzip ~{outputFileNamePrefix}.~{smallType}.VAF.vcf
- 		tabix -p vcf ~{outputFileNamePrefix}.~{smallType}.VAF.vcf.gz
- 
- 		zcat ~{smallsVcfFile} | awk '$1 !~ "#" {print}'  | wc -l >~{outputFileNamePrefix}.~{smallType}.filteringReport.txt
- 		zcat ~{outputFileNamePrefix}.~{smallType}.VAF.vcf.gz | awk '$1 !~ "#" {print}'  | wc -l >>~{outputFileNamePrefix}.~{smallType}.filteringReport.txt
- 
- ```
- ```
- 		set -euo pipefail
- 
- 		Rscript ~{sigtoolrScript} \
- 			--sampleName ~{outputFileNamePrefix} \
- 			--snvFile ~{snvVcfFiltered} \
- 			--indelFile  ~{indelVcfFiltered} \
- 			--SVFile ~{SV_vcf_location} \
- 			--LOHFile ~{lohSegFile} \
- 			--bootstraps ~{sigtoolsBootstrap} \
- 			--genomeVersion ~{genomeVersion} \
- 			--indelCutoff ~{indelCutoff} \
- 			--SVrefSigs ~{SVrefSigs} \
- 			--SNVrefSigs ~{SNVrefSigs}
- 
- ```
+This section lists command(s) run by WORKFLOW workflow
+  
+  * Running WORKFLOW
+  
+  ```
+  		set -euo pipefail
+  
+  
+  		$BCFTOOLS_ROOT/bin/bcftools view -f '~{structuralQUALfilter}' ~{structuralVcfFile} >> ~{outputFileNamePrefix}.structural.PASS.vcf
+  
+  		awk '$1 !~ "#" {print}' ~{structuralVcfFile} | wc -l >~{outputFileNamePrefix}.structural.filteringReport.txt
+  		awk '$1 !~ "#" {print}' ~{outputFileNamePrefix}.structural.PASS.vcf | wc -l >>~{outputFileNamePrefix}.structural.filteringReport.txt
+  
+  ```
+  ```
+  		set -euo pipefail
+  
+  		$BCFTOOLS_ROOT/bin/bcftools norm --multiallelics - --fasta-ref ~{genome} ~{difficultRegions} ~{smallsVcfFile} | \
+  		$BCFTOOLS_ROOT/bin/bcftools filter -i "TYPE='~{smallType}'" | \
+  		$BCFTOOLS_ROOT/bin/bcftools filter -e "~{QUALfilter}" | \
+  		$BCFTOOLS_ROOT/bin/bcftools filter -i "(FORMAT/AD[0:1])/(FORMAT/AD[0:0]+FORMAT/AD[0:1]) >= ~{VAF}" >~{outputFileNamePrefix}.~{smallType}.VAF.vcf
+  
+  		bgzip ~{outputFileNamePrefix}.~{smallType}.VAF.vcf
+  		tabix -p vcf ~{outputFileNamePrefix}.~{smallType}.VAF.vcf.gz
+  
+  		zcat ~{smallsVcfFile} | awk '$1 !~ "#" {print}'  | wc -l >~{outputFileNamePrefix}.~{smallType}.filteringReport.txt
+  		zcat ~{outputFileNamePrefix}.~{smallType}.VAF.vcf.gz | awk '$1 !~ "#" {print}'  | wc -l >>~{outputFileNamePrefix}.~{smallType}.filteringReport.txt
+  
+  ```
+  ```
+  		set -euo pipefail
+  
+  		Rscript ~{sigtoolrScript} \
+  			--sampleName ~{outputFileNamePrefix} \
+  			--snvFile ~{snvVcfFiltered} \
+  			--indelFile  ~{indelVcfFiltered} \
+  			--SVFile ~{SV_vcf_location} \
+  			--LOHFile ~{lohSegFile} \
+  			--bootstraps ~{sigtoolsBootstrap} \
+  			--genomeVersion ~{genomeVersion} \
+  			--indelCutoff ~{indelCutoff} \
+  			--SVrefSigs ~{SVrefSigs} \
+  			--SNVrefSigs ~{SNVrefSigs}
+  
  ## Support
 
 For support, please file an issue on the [Github project](https://github.com/oicr-gsi) or send an email to gsi@oicr.on.ca .
