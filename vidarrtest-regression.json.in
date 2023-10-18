@@ -50,6 +50,7 @@
                 "type": "EXTERNAL"
             },
             "HRDetect.filterSNVs.genome": "$HG38_ROOT/hg38_random.fa",
+            "HRDetect.reference": "hg38",
             "HRDetect.filterINDELs.genome": "$HG38_ROOT/hg38_random.fa",
             "HRDetect.filterINDELs.modules": "tabix/1.9 bcftools/1.9 hg38/p12 hg38-dac-exclusion/1.0",
             "HRDetect.filterSNVs.modules": "tabix/1.9 bcftools/1.9 hg38/p12 hg38-dac-exclusion/1.0",

@@ -1,5 +1,11 @@
 version 1.0
 
+struct GenomeResources {
+	String filterSMALLsModules
+	String genome
+	String difficultRegions
+}
+
 workflow HRDetect {
 	input {
 		String outputFileNamePrefix
@@ -7,13 +13,24 @@ workflow HRDetect {
 		File smallsVcfFile
 		File smallsVcfIndex
 		File segFile
+		String reference
 	}
 
 	parameter_meta {
 		structuralVcfFile: "Input VCF file of structural variants (eg. from delly)"
 		smallsVcfFile: "Input VCF file of SNV and indels (small mutations) (eg. from mutect2)"
+		smallsVcfIndex: "Index file for smallsVcfFile"
 		segFile: "File for segmentations, used to estimate number of segments in Loss of heterozygosity (LOH) (eg. from sequenza)"
 		outputFileNamePrefix: "Name of sample matching the tumor sample in .vcf"
+		reference: "Reference genome version"
+	}
+
+	Map[String,GenomeResources] resources = {
+		"hg38": {
+			"filterSMALLsModules": "tabix/1.9 bcftools/1.9 hg38/p12 hg38-dac-exclusion/1.0",
+			"genome": "$HG38_ROOT/hg38_random.fa",
+			"difficultRegions": "--regions-file $HG38_DAC_EXCLUSION_ROOT/hg38-dac-exclusion.v2.bed"
+		}
 	}
 
 	call filterStructural {
@@ -27,7 +44,10 @@ workflow HRDetect {
 			outputFileNamePrefix = outputFileNamePrefix,
 			smallsVcfFile = smallsVcfFile,
 			smallsVcfIndex = smallsVcfIndex,
-			smallType = "indel"
+			smallType = "indel",
+			modules = resources[reference].filterSMALLsModules,
+			genome = resources[reference].genome,
+			difficultRegions = resources[reference].difficultRegions
 	}
 
 	call filterSMALLs as filterSNVs {
@@ -35,7 +55,10 @@ workflow HRDetect {
 			outputFileNamePrefix = outputFileNamePrefix,
 			smallsVcfFile = smallsVcfFile,
 			smallsVcfIndex = smallsVcfIndex,
-			smallType = "snp"
+			smallType = "snp",
+			modules = resources[reference].filterSMALLsModules,
+			genome = resources[reference].genome,
+			difficultRegions = resources[reference].difficultRegions
 	}
 
 	call hrdResults {
@@ -46,7 +69,8 @@ workflow HRDetect {
 			indelVcfIndexFiltered = filterINDELs.smallsVcfIndexOutput,
 			snvVcfFiltered = filterSNVs.smallsVcfOutput,
 			snvVcfIndexFiltered = filterSNVs.smallsVcfIndexOutput,
-			lohSegFile = segFile
+			lohSegFile = segFile,
+			genomeVersion = reference
 	}
 
 	meta {
@@ -78,7 +102,6 @@ workflow HRDetect {
 			SV_catalog: "JSON cataloguing structural variants",
 			ID_catalog: "JSON cataloguing indels",
 			SBS_catalog: "JSON cataloguing  single basepair substitutions"
-
 		}
 	}
 	output {
@@ -154,9 +177,9 @@ task filterSMALLs {
 		File smallsVcfIndex
 		String smallType
 		File smallsVcfFile
-		String modules = "tabix/1.9 bcftools/1.9 hg38/p12 hg38-dac-exclusion/1.0"
-		String genome = "$HG38_ROOT/hg38_random.fa"
-		String? difficultRegions = "--regions-file $HG38_DAC_EXCLUSION_ROOT/hg38-dac-exclusion.v2.bed"
+		String modules
+		String genome
+		String? difficultRegions
 		Float VAF = 0.01
 		String QUALfilter = "FILTER~'haplotype' | FILTER~'clustered_events' | FILTER~'multiallelic' | FILTER~'slippage' |FILTER~'weak_evidence' | FILTER~'strand_bias' | FILTER~'position' | FILTER~'normal_artifact' |  FILTER~'map_qual' | FILTER~'germline' | FILTER~'fragment' | FILTER~'contamination' | FILTER~'base_qual'"
 		Int jobMemory = 10
@@ -225,11 +248,11 @@ task hrdResults {
 		File snvVcfFiltered
 		File snvVcfIndexFiltered
 		File lohSegFile
-		String modules = "sigtools/2.4.1"
-		String sigtoolrScript = "/.mounts/labs/CGI/scratch/fbeaudry/wdl/sigtools_workflow/sigTools_runthrough.R"
-		String SVrefSigs = "/.mounts/labs/CGI/scratch/fbeaudry/wdl/sigtools_workflow/data/RefSigv0_Rearr.tsv"
-		String SNVrefSigs = "/.mounts/labs/CGI/scratch/fbeaudry/wdl/sigtools_workflow/data/COSMIC_v1_SBS_GRCh38.txt"
-		String genomeVersion = "hg38"
+		String modules = "sigtools/2.4.1 sigtools-data/1.0 sigtools-rscript/1.0"
+		String sigtoolrScript = "$SIGTOOLS_RSCRIPT_ROOT/sigTools_runthrough.R"
+		String SVrefSigs = "$SIGTOOLS_DATA_ROOT/RefSigv0_Rearr.tsv"
+		String SNVrefSigs = "$SIGTOOLS_DATA_ROOT/COSMIC_v1_SBS_GRCh38.txt"
+		String genomeVersion
 		Int sigtoolsBootstrap = 200
 		Int indelCutoff = 10
 		Int jobMemory = 50
