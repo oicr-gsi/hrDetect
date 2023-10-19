@@ -4,5 +4,5 @@ set -o errexit
 set -o pipefail
 
 cd $1
-
-find . -regex '.*\.signatures.json$' -exec md5sum {} \;
+find . -name '*.json' -xtype f -exec sh -c "cat {} | md5sum" \;
+ls | sed 's/.*\.//' | sort | uniq -c

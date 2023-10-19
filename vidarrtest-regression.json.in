@@ -64,6 +64,7 @@
             "HRDetect.filterSNVs.timeout": null,
             "HRDetect.hrdResults.modules": null,
             "HRDetect.hrdResults.sigtoolrScript": null,
+            "HRDetect.hrdResults.callHrdetectScript": null,
             "HRDetect.hrdResults.SVrefSigs": null,
             "HRDetect.hrdResults.SNVrefSigs":null,
             "HRDetect.hrdResults.sigtoolsBootstrap": null,
@@ -128,7 +129,7 @@
             {
                 "metrics_calculate": "@CHECKOUT@/tests/calculate.sh",
                 "metrics_compare": "@CHECKOUT@/tests/compare.sh",
-                "output_metrics": "/.mounts/labs/gsi/testdata/HRDetect/1.0/output_metrics/PANX_1309Test.metrics",
+                "output_metrics": "/.mounts/labs/gsi/testdata/HRDetect/1.0/output_metrics/PANX_1309_Test.metrics",
                 "type": "script"
             }
         ]
