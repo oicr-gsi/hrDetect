@@ -1,4 +1,6 @@
 # CHANGELOG
+## 1.5 -2023-10-18
+Finalized version ready to release
 ## 1.4 - 2022-07-26
 - Fixed bugs
 	- removed rare fit set to Pancreas
