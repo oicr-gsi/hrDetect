@@ -2,6 +2,10 @@
 
 library(optparse)
 
+# Calling call_hrdetect.R
+basedir <- paste(Sys.getenv(c("BASE_DIR")), sep='/')
+source(paste0(basedir, "/call_hrdetect.R"))
+
 option_list = list(
   make_option(c("-s", "--sampleName"), type="character", default=NULL, help="sample name", metavar="character"),
   make_option(c("-r", "--SVrefSigs"), type="character", default=NULL, help="structural variant reference signatures", metavar="character"),

@@ -238,8 +238,7 @@ task hrdResults {
 		File snvVcfIndexFiltered
 		File lohSegFile
 		String modules = "sigtools/2.4.1 sigtools-data/1.0 sigtools-rscript/1.0"
-		String sigtoolrScript = "$SIGTOOLS_RSCRIPT_ROOT/sigTools_runthrough.R"
-		String callHrdetectScript = "$SIGTOOLS_RSCRIPT_ROOT/call_hrdetect.R"
+		String sigtoolrScript = "$SIGTOOLS_RSCRIPT_ROOT/scripts/sigTools_runthrough.R"
 		String SVrefSigs = "$SIGTOOLS_DATA_ROOT/RefSigv0_Rearr.tsv"
 		String SNVrefSigs = "$SIGTOOLS_DATA_ROOT/COSMIC_v1_SBS_GRCh38.txt"
 		String genomeVersion
@@ -260,7 +259,6 @@ task hrdResults {
 		snvVcfIndexFiltered: "filtered SNV .vcf.tbi (indexed)"
 		lohSegFile: "reformatted segmentation file"
 		sigtoolrScript: ".R script containing sigtools"
-		callHrdetectScript: "R script to call hrdectect script"
 		outputFileNamePrefix: "Name of sample matching the tumor sample in .vcf"		
 		modules: "Required environment modules"
 		genomeVersion: "version of genome, eg hg38"
@@ -274,7 +272,6 @@ task hrdResults {
 	command <<<
 		set -euo pipefail
 
-		Rscript ~{callHrdetectScript}
 		Rscript ~{sigtoolrScript} \
 			--sampleName ~{outputFileNamePrefix} \
 			--snvFile ~{snvVcfFiltered} \
