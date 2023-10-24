@@ -64,7 +64,6 @@
             "HRDetect.filterSNVs.timeout": null,
             "HRDetect.hrdResults.modules": null,
             "HRDetect.hrdResults.sigtoolrScript": null,
-            "HRDetect.hrdResults.callHrdetectScript": null,
             "HRDetect.hrdResults.SVrefSigs": null,
             "HRDetect.hrdResults.SNVrefSigs":null,
             "HRDetect.hrdResults.sigtoolsBootstrap": null,

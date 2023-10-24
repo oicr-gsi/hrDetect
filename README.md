@@ -55,7 +55,7 @@ Parameter|Value|Default|Description
 `filterSNVs.threads`|Int|1|Requested CPU threads
 `filterSNVs.timeout`|Int|2|Hours before task timeout
 `hrdResults.modules`|String|"sigtools/2.4.1 sigtools-data/1.0 sigtools-rscript/1.0"|Required environment modules
-`hrdResults.sigtoolrScript`|String|"$SIGTOOLS_RSCRIPT_ROOT/sigTools_runthrough.R"|.R script containing sigtools
+`hrdResults.sigtoolrScript`|String|"$SIGTOOLS_RSCRIPT_ROOT/scripts/sigTools_runthrough.R"|.R script containing sigtools
 `hrdResults.SVrefSigs`|String|"$SIGTOOLS_DATA_ROOT/RefSigv0_Rearr.tsv"|reference signatures for SVs
 `hrdResults.SNVrefSigs`|String|"$SIGTOOLS_DATA_ROOT/COSMIC_v1_SBS_GRCh38.txt"|reference signatures for SNVs
 `hrdResults.sigtoolsBootstrap`|Int|200|Number of bootstraps for sigtools
