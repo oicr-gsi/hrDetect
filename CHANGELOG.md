@@ -1,4 +1,6 @@
 # CHANGELOG
+## 1.5.1 -2023-10-24
+Update to call call_hrdetect.R from sigTools_runthrough.R
 ## 1.5 -2023-10-18
 Finalized version ready to release
 ## 1.4 - 2022-07-26
