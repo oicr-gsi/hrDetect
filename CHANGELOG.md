@@ -1,4 +1,6 @@
 # CHANGELOG
+## 1.5.2 -2023-10-25
+Change workflow name
 ## 1.5.1 -2023-10-24
 Update to call call_hrdetect.R from sigTools_runthrough.R
 ## 1.5 -2023-10-18
@@ -8,7 +10,7 @@ Finalized version ready to release
 	- removed rare fit set to Pancreas
 - Split INDEL and SNV cutoffs
 - Protects from crash on tissue not in catalog
-- Protects from crash on low SNV/INDEL counts
+- Protects from crash on low SNV/INDEL countsS
 - New function to extend LOH (default: OFF)
 - Added CNV signatures (default: OFF)
 

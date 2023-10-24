@@ -1,4 +1,4 @@
-# HRDetect
+# hrdetect
 
 Homologous Recombination Deficiency (HRD) Prediction Workflow using sig.tools
 
@@ -15,7 +15,7 @@ Homologous Recombination Deficiency (HRD) Prediction Workflow using sig.tools
 
 ### Cromwell
 ```
-java -jar cromwell.jar run HRDetect.wdl --inputs inputs.json
+java -jar cromwell.jar run hrdetect.wdl --inputs inputs.json
 ```
 
 ### Inputs
@@ -75,9 +75,9 @@ Output | Type | Description
 `ID_catalog`|File|JSON cataloguing indels
 
 
-This section lists command(s) run by WORKFLOW workflow
+This section lists command(s) run by hrdetect workflow
   
-  * Running WORKFLOW
+  * Running hrdetect
   
   ```
   		set -euo pipefail

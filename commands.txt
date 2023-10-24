@@ -1,44 +1,44 @@
-This section lists command(s) run by WORKFLOW workflow
- 
- * Running WORKFLOW
- 
- ```
- 		set -euo pipefail
- 
- 
- 		$BCFTOOLS_ROOT/bin/bcftools view -f '~{structuralQUALfilter}' ~{structuralVcfFile} >> ~{outputFileNamePrefix}.structural.PASS.vcf
- 
- 		awk '$1 !~ "#" {print}' ~{structuralVcfFile} | wc -l >~{outputFileNamePrefix}.structural.filteringReport.txt
- 		awk '$1 !~ "#" {print}' ~{outputFileNamePrefix}.structural.PASS.vcf | wc -l >>~{outputFileNamePrefix}.structural.filteringReport.txt
- 
- ```
- ```
- 		set -euo pipefail
- 
- 		$BCFTOOLS_ROOT/bin/bcftools norm --multiallelics - --fasta-ref ~{genome} ~{difficultRegions} ~{smallsVcfFile} | \
- 		$BCFTOOLS_ROOT/bin/bcftools filter -i "TYPE='~{smallType}'" | \
- 		$BCFTOOLS_ROOT/bin/bcftools filter -e "~{QUALfilter}" | \
- 		$BCFTOOLS_ROOT/bin/bcftools filter -i "(FORMAT/AD[0:1])/(FORMAT/AD[0:0]+FORMAT/AD[0:1]) >= ~{VAF}" >~{outputFileNamePrefix}.~{smallType}.VAF.vcf
- 
- 		bgzip ~{outputFileNamePrefix}.~{smallType}.VAF.vcf
- 		tabix -p vcf ~{outputFileNamePrefix}.~{smallType}.VAF.vcf.gz
- 
- 		zcat ~{smallsVcfFile} | awk '$1 !~ "#" {print}'  | wc -l >~{outputFileNamePrefix}.~{smallType}.filteringReport.txt
- 		zcat ~{outputFileNamePrefix}.~{smallType}.VAF.vcf.gz | awk '$1 !~ "#" {print}'  | wc -l >>~{outputFileNamePrefix}.~{smallType}.filteringReport.txt
- 
- ```
- ```
- 		set -euo pipefail
- 
- 		Rscript ~{sigtoolrScript} \
- 			--sampleName ~{outputFileNamePrefix} \
- 			--snvFile ~{snvVcfFiltered} \
- 			--indelFile  ~{indelVcfFiltered} \
- 			--SVFile ~{SV_vcf_location} \
- 			--LOHFile ~{lohSegFile} \
- 			--bootstraps ~{sigtoolsBootstrap} \
- 			--genomeVersion ~{genomeVersion} \
- 			--indelCutoff ~{indelCutoff} \
- 			--SVrefSigs ~{SVrefSigs} \
- 			--SNVrefSigs ~{SNVrefSigs}
+This section lists command(s) run by hrdetect workflow
+  
+  * Running hrdetect
+  
+  ```
+  		set -euo pipefail
+  
+  
+  		$BCFTOOLS_ROOT/bin/bcftools view -f '~{structuralQUALfilter}' ~{structuralVcfFile} >> ~{outputFileNamePrefix}.structural.PASS.vcf
+  
+  		awk '$1 !~ "#" {print}' ~{structuralVcfFile} | wc -l >~{outputFileNamePrefix}.structural.filteringReport.txt
+  		awk '$1 !~ "#" {print}' ~{outputFileNamePrefix}.structural.PASS.vcf | wc -l >>~{outputFileNamePrefix}.structural.filteringReport.txt
+  
+  ```
+  ```
+  		set -euo pipefail
+  
+  		$BCFTOOLS_ROOT/bin/bcftools norm --multiallelics - --fasta-ref ~{genome} ~{difficultRegions} ~{smallsVcfFile} | \
+  		$BCFTOOLS_ROOT/bin/bcftools filter -i "TYPE='~{smallType}'" | \
+  		$BCFTOOLS_ROOT/bin/bcftools filter -e "~{QUALfilter}" | \
+  		$BCFTOOLS_ROOT/bin/bcftools filter -i "(FORMAT/AD[0:1])/(FORMAT/AD[0:0]+FORMAT/AD[0:1]) >= ~{VAF}" >~{outputFileNamePrefix}.~{smallType}.VAF.vcf
+  
+  		bgzip ~{outputFileNamePrefix}.~{smallType}.VAF.vcf
+  		tabix -p vcf ~{outputFileNamePrefix}.~{smallType}.VAF.vcf.gz
+  
+  		zcat ~{smallsVcfFile} | awk '$1 !~ "#" {print}'  | wc -l >~{outputFileNamePrefix}.~{smallType}.filteringReport.txt
+  		zcat ~{outputFileNamePrefix}.~{smallType}.VAF.vcf.gz | awk '$1 !~ "#" {print}'  | wc -l >>~{outputFileNamePrefix}.~{smallType}.filteringReport.txt
+  
+  ```
+  ```
+  		set -euo pipefail
+  
+  		Rscript ~{sigtoolrScript} \
+  			--sampleName ~{outputFileNamePrefix} \
+  			--snvFile ~{snvVcfFiltered} \
+  			--indelFile  ~{indelVcfFiltered} \
+  			--SVFile ~{SV_vcf_location} \
+  			--LOHFile ~{lohSegFile} \
+  			--bootstraps ~{sigtoolsBootstrap} \
+  			--genomeVersion ~{genomeVersion} \
+  			--indelCutoff ~{indelCutoff} \
+  			--SVrefSigs ~{SVrefSigs} \
+  			--SNVrefSigs ~{SNVrefSigs}
  
