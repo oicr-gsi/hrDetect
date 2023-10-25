@@ -6,7 +6,7 @@ struct GenomeResources {
 	String difficultRegions
 }
 
-workflow HRDetect {
+workflow hrDetect {
 	input {
 		String outputFileNamePrefix
 		File structuralVcfFile

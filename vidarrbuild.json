@@ -1,6 +1,6 @@
 {
     "names": [
-        "HRDetect"
+        "hrDetect"
     ],
-    "wdl": "HRDetect.wdl"
+    "wdl": "hrDetect.wdl"
 }
