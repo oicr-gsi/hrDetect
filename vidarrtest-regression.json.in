@@ -1,7 +1,7 @@
 [
     {
         "arguments": {
-            "hrdetect.smallsVcfFile": {
+            "hrDetect.smallsVcfFile": {
                 "contents": {
                     "configuration": "/.mounts/labs/gsi/testdata/HRDetect/1.0/input_data/PANX_1309_Lv_M_WG_100-PM-033_LCM4.filter.deduped.realigned.recalibrated.mutect2.filtered.vcf.gz",
                     "externalIds": [
@@ -13,7 +13,7 @@
                 },
                 "type": "EXTERNAL"
             },
-            "hrdetect.smallsVcfIndex": {
+            "hrDetect.smallsVcfIndex": {
                 "contents": {
                     "configuration": "/.mounts/labs/gsi/testdata/HRDetect/1.0/input_data/PANX_1309_Lv_M_WG_100-PM-033_LCM4.filter.deduped.realigned.recalibrated.mutect2.filtered.vcf.gz.tbi",
                     "externalIds": [
@@ -25,7 +25,7 @@
                 },
                 "type": "EXTERNAL"
             },
-            "hrdetect.segFile": {
+            "hrDetect.segFile": {
                 "contents": {
                     "configuration": "/.mounts/labs/gsi/testdata/HRDetect/1.0/input_data/PANX_1309_Lv_M_WG_100-PM-033_LCM4_segments.txt",
                     "externalIds": [
@@ -37,7 +37,7 @@
                 },
                 "type": "EXTERNAL"
             },
-            "hrdetect.structuralVcfFile": {
+            "hrDetect.structuralVcfFile": {
                 "contents": {
                     "configuration": "/.mounts/labs/gsi/testdata/HRDetect/1.0/input_data/PANX_1309_Lv_M_WG_100-PM-033_LCM4_somatic.somatic_filtered.delly.merged.vcf.gz",
                     "externalIds": [
@@ -49,40 +49,40 @@
                 },
                 "type": "EXTERNAL"
             },
-            "hrdetect.filterSNVs.genome": "$HG38_ROOT/hg38_random.fa",
-            "hrdetect.reference": "hg38",
-            "hrdetect.filterStructural.modules":null,
-            "hrdetect.filterStructural.structuralQUALfilter": null,
-            "hrdetect.filterStructural.jobMemory": null,
-            "hrdetect.filterStructural.threads": null,
-            "hrdetect.filterStructural.timeout": null,
-            "hrdetect.filterINDELs.jobMemory": null,
-            "hrdetect.filterINDELs.threads": null,
-            "hrdetect.filterINDELs.timeout": null,
-            "hrdetect.filterSNVs.jobMemory": null,
-            "hrdetect.filterSNVs.threads": null,
-            "hrdetect.filterSNVs.timeout": null,
-            "hrdetect.hrdResults.modules": null,
-            "hrdetect.hrdResults.sigtoolrScript": null,
-            "hrdetect.hrdResults.SVrefSigs": null,
-            "hrdetect.hrdResults.SNVrefSigs":null,
-            "hrdetect.hrdResults.sigtoolsBootstrap": null,
-            "hrdetect.hrdResults.indelCutoff": null,
-            "hrdetect.hrdResults.threads": null,
-            "hrdetect.filterINDELs.genome": "$HG38_ROOT/hg38_random.fa",
-            "hrdetect.filterINDELs.modules": "tabix/1.9 bcftools/1.9 hg38/p12 hg38-dac-exclusion/1.0",
-            "hrdetect.filterSNVs.modules": "tabix/1.9 bcftools/1.9 hg38/p12 hg38-dac-exclusion/1.0",
-            "hrdetect.filterINDELs.difficultRegions":  "--regions-file $HG38_DAC_EXCLUSION_ROOT/hg38-dac-exclusion.v2.bed",
-            "hrdetect.filterSNVs.difficultRegions":  "--regions-file $HG38_DAC_EXCLUSION_ROOT/hg38-dac-exclusion.v2.bed",
-            "hrdetect.filterINDELs.VAF": 0.01,
-            "hrdetect.filterSNVs.VAF": 0.01,
-            "hrdetect.plotIt": "FALSE",
-            "hrdetect.filterSNVs.QUALfilter": "FILTER~'haplotype' | FILTER~'clustered_events' | FILTER~'multiallelic' | FILTER~'slippage' |FILTER~'weak_evidence' | FILTER~'strand_bias' | FILTER~'position' | FILTER~'normal_artifact' |  FILTER~'map_qual' | FILTER~'germline' | FILTER~'fragment' | FILTER~'contamination' | FILTER~'base_qual'",
-            "hrdetect.filterINDELs.QUALfilter": "FILTER~'haplotype' | FILTER~'clustered_events' | FILTER~'multiallelic' | FILTER~'slippage' |FILTER~'weak_evidence' | FILTER~'strand_bias' | FILTER~'position' | FILTER~'normal_artifact' |  FILTER~'map_qual' | FILTER~'germline' | FILTER~'fragment' | FILTER~'contamination' | FILTER~'base_qual'" ,
-            "hrdetect.hrdResults.timeout": 5,
-            "hrdetect.hrdResults.jobMemory": 30,
-            "hrdetect.hrdResults.tissue": "Pancreas",
-            "hrdetect.outputFileNamePrefix": "PANX_1309"
+            "hrDetect.filterSNVs.genome": "$HG38_ROOT/hg38_random.fa",
+            "hrDetect.reference": "hg38",
+            "hrDetect.filterStructural.modules":null,
+            "hrDetect.filterStructural.structuralQUALfilter": null,
+            "hrDetect.filterStructural.jobMemory": null,
+            "hrDetect.filterStructural.threads": null,
+            "hrDetect.filterStructural.timeout": null,
+            "hrDetect.filterINDELs.jobMemory": null,
+            "hrDetect.filterINDELs.threads": null,
+            "hrDetect.filterINDELs.timeout": null,
+            "hrDetect.filterSNVs.jobMemory": null,
+            "hrDetect.filterSNVs.threads": null,
+            "hrDetect.filterSNVs.timeout": null,
+            "hrDetect.hrdResults.modules": null,
+            "hrDetect.hrdResults.sigtoolrScript": null,
+            "hrDetect.hrdResults.SVrefSigs": null,
+            "hrDetect.hrdResults.SNVrefSigs":null,
+            "hrDetect.hrdResults.sigtoolsBootstrap": null,
+            "hrDetect.hrdResults.indelCutoff": null,
+            "hrDetect.hrdResults.threads": null,
+            "hrDetect.filterINDELs.genome": "$HG38_ROOT/hg38_random.fa",
+            "hrDetect.filterINDELs.modules": "tabix/1.9 bcftools/1.9 hg38/p12 hg38-dac-exclusion/1.0",
+            "hrDetect.filterSNVs.modules": "tabix/1.9 bcftools/1.9 hg38/p12 hg38-dac-exclusion/1.0",
+            "hrDetect.filterINDELs.difficultRegions":  "--regions-file $HG38_DAC_EXCLUSION_ROOT/hg38-dac-exclusion.v2.bed",
+            "hrDetect.filterSNVs.difficultRegions":  "--regions-file $HG38_DAC_EXCLUSION_ROOT/hg38-dac-exclusion.v2.bed",
+            "hrDetect.filterINDELs.VAF": 0.01,
+            "hrDetect.filterSNVs.VAF": 0.01,
+            "hrDetect.plotIt": "FALSE",
+            "hrDetect.filterSNVs.QUALfilter": "FILTER~'haplotype' | FILTER~'clustered_events' | FILTER~'multiallelic' | FILTER~'slippage' |FILTER~'weak_evidence' | FILTER~'strand_bias' | FILTER~'position' | FILTER~'normal_artifact' |  FILTER~'map_qual' | FILTER~'germline' | FILTER~'fragment' | FILTER~'contamination' | FILTER~'base_qual'",
+            "hrDetect.filterINDELs.QUALfilter": "FILTER~'haplotype' | FILTER~'clustered_events' | FILTER~'multiallelic' | FILTER~'slippage' |FILTER~'weak_evidence' | FILTER~'strand_bias' | FILTER~'position' | FILTER~'normal_artifact' |  FILTER~'map_qual' | FILTER~'germline' | FILTER~'fragment' | FILTER~'contamination' | FILTER~'base_qual'" ,
+            "hrDetect.hrdResults.timeout": 5,
+            "hrDetect.hrdResults.jobMemory": 30,
+            "hrDetect.hrdResults.tissue": "Pancreas",
+            "hrDetect.outputFileNamePrefix": "PANX_1309"
         },
         "description": "HRDetect workflow test",
         "engineArguments": {
@@ -91,7 +91,7 @@
         },
         "id": "PANX_1309Test",
         "metadata": {
-            "hrdetect.hrd_signatures": {
+            "hrDetect.hrd_signatures": {
                 "contents": [
                     {
                         "outputDirectory": "@SCRATCH@/@DATE@_Workflow_HRDetect_PANX_1309Test_@JENKINSID@"
@@ -99,7 +99,7 @@
                 ],
                 "type": "ALL"
             },
-            "hrdetect.SBS_exposures": {
+            "hrDetect.SBS_exposures": {
                 "contents": [
                     {
                         "outputDirectory": "@SCRATCH@/@DATE@_Workflow_HRDetect_PANX_1309Test_@JENKINSID@"
@@ -107,7 +107,7 @@
                 ],
                 "type": "ALL"
             },
-            "hrdetect.SV_exposures": {
+            "hrDetect.SV_exposures": {
                 "contents": [
                     {
                         "outputDirectory": "@SCRATCH@/@DATE@_Workflow_HRDetect_PANX_1309Test_@JENKINSID@"
@@ -115,7 +115,7 @@
                 ],
                 "type": "ALL"
             },
-            "hrdetect.ID_catalog": {
+            "hrDetect.ID_catalog": {
                 "contents": [
                     {
                         "outputDirectory": "@SCRATCH@/@DATE@_Workflow_HRDetect_PANX_1309Test_@JENKINSID@"

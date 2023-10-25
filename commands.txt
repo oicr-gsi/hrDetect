@@ -1,6 +1,6 @@
-This section lists command(s) run by hrdetect workflow
+This section lists command(s) run by hrDetect workflow
   
-  * Running hrdetect
+  * Running hrDetect
   
   ```
   		set -euo pipefail

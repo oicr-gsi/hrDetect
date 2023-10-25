@@ -1,4 +1,4 @@
-# hrdetect
+# hrDetect
 
 Homologous Recombination Deficiency (HRD) Prediction Workflow using sig.tools
 
@@ -15,7 +15,7 @@ Homologous Recombination Deficiency (HRD) Prediction Workflow using sig.tools
 
 ### Cromwell
 ```
-java -jar cromwell.jar run hrdetect.wdl --inputs inputs.json
+java -jar cromwell.jar run hrDetect.wdl --inputs inputs.json
 ```
 
 ### Inputs
@@ -69,15 +69,15 @@ Parameter|Value|Default|Description
 
 Output | Type | Description
 ---|---|---
-`hrd_signatures`|File|JSON file of hrdetect signatures
+`hrd_signatures`|File|JSON file of hrDetect signatures
 `SBS_exposures`|File|JSON of single basepair substitution signatures
 `SV_exposures`|File|JSON of structural variant signatures
 `ID_catalog`|File|JSON cataloguing indels
 
 
-This section lists command(s) run by hrdetect workflow
+This section lists command(s) run by hrDetect workflow
   
-  * Running hrdetect
+  * Running hrDetect
   
   ```
   		set -euo pipefail
