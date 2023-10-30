@@ -96,6 +96,13 @@ summarize_indels <- function(indels_class){
   indel_info <- indels_class$count_proportion[c("all.indels","ins","all.del","del.mh","del.rep","del.none","del.mh.prop","del.rep.prop","del.none.prop")]
   
   sim_proportions <- table(sample(1:3 , indel_info$all.del, replace=TRUE, prob=indel_info[c(7:9)])) / indel_info$all.del
+  
+  # ensures all three columns exist
+  if("1" %ni% names(sim_proportions)){sim_proportions["1"] <- 0}
+  if("2" %ni% names(sim_proportions)){sim_proportions["2"] <- 0}
+  if("3" %ni% names(sim_proportions)){sim_proportions["3"] <- 0}
+  sim_proportions <- sim_proportions[order(names(sim_proportions))]
+  
   names(sim_proportions) <-  c("del.mh.prop","del.rep.prop","del.none.prop")
   
   #make indel list
