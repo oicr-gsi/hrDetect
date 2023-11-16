@@ -272,7 +272,7 @@ SV_vcf_cataloger <- function(SV_vcf_location, sample_name, genome="hg38"){
 
 bedpeToRearrCatalogue2 <- function(sv_bedpe, kmin = 10, PEAK.FACTOR = 10) {
   #Replaces bedpeToRearrCatalogue from signatures.tools which crashed if it filtered out all the SVs
-  
+  library(signature.tools.lib)
   # this is used for per-sample clustering of both single-base substitutions and rearrangement breakpoints
   
   rearrangement.clustering_bedpe <- function(sv_bedpe,
