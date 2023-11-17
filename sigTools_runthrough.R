@@ -37,7 +37,7 @@ indel_vcf_location  <-  opt$indelFile
 SV_vcf_location     <-  opt$SVFile
 LOH_seg_file        <-  opt$LOHFile
 
-print('pre-processing data')
+
 
 ## import signatures
   SV_sigs  <- read.table(SVrefSigs, sep = "\t", header = TRUE)
@@ -48,9 +48,11 @@ print('pre-processing data')
 missing_data = FALSE
   
 #### pre-process SEGMENT data ####
+  cat('pre-processing LOH data\n')
   seg.data <- read.table(LOH_seg_file, sep="\t", header=TRUE)
 
 #### pre-process In/Del data ####
+  cat('pre-processing in/del data\n')
   indel_vcf <- try(read.table(indel_vcf_location, sep = "\t", header = TRUE))
   
   if("try-error" %in% class(indel_vcf)){
@@ -66,7 +68,8 @@ missing_data = FALSE
   write(ID.catalog.JSON, file = paste0(sample_name,".catalog.ID.json"))
 
 #### pre-process Structural Variant data ####
-
+  cat('pre-processing SV data\n')
+  
   SV_vcf        <- try(read.table(SV_vcf_location, sep = "\t", header = TRUE))
   
   if("try-error" %in% class(SV_vcf)){
@@ -88,6 +91,7 @@ missing_data = FALSE
   write(SV.JSON, file = paste0(sample_name,".exposures.SV.json"))
 
 #### pre-process SNV data ####
+  cat('pre-processing SNV data\n')
   
   snv_df    <- try(read.table(snv_vcf_location, sep = "\t", header = FALSE))
   
