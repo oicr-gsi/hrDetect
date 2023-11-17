@@ -1,4 +1,6 @@
 # CHANGELOG
+## 1.5.6 -2023-11-17
+Included new version of sigtools-rscript module that fixed bugs
 ## 1.5.2 -2023-10-25
 Change workflow name
 ## 1.5.1 -2023-10-24
