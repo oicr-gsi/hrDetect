@@ -17,8 +17,8 @@ option_list = list(
   make_option(c("-b", "--bootstraps"), type="numeric", default=2500, help="number of bootstraps for signature detection", metavar="numeric"),
   make_option(c("-g", "--genomeVersion"), type="character", default="hg38", help="genome version", metavar="character"),
   make_option(c("-i", "--indelCutoff"), type="numeric", default=10, help="minimum number of indels for analysis", metavar="numeric"),
-  make_option(c("-c", "--snvCutoff"), type="numeric", default=10, help="minimum number of snvs for analysis", metavar="numeric"),
-  make_option(c("-v", "--svCutoff"), type="numeric", default=10, help="minimum number of SVs for analysis", metavar="numeric")
+  make_option(c("-c", "--snvCutoff"), type="numeric", default=50, help="minimum number of snvs for analysis", metavar="numeric"),
+  make_option(c("-v", "--svCutoff"), type="numeric", default=1, help="minimum number of SVs for analysis", metavar="numeric")
 )
 
 opt_parser <- OptionParser(option_list=option_list, add_help_option=FALSE)
@@ -56,12 +56,14 @@ missing_data = FALSE
   indel_vcf <- try(read.table(indel_vcf_location, sep = "\t", header = TRUE))
   
   if("try-error" %in% class(indel_vcf)){
-    ID.catalog.JSON <- jsonlite::toJSON(list("QC"="FAIL","count"=0,"Results"="NA"),pretty=TRUE,auto_unbox=TRUE)
-    missing_data = TRUE
+    ID.catalog.JSON <- jsonlite::toJSON(list("QC"="PASS","count"=0,"Results"="NA"),pretty=TRUE,auto_unbox=TRUE)
+    indels_class = NULL
   }else{
     indels_class    <- vcfToIndelsClassification(indel_vcf_location, sample_name, genome.v = genomeVersion)
+    
     ID.catalog.JSON <- jsonlite::toJSON(list("QC"="PASS","count"=nrow(indel_vcf),"Results"=indels_class$count_proportion),pretty=TRUE,auto_unbox=TRUE)
-    if( nrow(indel_vcf) < indelCutoff ){missing_data = TRUE}
+    if( indels_class$count_proportion$all.del == 0 ){indels_class = NULL}
+    if( nrow(indel_vcf) < indelCutoff ){indels_class = NULL}
     
   }
 
@@ -73,8 +75,8 @@ missing_data = FALSE
   SV_vcf        <- try(read.table(SV_vcf_location, sep = "\t", header = TRUE))
   
   if("try-error" %in% class(SV_vcf)){
-    SV.JSON <- jsonlite::toJSON(list("QC"="FAIL","count"=0,"catalog"="NA","exposures"="NA"),pretty=TRUE,auto_unbox=TRUE)  
-    missing_data = TRUE
+    SV.JSON <- jsonlite::toJSON(list("QC"="PASS","count"=0,"catalog"="NA","exposures"="NA"),pretty=TRUE,auto_unbox=TRUE)  
+    SV_catalogue = NULL
     
   }else{  
     SV_catalogue  <- SV_vcf_cataloger(SV_vcf_location, sample_name)
@@ -85,7 +87,7 @@ missing_data = FALSE
                           "catalog"=as.data.frame(t(SV_ls$SV_sigtools_catalog[1])),
                           "exposures"=SV_ls$SV_sigtools_exposures)
     SV.JSON <- jsonlite::toJSON(SV_ls.preJSON,pretty=TRUE,auto_unbox=TRUE)
-    if( nrow(SV_vcf) < svCutoff ){missing_data = TRUE}
+    if( nrow(SV_vcf) < svCutoff ){SV_catalogue = NULL}
     
   }
   write(SV.JSON, file = paste0(sample_name,".exposures.SV.json"))
@@ -97,8 +99,8 @@ missing_data = FALSE
   
   if("try-error" %in% class(snv_df)){
     
-    SBS.JSON <- jsonlite::toJSON(list("QC"="FAIL","count"=0,"catalog"="NA","exposures"="NA"),pretty=TRUE,auto_unbox=TRUE)  
-    missing_data = TRUE
+    SBS.JSON <- jsonlite::toJSON(list("QC"="TRUE","count"=0,"catalog"="NA","exposures"="NA"),pretty=TRUE,auto_unbox=TRUE)  
+    snv_df = NULL
     
   }else{  
     names(snv_df)[c(1,2,4,5)] <- c("Chromosome", "Start_Position", "Reference_Allele", "Allele")
@@ -120,7 +122,7 @@ missing_data = FALSE
                           )
     
     SBS.JSON <- jsonlite::toJSON(SNV_ls.preJSON,pretty=TRUE,auto_unbox=TRUE)
-    if( nrow(snv_df) < snvCutoff ){missing_data = TRUE}
+    if( nrow(snv_df) < snvCutoff ){snv_df = NULL}
   }
   write(SBS.JSON, file = paste0(sample_name,".exposures.SBS.json"))
 
