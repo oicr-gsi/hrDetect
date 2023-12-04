@@ -62,7 +62,6 @@ missing_data = FALSE
     indels_class    <- vcfToIndelsClassification(indel_vcf_location, sample_name, genome.v = genomeVersion)
     
     ID.catalog.JSON <- jsonlite::toJSON(list("QC"="PASS","count"=nrow(indel_vcf),"Results"=indels_class$count_proportion),pretty=TRUE,auto_unbox=TRUE)
-   # if( indels_class$count_proportion$all.del == 0 ){indels_class = NULL}
     if( indels_class$count_proportion$all.del < indelCutoff ){indels_class = NULL}
     
   }
