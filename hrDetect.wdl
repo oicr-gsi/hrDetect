@@ -243,7 +243,7 @@ task hrdResults {
 		String SNVrefSigs = "$SIGTOOLS_DATA_ROOT/COSMIC_v1_SBS_GRCh38.txt"
 		String genomeVersion
 		Int sigtoolsBootstrap = 200
-		Int indelCutoff = 10
+		Int indelCutoff = 50
 		Int jobMemory = 50
 		Int threads = 1
 		Int timeout = 15
