@@ -98,7 +98,11 @@ missing_data = FALSE
   
   if("try-error" %in% class(snv_df)){
     
-    SBS.JSON <- jsonlite::toJSON(list("QC"="TRUE","count"=0,"catalog"="NA","exposures"="NA"),pretty=TRUE,auto_unbox=TRUE)  
+    SBS.JSON <- jsonlite::toJSON(list("QC"="PASS",
+                                      "count"=0,
+                                      "catalog"="NA",
+                                      "exposures"="NA")
+                                 ,pretty=TRUE,auto_unbox=TRUE)  
     snv_df = NULL
     
   }else{  
