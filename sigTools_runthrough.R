@@ -16,7 +16,7 @@ option_list = list(
   make_option(c("-L", "--LOHFile"), type="character", default=NULL, help="LOH file", metavar="character"),
   make_option(c("-b", "--bootstraps"), type="numeric", default=2500, help="number of bootstraps for signature detection", metavar="numeric"),
   make_option(c("-g", "--genomeVersion"), type="character", default="hg38", help="genome version", metavar="character"),
-  make_option(c("-i", "--indelCutoff"), type="numeric", default=10, help="minimum number of indels for analysis", metavar="numeric"),
+  make_option(c("-i", "--indelCutoff"), type="numeric", default=50, help="minimum number of indels for analysis", metavar="numeric"),
   make_option(c("-c", "--snvCutoff"), type="numeric", default=50, help="minimum number of snvs for analysis", metavar="numeric"),
   make_option(c("-v", "--svCutoff"), type="numeric", default=1, help="minimum number of SVs for analysis", metavar="numeric")
 )
@@ -62,8 +62,8 @@ missing_data = FALSE
     indels_class    <- vcfToIndelsClassification(indel_vcf_location, sample_name, genome.v = genomeVersion)
     
     ID.catalog.JSON <- jsonlite::toJSON(list("QC"="PASS","count"=nrow(indel_vcf),"Results"=indels_class$count_proportion),pretty=TRUE,auto_unbox=TRUE)
-    if( indels_class$count_proportion$all.del == 0 ){indels_class = NULL}
-    if( nrow(indel_vcf) < indelCutoff ){indels_class = NULL}
+   # if( indels_class$count_proportion$all.del == 0 ){indels_class = NULL}
+    if( indels_class$count_proportion$all.del < indelCutoff ){indels_class = NULL}
     
   }
 
