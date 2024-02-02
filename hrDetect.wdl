@@ -237,8 +237,8 @@ task hrdResults {
 		File snvVcfFiltered
 		File snvVcfIndexFiltered
 		File lohSegFile
-		String modules = "sigtools/2.4.1 sigtools-data/1.0 sigtools-rscript/1.5.8"
-		String sigtoolrScript = "$SIGTOOLS_RSCRIPT_ROOT/scripts/sigTools_runthrough.R"
+		String modules = "sigtools/2.4.1 sigtools-data/1.0 hrdetect-rscript/1.5.8"
+		String sigtoolrScript = "$HRDETECT_RSCRIPT_ROOT/scripts/sigTools_runthrough.R"
 		String SVrefSigs = "$SIGTOOLS_DATA_ROOT/RefSigv0_Rearr.tsv"
 		String SNVrefSigs = "$SIGTOOLS_DATA_ROOT/COSMIC_v1_SBS_GRCh38.txt"
 		String genomeVersion
