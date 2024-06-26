@@ -1,4 +1,6 @@
 # CHANGELOG
+## 1.6.0 - 2024-06-25
+[GRD-797](https://jira.oicr.on.ca/browse/GRD-797) - add vidarr labels to outputs (changes to medata only)
 ## 1.5.6 -2023-11-17
 Included new version of sigtools-rscript module that fixed bugs
 ## 1.5.2 -2023-10-25
