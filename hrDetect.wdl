@@ -92,12 +92,24 @@ workflow hrDetect {
 				url: "https://github.com/Nik-Zainal-Group/signature.tools.lib"
 			}
 		]
-		output_meta: {
-			hrd_signatures : "JSON file of hrdetect signatures",
-			SV_exposures: "JSON of structural variant signatures",
-			SV_catalog: "JSON cataloguing structural variants",
-			ID_catalog: "JSON cataloguing indels"
-		}
+    output_meta: {
+    hrd_signatures : {
+        description: "JSON file of hrdetect signatures",
+        vidarr_label: "hrd_signatures "
+    },
+    SBS_exposures: {
+        description: "JSON of structural variant signatures",
+        vidarr_label: "SBS_exposures"
+    },
+    SV_exposures: {
+        description: "JSON cataloguing structural variants",
+        vidarr_label: "SV_exposures"
+    },
+    ID_catalog: {
+        description: "JSON cataloguing indels",
+        vidarr_label: "ID_catalog"
+    }
+}
 	}
 	output {
 		File hrd_signatures = hrdResults.hrd_signatures
