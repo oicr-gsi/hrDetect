@@ -5,9 +5,12 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 
-## [1.6.0] - 2024-06-25
+## [1.7.0] - 2024-06-25
 ### Added
 - [GRD-797](https://jira.oicr.on.ca/browse/GRD-797) - add vidarr labels to outputs (changes to medata only)
+
+## [1.6.0] - 2024-02-02
+- Changes to module name
 
 ## [1.5.6] -2023-11-17
 ### Added
