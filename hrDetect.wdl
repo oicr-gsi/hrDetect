@@ -97,13 +97,13 @@ workflow hrDetect {
         description: "JSON file of hrdetect signatures",
         vidarr_label: "hrd_signatures "
     },
-    SV_exposures: {
+    SBS_exposures: {
         description: "JSON of structural variant signatures",
-        vidarr_label: "SV_exposures"
+        vidarr_label: "SBS_exposures"
     },
-    SV_catalog: {
+    SV_exposures: {
         description: "JSON cataloguing structural variants",
-        vidarr_label: "SV_catalog"
+        vidarr_label: "SV_exposures"
     },
     ID_catalog: {
         description: "JSON cataloguing indels",

@@ -70,8 +70,8 @@ Parameter|Value|Default|Description
 Output | Type | Description | Labels
 ---|---|---|---
 `hrd_signatures`|File|JSON file of hrdetect signatures|vidarr_label: hrd_signatures 
-`SBS_exposures`|File|JSON of single basepair substitution signatures|
-`SV_exposures`|File|JSON of structural variant signatures|vidarr_label: SV_exposures
+`SBS_exposures`|File|JSON of structural variant signatures|vidarr_label: SBS_exposures
+`SV_exposures`|File|JSON cataloguing structural variants|vidarr_label: SV_exposures
 `ID_catalog`|File|JSON cataloguing indels|vidarr_label: ID_catalog
 
 
@@ -79,7 +79,7 @@ This section lists command(s) run by hrDetect workflow
   
 * Running hrDetect
 
-### Generate list if PASS calls
+### Generate list of PASS calls
   
 ```
 	set -euo pipefail
