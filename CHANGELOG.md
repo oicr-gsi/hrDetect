@@ -11,21 +11,48 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [1.6.0] - 2024-02-02
 ### Changed
-- Changes to module name.
+- Change to module name.
 
-## [1.5.6] -2023-11-17
+## [1.5.9] - 2023-12-05
+### Fixed
+- Fix low count.
+
+## [1.5.8] - 2023-12-04
+### Changed
+- Changed call-hrdetect such that now tumours with low mutation counts are counted as HRD- rather than as failing QC.
+
+### Added
+- Added R tests and accompanying simulated test data.
+
+## [1.5.7] - 2023-11-17
+### Changed
+- Update module version.
+
+## [1.5.6] - 2023-11-17
 ### Added
 - Included new version of sigtools-rscript module that fixed bugs.
 
-## [1.5.2] -2023-10-25
+## [1.5.5] - 2023-11-16
+### Added
+- Added loading signature.tools in new fxn.
+
+## [1.5.4] - 2023-11-15
+### Fixed
+- Fixed bedpeToRearrCatalogue filtering bug.
+
+## [1.5.3] - 2023-10-30
+### Fixed
+- Fixed indel bug.
+
+## [1.5.2] - 2023-10-25
 ### Changed
 - Change workflow name.
 
-## [1.5.1] -2023-10-24
+## [1.5.1] - 2023-10-24
 ### Changed
 - Update to call call_hrdetect.R from sigTools_runthrough.R
 
-## [1.5.0] -2023-10-18
+## [1.5.0] - 2023-10-18
 ### Changed
 - Finalized version ready to release.
 
@@ -50,7 +77,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Changed
 - Fixed SV reformatting for bug on end2 (was printing end1).
 - changed runthrough script output to make JSON and save more information.
-- changed output for plotIt from .png to .svg
+- changed output for plotIt from .png to .svg.
 
 ## [1.1.0] - 2022-05-11
 ### Added
@@ -58,9 +85,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Added filtering option parameters (instead of hardcoded).
 
 ### Changed
-- Changed name of workflow to HRDetect
-- Changed plotting from .pdf to .png, and changes intake format
-- Merged SNV and INDEL filtering using alias in wdl
+- Changed name of workflow to HRDetect.
+- Changed plotting from .pdf to .png, and changes intake format.
+- Merged SNV and INDEL filtering using alias in wdl.
 
 ## [1.0.0] - 2022-04-11
 ### Added
