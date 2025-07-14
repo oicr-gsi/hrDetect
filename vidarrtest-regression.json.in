@@ -3,7 +3,7 @@
         "arguments": {
             "hrDetect.smallsVcfFile": {
                 "contents": {
-                    "configuration": "/.mounts/labs/gsi/testdata/HRDetect/1.0/input_data/PANX_1309_Lv_M_WG_100-PM-033_LCM4.filter.deduped.realigned.recalibrated.mutect2.filtered.vcf.gz",
+                    "configuration": "/.mounts/labs/gsi/testdata/hrDetect/test_inputs/PANX_Test01.filter.deduped.realigned.recalibrated.mutect2.filtered.vcf.gz",
                     "externalIds": [
                         {
                             "id": "TEST",
@@ -15,7 +15,7 @@
             },
             "hrDetect.smallsVcfIndex": {
                 "contents": {
-                    "configuration": "/.mounts/labs/gsi/testdata/HRDetect/1.0/input_data/PANX_1309_Lv_M_WG_100-PM-033_LCM4.filter.deduped.realigned.recalibrated.mutect2.filtered.vcf.gz.tbi",
+                    "configuration": "/.mounts/labs/gsi/testdata/hrDetect/test_inputs/PANX_Test01.filter.deduped.realigned.recalibrated.mutect2.filtered.vcf.gz.tbi",
                     "externalIds": [
                         {
                             "id": "TEST",
@@ -27,7 +27,7 @@
             },
             "hrDetect.segFile": {
                 "contents": {
-                    "configuration": "/.mounts/labs/gsi/testdata/HRDetect/1.0/input_data/PANX_1309_Lv_M_WG_100-PM-033_LCM4_segments.txt",
+                    "configuration": "/.mounts/labs/gsi/testdata/hrDetect/test_inputs/PANX_Test01_segments.txt",
                     "externalIds": [
                         {
                             "id": "TEST",
@@ -39,7 +39,7 @@
             },
             "hrDetect.structuralVcfFile": {
                 "contents": {
-                    "configuration": "/.mounts/labs/gsi/testdata/HRDetect/1.0/input_data/PANX_1309_Lv_M_WG_100-PM-033_LCM4_somatic.somatic_filtered.delly.merged.vcf.gz",
+                    "configuration": "/.mounts/labs/gsi/testdata/hrDetect/test_inputs/PANX_Test01_somatic.somatic_filtered.delly.merged.vcf.gz",
                     "externalIds": [
                         {
                             "id": "TEST",
@@ -82,19 +82,19 @@
             "hrDetect.hrdResults.timeout": 5,
             "hrDetect.hrdResults.jobMemory": 30,
             "hrDetect.hrdResults.tissue": "Pancreas",
-            "hrDetect.outputFileNamePrefix": "PANX_1309"
+            "hrDetect.outputFileNamePrefix": "PANX_Test"
         },
         "description": "HRDetect workflow test",
         "engineArguments": {
           "write_to_cache": false,
           "read_from_cache": false
         },
-        "id": "PANX_1309Test",
+        "id": "PANX_Test",
         "metadata": {
             "hrDetect.hrd_signatures": {
                 "contents": [
                     {
-                        "outputDirectory": "@SCRATCH@/@DATE@_Workflow_HRDetect_PANX_1309Test_@JENKINSID@"
+                        "outputDirectory": "@SCRATCH@/@DATE@_Workflow_HRDetect_PANX_Test_@JENKINSID@"
                     }
                 ],
                 "type": "ALL"
@@ -102,7 +102,7 @@
             "hrDetect.SBS_exposures": {
                 "contents": [
                     {
-                        "outputDirectory": "@SCRATCH@/@DATE@_Workflow_HRDetect_PANX_1309Test_@JENKINSID@"
+                        "outputDirectory": "@SCRATCH@/@DATE@_Workflow_HRDetect_PANX_Test_@JENKINSID@"
                     }
                 ],
                 "type": "ALL"
@@ -110,7 +110,7 @@
             "hrDetect.SV_exposures": {
                 "contents": [
                     {
-                        "outputDirectory": "@SCRATCH@/@DATE@_Workflow_HRDetect_PANX_1309Test_@JENKINSID@"
+                        "outputDirectory": "@SCRATCH@/@DATE@_Workflow_HRDetect_PANX_Test_@JENKINSID@"
                     }
                 ],
                 "type": "ALL"
@@ -118,7 +118,7 @@
             "hrDetect.ID_catalog": {
                 "contents": [
                     {
-                        "outputDirectory": "@SCRATCH@/@DATE@_Workflow_HRDetect_PANX_1309Test_@JENKINSID@"
+                        "outputDirectory": "@SCRATCH@/@DATE@_Workflow_HRDetect_PANX_Test_@JENKINSID@"
                     }
                 ],
                 "type": "ALL"
@@ -128,7 +128,7 @@
             {
                 "metrics_calculate": "@CHECKOUT@/tests/calculate.sh",
                 "metrics_compare": "@CHECKOUT@/tests/compare.sh",
-                "output_metrics": "/.mounts/labs/gsi/testdata/HRDetect/1.0/output_metrics/PANX_1309_Test.metrics",
+                "output_metrics": "/.mounts/labs/gsi/testdata/hrDetect/output_metrics/workflow_test_01.metrics",
                 "type": "script"
             }
         ]
