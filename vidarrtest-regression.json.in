@@ -132,5 +132,139 @@
                 "type": "script"
             }
         ]
+    },
+    {
+        "arguments": {
+            "hrDetect.smallsVcfFile": {
+                "contents": {
+                    "configuration": "/.mounts/labs/gsi/testdata/hrDetect/test_inputs/PANX_Test01.filter.deduped.realigned.recalibrated.mutect2.filtered.vcf.gz",
+                    "externalIds": [
+                        {
+                            "id": "TEST",
+                            "provider": "TEST"
+                        }
+                    ]
+                },
+                "type": "EXTERNAL"
+            },
+            "hrDetect.smallsVcfIndex": {
+                "contents": {
+                    "configuration": "/.mounts/labs/gsi/testdata/hrDetect/test_inputs/PANX_Test01.filter.deduped.realigned.recalibrated.mutect2.filtered.vcf.gz.tbi",
+                    "externalIds": [
+                        {
+                            "id": "TEST",
+                            "provider": "TEST"
+                        }
+                    ]
+                },
+                "type": "EXTERNAL"
+            },
+            "hrDetect.segFile": {
+                "contents": {
+                    "configuration": "/.mounts/labs/gsi/testdata/hrDetect/test_inputs/PANX_Test01_segments.txt",
+                    "externalIds": [
+                        {
+                            "id": "TEST",
+                            "provider": "TEST"
+                        }
+                    ]
+                },
+                "type": "EXTERNAL"
+            },
+            "hrDetect.structuralVcfFile": {
+                "contents": {
+                    "configuration": "/.mounts/labs/gsi/testdata/hrDetect/test_inputs/PANX_Test01_somatic.somatic_filtered.delly.merged.vcf.gz",
+                    "externalIds": [
+                        {
+                            "id": "TEST",
+                            "provider": "TEST"
+                        }
+                    ]
+                },
+                "type": "EXTERNAL"
+            },
+            "hrDetect.filterSNVs.genome": "$HG38_NOALT_ROOT/hg38_noAlt.fa",
+            "hrDetect.reference": "hg38_noAlt",
+            "hrDetect.filterStructural.modules":null,
+            "hrDetect.filterStructural.structuralQUALfilter": null,
+            "hrDetect.filterStructural.jobMemory": null,
+            "hrDetect.filterStructural.threads": null,
+            "hrDetect.filterStructural.timeout": null,
+            "hrDetect.filterINDELs.jobMemory": null,
+            "hrDetect.filterINDELs.threads": null,
+            "hrDetect.filterINDELs.timeout": null,
+            "hrDetect.filterSNVs.jobMemory": null,
+            "hrDetect.filterSNVs.threads": null,
+            "hrDetect.filterSNVs.timeout": null,
+            "hrDetect.hrdResults.modules": null,
+            "hrDetect.hrdResults.sigtoolrScript": null,
+            "hrDetect.hrdResults.SVrefSigs": null,
+            "hrDetect.hrdResults.SNVrefSigs":null,
+            "hrDetect.hrdResults.sigtoolsBootstrap": null,
+            "hrDetect.hrdResults.indelCutoff": null,
+            "hrDetect.hrdResults.threads": null,
+            "hrDetect.filterINDELs.genome": "$HG38_NOALT_ROOT/hg38_noAlt.fa",
+            "hrDetect.filterINDELs.modules": "tabix/1.9 bcftools/1.9 hg38-noalt/p12 hg38-dac-exclusion/1.0",
+            "hrDetect.filterSNVs.modules": "tabix/1.9 bcftools/1.9 hg38-noalt/p12 hg38-dac-exclusion/1.0",
+            "hrDetect.filterINDELs.difficultRegions":  "--regions-file $HG38_DAC_EXCLUSION_ROOT/hg38-dac-exclusion.v2.bed",
+            "hrDetect.filterSNVs.difficultRegions":  "--regions-file $HG38_DAC_EXCLUSION_ROOT/hg38-dac-exclusion.v2.bed",
+            "hrDetect.filterINDELs.VAF": 0.01,
+            "hrDetect.filterSNVs.VAF": 0.01,
+            "hrDetect.plotIt": "FALSE",
+            "hrDetect.filterSNVs.QUALfilter": "FILTER~'haplotype' | FILTER~'clustered_events' | FILTER~'multiallelic' | FILTER~'slippage' |FILTER~'weak_evidence' | FILTER~'strand_bias' | FILTER~'position' | FILTER~'normal_artifact' |  FILTER~'map_qual' | FILTER~'germline' | FILTER~'fragment' | FILTER~'contamination' | FILTER~'base_qual'",
+            "hrDetect.filterINDELs.QUALfilter": "FILTER~'haplotype' | FILTER~'clustered_events' | FILTER~'multiallelic' | FILTER~'slippage' |FILTER~'weak_evidence' | FILTER~'strand_bias' | FILTER~'position' | FILTER~'normal_artifact' |  FILTER~'map_qual' | FILTER~'germline' | FILTER~'fragment' | FILTER~'contamination' | FILTER~'base_qual'" ,
+            "hrDetect.hrdResults.timeout": 5,
+            "hrDetect.hrdResults.jobMemory": 30,
+            "hrDetect.hrdResults.tissue": "Pancreas",
+            "hrDetect.outputFileNamePrefix": "PANX_noAlt"
+        },
+        "description": "HRDetect workflow test - noAlt",
+        "engineArguments": {
+          "write_to_cache": false,
+          "read_from_cache": false
+        },
+        "id": "PANX_noAlt",
+        "metadata": {
+            "hrDetect.hrd_signatures": {
+                "contents": [
+                    {
+                        "outputDirectory": "@SCRATCH@/@DATE@_Workflow_HRDetect_PANX_noAlt_@JENKINSID@"
+                    }
+                ],
+                "type": "ALL"
+            },
+            "hrDetect.SBS_exposures": {
+                "contents": [
+                    {
+                        "outputDirectory": "@SCRATCH@/@DATE@_Workflow_HRDetect_PANX_noAlt_@JENKINSID@"
+                    }
+                ],
+                "type": "ALL"
+            },
+            "hrDetect.SV_exposures": {
+                "contents": [
+                    {
+                        "outputDirectory": "@SCRATCH@/@DATE@_Workflow_HRDetect_PANX_noAlt_@JENKINSID@"
+                    }
+                ],
+                "type": "ALL"
+            },
+            "hrDetect.ID_catalog": {
+                "contents": [
+                    {
+                        "outputDirectory": "@SCRATCH@/@DATE@_Workflow_HRDetect_PANX_noAlt_@JENKINSID@"
+                    }
+                ],
+                "type": "ALL"
+            }
+        },
+        "validators": [
+            {
+                "metrics_calculate": "@CHECKOUT@/tests/calculate.sh",
+                "metrics_compare": "@CHECKOUT@/tests/compare.sh",
+                "output_metrics": "/.mounts/labs/gsi/testdata/hrDetect/output_metrics/workflow_test_02.metrics",
+                "type": "script"
+            }
+        ]
     }
 ]
