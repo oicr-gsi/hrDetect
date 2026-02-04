@@ -137,7 +137,7 @@
         "arguments": {
             "hrDetect.smallsVcfFile": {
                 "contents": {
-                    "configuration": "/.mounts/labs/gsi/testdata/hrDetect/test_inputs/PANX_Test01.filter.deduped.realigned.recalibrated.mutect2.filtered.vcf.gz",
+                    "configuration": "/.mounts/labs/gsi/testdata/hrDetect/test_inputs/PANX_Test02.mutect2.filtered.vcf.gz",
                     "externalIds": [
                         {
                             "id": "TEST",
@@ -149,7 +149,7 @@
             },
             "hrDetect.smallsVcfIndex": {
                 "contents": {
-                    "configuration": "/.mounts/labs/gsi/testdata/hrDetect/test_inputs/PANX_Test01.filter.deduped.realigned.recalibrated.mutect2.filtered.vcf.gz.tbi",
+                    "configuration": "/.mounts/labs/gsi/testdata/hrDetect/test_inputs/PANX_Test02.mutect2.filtered.vcf.gz.tbi",
                     "externalIds": [
                         {
                             "id": "TEST",
@@ -173,7 +173,7 @@
             },
             "hrDetect.structuralVcfFile": {
                 "contents": {
-                    "configuration": "/.mounts/labs/gsi/testdata/hrDetect/test_inputs/PANX_Test01_somatic.somatic_filtered.delly.merged.vcf.gz",
+                    "configuration": "/.mounts/labs/gsi/testdata/hrDetect/test_inputs/PANX_Test02.somatic_filtered.vcf.gz",
                     "externalIds": [
                         {
                             "id": "TEST",
