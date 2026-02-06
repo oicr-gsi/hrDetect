@@ -4,6 +4,7 @@ struct GenomeResources {
 	String filterSMALLsModules
 	String genome
 	String difficultRegions
+	String genomeVersion
 }
 
 workflow hrDetect {
@@ -29,25 +30,22 @@ workflow hrDetect {
 		"hg38": {
 			"filterSMALLsModules": "tabix/1.9 bcftools/1.9 hg38/p12 hg38-dac-exclusion/1.0",
 			"genome": "$HG38_ROOT/hg38_random.fa",
-			"difficultRegions": "--regions-file $HG38_DAC_EXCLUSION_ROOT/hg38-dac-exclusion.v2.bed"
+			"difficultRegions": "--regions-file $HG38_DAC_EXCLUSION_ROOT/hg38-dac-exclusion.v2.bed",
+			"genomeVersion" : "hg38"
 		},
 		"hg38_noAlt": {
 			"filterSMALLsModules": "tabix/1.9 bcftools/1.9 hg38-noalt/p12 hg38-dac-exclusion/1.0",
 			"genome": "$HG38_NOALT_ROOT/hg38_noAlt.fa",
 			"difficultRegions": "--regions-file $HG38_DAC_EXCLUSION_ROOT/hg38-dac-exclusion.v2.bed",
+			"genomeVersion" : "hg38"
 		},
 		"grch38": {
 			"filterSMALLsModules": "tabix/1.9 bcftools/1.9 grch38/p15 hg38-dac-exclusion/1.0",
 			"genome": "$GRCH38_ROOT/GCA_000001405.15_GRCh38_no_alt_analysis_set.fna",
 			"difficultRegions": "--regions-file $HG38_DAC_EXCLUSION_ROOT/hg38-dac-exclusion.v2.bed",
+			"genomeVersion" : "hg38"
 		}
 	}
-
-	String genomeVersionForHRD =
-		if (reference == "hg38") then "hg38"
-		else if (reference == "hg38_noAlt") then "hg38"
-		else if (reference == "grch38") then "hg38"
-		else reference
 
 	call filterStructural {
 		input: 
@@ -86,7 +84,7 @@ workflow hrDetect {
 			snvVcfFiltered = filterSNVs.smallsVcfOutput,
 			snvVcfIndexFiltered = filterSNVs.smallsVcfIndexOutput,
 			lohSegFile = segFile,
-			genomeVersion = genomeVersionForHRD
+			genomeVersion = resources[reference].genomeVersion
 	}
 
 	meta {
